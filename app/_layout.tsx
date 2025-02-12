@@ -1,21 +1,29 @@
 import { useEffect } from 'react'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import 'react-native-reanimated'
 
 import { useFonts } from 'expo-font'
 import { useKeepAwake } from 'expo-keep-awake'
-import * as NavigationBar from 'expo-navigation-bar'
-import { Stack } from 'expo-router'
-import * as SplashScreen from 'expo-splash-screen'
-import { StatusBar } from 'expo-status-bar'
+import { SplashScreen, Stack } from 'expo-router'
 
-import { FontAssets } from '@/constants'
+import { QueryClientProvider } from '@tanstack/react-query'
 
-SplashScreen.preventAutoHideAsync()
-NavigationBar.setVisibilityAsync('hidden')
+import { queryClient } from '@/api'
+import { fontAssets } from '@/constants'
+
+void SplashScreen.preventAutoHideAsync()
 
 const RootLayout = () => {
   useKeepAwake()
-  const [loaded] = useFonts(FontAssets)
+  return (
+    <QueryClientProvider client={queryClient}>
+      <EveryoneWaiterApplication />
+    </QueryClientProvider>
+  )
+}
+
+const EveryoneWaiterApplication = () => {
+  const [loaded] = useFonts(fontAssets)
 
   useEffect(() => {
     if (loaded) {
@@ -28,13 +36,13 @@ const RootLayout = () => {
   }
 
   return (
-    <>
-      <Stack>
-        <Stack.Screen name="index" />
+    <GestureHandlerRootView>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(unauth)" />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar hidden={true} />
-    </>
+    </GestureHandlerRootView>
   )
 }
 
