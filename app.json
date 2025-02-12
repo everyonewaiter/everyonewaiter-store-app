@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "everyonewaiter-store-app",
+    "name": "모두의 웨이터",
     "slug": "everyonewaiter-store-app",
     "version": "1.0.0",
     "orientation": "default",
@@ -14,6 +14,12 @@
         "backgroundColor": "#ffffff"
       }
     },
+    "androidStatusBar": {
+      "hidden": true
+    },
+    "androidNavigationBar": {
+      "visible": "sticky-immersive"
+    },
     "platforms": [
       "android"
     ],
@@ -26,6 +32,12 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
         }
       ]
     ],
