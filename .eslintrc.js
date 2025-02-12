@@ -7,12 +7,7 @@ module.exports = {
     'import/order': [
       'error',
       {
-        groups: [
-          'builtin',
-          'external',
-          'internal',
-          ['parent', 'sibling', 'index'],
-        ],
+        groups: ['builtin', 'external', 'internal'],
         pathGroups: [
           {
             pattern: 'react*',
@@ -22,7 +17,7 @@ module.exports = {
           {
             pattern: 'expo{,-*}',
             group: 'external',
-            position: 'after',
+            position: 'before',
           },
           {
             pattern: '@/**',
