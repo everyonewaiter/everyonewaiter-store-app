@@ -1,1 +1,1 @@
-export * from '@/constants/Fonts'
+export * from '@/constants/fonts'
