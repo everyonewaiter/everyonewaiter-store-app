@@ -39,7 +39,7 @@ const EveryoneWaiterApplication = () => {
     <GestureHandlerRootView>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(unauth)" />
+        <Stack.Screen name="device" />
         <Stack.Screen name="+not-found" />
       </Stack>
     </GestureHandlerRootView>

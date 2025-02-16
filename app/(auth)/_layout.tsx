@@ -4,7 +4,7 @@ const AuthenticationLayout = () => {
   const isAuthenticated = false
 
   if (!isAuthenticated) {
-    return <Redirect href="/device-registration" />
+    return <Redirect href="/device/registration-step1" />
   }
 
   return <Stack />
