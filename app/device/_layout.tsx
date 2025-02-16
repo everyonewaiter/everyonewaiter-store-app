@@ -2,9 +2,10 @@ import { Redirect, Stack } from 'expo-router'
 
 import LogoHeaderTitle from '@/components/LogoHeaderTitle'
 import { colors } from '@/constants'
+import { useAuthentication } from '@/contexts/AuthenticationContext'
 
 const UnAuthenticationLayout = () => {
-  const isAuthenticated = false
+  const { isAuthenticated } = useAuthentication()
 
   if (isAuthenticated) {
     return <Redirect href="/" />
