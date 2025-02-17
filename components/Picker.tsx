@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import { Picker as NativePicker } from '@react-native-picker/picker'
@@ -7,6 +7,8 @@ import { colors, fonts } from '@/constants'
 
 interface PickerProps {
   items: PickerItemProps[]
+  selectedItem: string
+  setSelectedItem: React.Dispatch<React.SetStateAction<string>>
 }
 
 interface PickerItemProps {
@@ -14,9 +16,7 @@ interface PickerItemProps {
   value: string
 }
 
-const Picker = ({ items }: PickerProps) => {
-  const [selectedItem, setSelectedItem] = useState<string>(items[0]?.value)
-
+const Picker = ({ items, selectedItem, setSelectedItem }: PickerProps) => {
   return (
     <View style={styles.container}>
       <NativePicker
