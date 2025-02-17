@@ -1,4 +1,5 @@
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native'
 
 import { router } from 'expo-router'
 
@@ -6,8 +7,14 @@ import Button from '@/components/Button'
 import Input from '@/components/Input'
 import InputLabel from '@/components/InputLabel'
 import Picker from '@/components/Picker'
-import { fonts } from '@/constants'
-import { useDeviceType } from '@/hooks'
+import { AuthenticationPurpose, fonts, milliTimes } from '@/constants'
+import { useSendAuthCode, useVerifyAuthCode } from '@/hooks'
+import {
+  clearNullableInterval,
+  formatTime,
+  validateAuthCode,
+  validatePhoneNumber,
+} from '@/utils'
 
 const mockStoreList = [
   {
@@ -20,12 +27,121 @@ const mockStoreList = [
   },
 ]
 
+interface RegistrationForm {
+  code: RegistrationFormProps
+  phoneNumber: RegistrationFormProps
+}
+
+interface RegistrationFormProps {
+  value: string
+  error: string
+}
+
 const RegistrationStep1Screen = () => {
-  const { isTablet } = useDeviceType()
+  const phoneNumberRef = useRef<TextInput | null>(null)
+  const authenticationCodeRef = useRef<TextInput | null>(null)
+
+  const [isAuthenticate, setIsAuthenticate] = useState(false)
+  const [isSendAuthCode, setIsSendAuthCode] = useState(false)
+  const [authTime, setAuthTime] = useState(milliTimes.FIVE_MINUTE)
+  const [registrationForm, setRegistrationForm] = useState<RegistrationForm>({
+    code: { value: '', error: '' },
+    phoneNumber: { value: '', error: '' },
+  })
+
+  const sendAuthCode = useSendAuthCode()
+  const verifyAuthCode = useVerifyAuthCode()
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null
+
+    if (isSendAuthCode && authTime > 0) {
+      interval = setInterval(() => {
+        setAuthTime(prev => prev - milliTimes.ONE_SECOND)
+      }, milliTimes.ONE_SECOND)
+    } else if (authTime <= 0) {
+      clearNullableInterval(interval)
+    }
+
+    return () => clearNullableInterval(interval)
+  }, [isSendAuthCode, authTime])
+
+  const handleOnChange = (key: keyof RegistrationForm, value: string) => {
+    setRegistrationForm(prev => ({
+      ...prev,
+      [key]: { value, error: '' },
+    }))
+  }
+
+  const handleOnError = (key: keyof RegistrationForm, error: string) => {
+    setRegistrationForm(prev => ({
+      ...prev,
+      [key]: { value: prev[key].value, error },
+    }))
+  }
+
+  const sendAuthenticationCode = () => {
+    const phoneNumber = registrationForm.phoneNumber.value
+    const error = validatePhoneNumber(phoneNumber)
+
+    if (error) {
+      handleOnError('phoneNumber', error)
+      return
+    }
+
+    sendAuthCode.mutate(
+      {
+        phoneNumber: phoneNumber,
+        purpose: AuthenticationPurpose.DEVICE_REGISTRATION,
+      },
+      {
+        onSuccess: () => {
+          setAuthTime(milliTimes.FIVE_MINUTE)
+          setIsSendAuthCode(true)
+          authenticationCodeRef.current?.focus()
+        },
+        onError: error => {
+          handleOnError(
+            'phoneNumber',
+            error.response?.data.message ?? error.message,
+          )
+          phoneNumberRef.current?.focus()
+        },
+      },
+    )
+  }
+
+  const verifyAuthenticationCode = () => {
+    const code = registrationForm.code.value
+    const error = validateAuthCode(code)
+
+    if (error) {
+      handleOnError('code', error)
+      return
+    }
+
+    verifyAuthCode.mutate(
+      {
+        code: registrationForm.code.value,
+        phoneNumber: registrationForm.phoneNumber.value,
+        purpose: AuthenticationPurpose.DEVICE_REGISTRATION,
+      },
+      {
+        onSuccess: () => {
+          setAuthTime(milliTimes.ZERO)
+          setIsAuthenticate(true)
+        },
+        onError: error => {
+          handleOnError('code', error.response?.data.message ?? error.message)
+          authenticationCodeRef.current?.focus()
+        },
+      },
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={isTablet ? styles.tablet : styles.mobile}>
+      <View style={styles.contentContainer}>
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>기기 등록</Text>
         </View>
@@ -35,12 +151,23 @@ const RegistrationStep1Screen = () => {
             <View style={styles.inputWithButtonContainer}>
               <View style={styles.inputContainer}>
                 <Input
+                  ref={phoneNumberRef}
                   inputMode="numeric"
                   placeholder="사장님 계정에 등록된 전화번호를 입력해주세요."
+                  value={registrationForm.phoneNumber.value}
+                  error={registrationForm.phoneNumber.error}
+                  onChangeText={value => handleOnChange('phoneNumber', value)}
+                  returnKeyType="done"
+                  disabled={isAuthenticate}
                 />
               </View>
               <View style={styles.buttonContainer}>
-                <Button label="인증요청" size="medium" />
+                <Button
+                  label={isSendAuthCode ? '재요청' : '인증요청'}
+                  size="medium"
+                  onPress={sendAuthenticationCode}
+                  disabled={isAuthenticate}
+                />
               </View>
             </View>
           </View>
@@ -48,12 +175,25 @@ const RegistrationStep1Screen = () => {
             <View style={styles.inputWithButtonContainer}>
               <View style={styles.inputContainer}>
                 <Input
+                  ref={authenticationCodeRef}
                   inputMode="numeric"
                   placeholder="인증번호를 입력해주세요."
+                  right={isSendAuthCode ? `${formatTime(authTime)}` : ''}
+                  value={registrationForm.code.value}
+                  error={registrationForm.code.error}
+                  onChangeText={value => handleOnChange('code', value)}
+                  disabled={isAuthenticate}
+                  returnKeyType="done"
+                  autoComplete="one-time-code"
                 />
               </View>
               <View style={styles.buttonContainer}>
-                <Button label="확인" size="medium" />
+                <Button
+                  label="확인"
+                  size="medium"
+                  onPress={verifyAuthenticationCode}
+                  disabled={!isSendAuthCode || isAuthenticate}
+                />
               </View>
             </View>
           </View>
@@ -77,10 +217,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  mobile: {
-    width: 320,
-  },
-  tablet: {
+  contentContainer: {
     width: 480,
   },
   headerContainer: {

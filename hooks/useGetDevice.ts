@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getDevice } from '@/api'
 import { queryKeys, storageKeys } from '@/constants'
 import { UseQueryOptions } from '@/types'
-import { removeItem, setItem } from '@/utils/storage'
+import { removeItem, setItem } from '@/utils'
 
 export const useGetDevice = (queryOptions?: UseQueryOptions) => {
   const { data, error, isSuccess, isError, isPending } = useQuery({

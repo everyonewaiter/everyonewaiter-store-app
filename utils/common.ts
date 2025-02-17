@@ -11,3 +11,9 @@ export const mergeRefs = <T>(...refs: ForwardedRef<T>[]) => {
     })
   }
 }
+
+export const clearNullableInterval = (interval: NodeJS.Timeout | null) => {
+  if (interval) {
+    clearInterval(interval)
+  }
+}

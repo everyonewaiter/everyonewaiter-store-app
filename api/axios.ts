@@ -9,5 +9,5 @@ export const axiosInstance = axios.create({
   },
   withCredentials: true,
   transformRequest: data => JSONBig.stringify(data),
-  transformResponse: data => JSONBig.parse(data),
+  transformResponse: data => (data ? JSONBig.parse(data) : data),
 })
