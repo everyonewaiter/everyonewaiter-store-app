@@ -5,6 +5,7 @@ import { isAxiosError } from 'axios'
 
 import { getDevice } from '@/api'
 import { queryKeys, storageKeys } from '@/constants'
+import { Device } from '@/types'
 import { removeItem, setItem } from '@/utils'
 
 export const useGetDevice = () => {
@@ -15,16 +16,18 @@ export const useGetDevice = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      void setItem(storageKeys.DEVICE, data)
+      void setItem<Device>(storageKeys.DEVICE, data)
     }
   }, [isSuccess, data])
 
   useEffect(() => {
     if (isError && isAxiosError(error) && error.response?.status === 404) {
       void Promise.all([
-        removeItem(storageKeys.USER_ID),
-        removeItem(storageKeys.DEVICE_ID),
         removeItem(storageKeys.DEVICE),
+        removeItem(storageKeys.DEVICE_ID),
+        removeItem(storageKeys.SECRET_KEY),
+        removeItem(storageKeys.STORE_ID),
+        removeItem(storageKeys.USER_ID),
       ])
     }
   }, [isError, error])
