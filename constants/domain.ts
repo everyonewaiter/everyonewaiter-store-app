@@ -14,3 +14,9 @@ export const DeviceStatus = {
   ACTIVE: '활성',
   INACTIVE: '비활성',
 } as const
+
+export const UserRole = {
+  USER: '사용자',
+  OWNER: '사장님',
+  ADMIN: '관리자',
+} as const

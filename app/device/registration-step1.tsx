@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native'
+import {
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 
 import { router } from 'expo-router'
 
@@ -8,24 +15,19 @@ import Input from '@/components/Input'
 import InputLabel from '@/components/InputLabel'
 import Picker from '@/components/Picker'
 import { AuthenticationPurpose, fonts, milliTimes } from '@/constants'
-import { useSendAuthCode, useVerifyAuthCode } from '@/hooks'
+import {
+  useGetProfile,
+  useGetStores,
+  useSendAuthCode,
+  useVerifyAuthCode,
+} from '@/hooks'
 import {
   clearNullableInterval,
   formatTime,
+  parseErrorMessage,
   validateAuthCode,
   validatePhoneNumber,
 } from '@/utils'
-
-const mockStoreList = [
-  {
-    label: '나루 1호점',
-    value: '1',
-  },
-  {
-    label: '나루 2호점',
-    value: '2',
-  },
-]
 
 interface RegistrationForm {
   code: RegistrationFormProps
@@ -48,9 +50,16 @@ const RegistrationStep1Screen = () => {
     code: { value: '', error: '' },
     phoneNumber: { value: '', error: '' },
   })
+  const [selectedStoreId, setSelectedStoreId] = useState<string>('')
 
   const sendAuthCode = useSendAuthCode()
   const verifyAuthCode = useVerifyAuthCode()
+  const { data: profile } = useGetProfile(
+    registrationForm.phoneNumber.value,
+    isAuthenticate,
+  )
+  const { id } = profile || {}
+  const { data: stores } = useGetStores(id)
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
@@ -65,6 +74,21 @@ const RegistrationStep1Screen = () => {
 
     return () => clearNullableInterval(interval)
   }, [isSendAuthCode, authTime])
+
+  useEffect(() => {
+    if (!stores) return
+
+    if (stores.length > 0) {
+      setSelectedStoreId(stores[0].id.toString())
+    } else {
+      Alert.alert('알림', '매장을 먼저 등록해주세요.', [
+        {
+          text: '확인',
+          onPress: () => router.replace('/device/registration-step1'),
+        },
+      ])
+    }
+  }, [stores])
 
   const handleOnChange = (key: keyof RegistrationForm, value: string) => {
     setRegistrationForm(prev => ({
@@ -101,10 +125,7 @@ const RegistrationStep1Screen = () => {
           authenticationCodeRef.current?.focus()
         },
         onError: error => {
-          handleOnError(
-            'phoneNumber',
-            error.response?.data.message ?? error.message,
-          )
+          handleOnError('phoneNumber', parseErrorMessage(error))
           phoneNumberRef.current?.focus()
         },
       },
@@ -132,7 +153,7 @@ const RegistrationStep1Screen = () => {
           setIsAuthenticate(true)
         },
         onError: error => {
-          handleOnError('code', error.response?.data.message ?? error.message)
+          handleOnError('code', parseErrorMessage(error))
           authenticationCodeRef.current?.focus()
         },
       },
@@ -197,14 +218,32 @@ const RegistrationStep1Screen = () => {
               </View>
             </View>
           </View>
-          <View>
-            <InputLabel label="매장 선택" />
-            <Picker items={mockStoreList} />
-          </View>
+          {stores && (
+            <View>
+              <InputLabel label="매장 선택" />
+              <Picker
+                items={stores.map(store => ({
+                  label: store.name,
+                  value: store.id.toString(),
+                }))}
+                selectedItem={selectedStoreId}
+                setSelectedItem={setSelectedStoreId}
+              />
+            </View>
+          )}
         </View>
         <Button
           label="다음"
-          onPress={() => router.push('/device/registration-step2')}
+          onPress={() =>
+            router.push({
+              pathname: '/device/registration-step2',
+              params: {
+                userId: profile?.id.toString(),
+                storeId: selectedStoreId,
+              },
+            })
+          }
+          disabled={!isAuthenticate || !stores}
         />
       </View>
     </SafeAreaView>
