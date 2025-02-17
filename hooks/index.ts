@@ -1,5 +1,7 @@
 export * from '@/hooks/useDeviceType'
 export * from '@/hooks/useGetDevice'
+export * from '@/hooks/useGetProfile'
+export * from '@/hooks/useGetStores'
 export * from '@/hooks/useOrientation'
 export * from '@/hooks/useSendAuthCode'
 export * from '@/hooks/useVerifyAuthCode'

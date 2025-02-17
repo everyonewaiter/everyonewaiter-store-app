@@ -7,4 +7,8 @@ export const storageKeys = {
 export const queryKeys = {
   DEVICE: 'device',
   GET_DEVICE: 'getDevice',
+  STORE: 'store',
+  GET_STORES: 'getStores',
+  USER: 'user',
+  GET_PROFILE: 'getProfile',
 } as const

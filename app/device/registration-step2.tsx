@@ -1,5 +1,7 @@
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 
+import { useLocalSearchParams } from 'expo-router'
+
 import Button from '@/components/Button'
 import Input from '@/components/Input'
 import RadioBox from '@/components/RadioBox'
@@ -13,8 +15,14 @@ const mockRadioItems = [
   { label: 'POS', value: '4' },
 ]
 
+type RegistrationPageParams = {
+  userId: string
+  storeId: string
+}
+
 const RegistrationStep2Screen = () => {
   const { isTablet } = useDeviceType()
+  const { userId, storeId } = useLocalSearchParams<RegistrationPageParams>()
 
   return (
     <SafeAreaView style={styles.container}>
@@ -22,6 +30,8 @@ const RegistrationStep2Screen = () => {
         <View style={styles.headerContainer}>
           <Text style={styles.headerTitle}>기기 등록</Text>
           <Text>아래 버튼을 눌러 해당 기기의 용도를 선택하세요!</Text>
+          <Text>{`사용자 ID: ${userId}`}</Text>
+          <Text>{`매장 ID: ${storeId}`}</Text>
         </View>
         <View style={styles.selectBoxContainer}>
           <RadioBox items={mockRadioItems} />
