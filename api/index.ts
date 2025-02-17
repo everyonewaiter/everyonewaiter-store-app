@@ -1,3 +1,4 @@
+export * from '@/api/auth'
 export * from '@/api/axios'
 export * from '@/api/device'
 export * from '@/api/queryClient'
