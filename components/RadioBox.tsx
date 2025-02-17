@@ -1,25 +1,29 @@
-import { useState } from 'react'
+import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import RadioItem from '@/components/RadioBoxItem'
 
-interface RadioBoxProps {
-  items: RadioBoxItemProps[]
+interface RadioBoxProps<T> {
+  items: RadioBoxItemProps<T>[]
+  selectedItem: string
+  setSelectedItem: React.Dispatch<React.SetStateAction<T>>
 }
 
-interface RadioBoxItemProps {
+interface RadioBoxItemProps<T> {
   label: string
-  value: string
+  value: T
 }
 
-const RadioBox = ({ items }: RadioBoxProps) => {
-  const [selectedItem, setSelectedItem] = useState<string>(items[0]?.value)
-
+const RadioBox = <T,>({
+  items,
+  selectedItem,
+  setSelectedItem,
+}: RadioBoxProps<T>) => {
   return (
     <View style={styles.container}>
-      {items.map(item => (
+      {items.map((item, index) => (
         <RadioItem
-          key={item.value}
+          key={`${item.value}-${index}`}
           label={item.label}
           selected={selectedItem === item.value}
           onPress={() => setSelectedItem(item.value)}

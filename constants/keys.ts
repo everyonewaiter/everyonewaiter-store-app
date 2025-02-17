@@ -1,7 +1,9 @@
 export const storageKeys = {
-  USER_ID: 'userId',
   DEVICE: 'device',
   DEVICE_ID: 'deviceId',
+  SECRET_KEY: 'secretKey',
+  STORE_ID: 'storeId',
+  USER_ID: 'userId',
 } as const
 
 export const queryKeys = {

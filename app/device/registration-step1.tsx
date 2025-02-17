@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Alert,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native'
 
@@ -161,92 +163,94 @@ const RegistrationStep1Screen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>기기 등록</Text>
-        </View>
-        <View style={styles.sectionContainer}>
-          <View>
-            <InputLabel label="휴대폰 번호" />
-            <View style={styles.inputWithButtonContainer}>
-              <View style={styles.inputContainer}>
-                <Input
-                  ref={phoneNumberRef}
-                  inputMode="numeric"
-                  placeholder="사장님 계정에 등록된 전화번호를 입력해주세요."
-                  value={registrationForm.phoneNumber.value}
-                  error={registrationForm.phoneNumber.error}
-                  onChangeText={value => handleOnChange('phoneNumber', value)}
-                  returnKeyType="done"
-                  disabled={isAuthenticate}
-                />
-              </View>
-              <View style={styles.buttonContainer}>
-                <Button
-                  label={isSendAuthCode ? '재요청' : '인증요청'}
-                  size="medium"
-                  onPress={sendAuthenticationCode}
-                  disabled={isAuthenticate}
-                />
-              </View>
-            </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.contentContainer}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>기기 등록</Text>
           </View>
-          <View>
-            <View style={styles.inputWithButtonContainer}>
-              <View style={styles.inputContainer}>
-                <Input
-                  ref={authenticationCodeRef}
-                  inputMode="numeric"
-                  placeholder="인증번호를 입력해주세요."
-                  right={isSendAuthCode ? `${formatTime(authTime)}` : ''}
-                  value={registrationForm.code.value}
-                  error={registrationForm.code.error}
-                  onChangeText={value => handleOnChange('code', value)}
-                  disabled={isAuthenticate}
-                  returnKeyType="done"
-                  autoComplete="one-time-code"
-                />
-              </View>
-              <View style={styles.buttonContainer}>
-                <Button
-                  label="확인"
-                  size="medium"
-                  onPress={verifyAuthenticationCode}
-                  disabled={!isSendAuthCode || isAuthenticate}
-                />
-              </View>
-            </View>
-          </View>
-          {stores && (
+          <View style={styles.sectionContainer}>
             <View>
-              <InputLabel label="매장 선택" />
-              <Picker
-                items={stores.map(store => ({
-                  label: store.name,
-                  value: store.id.toString(),
-                }))}
-                selectedItem={selectedStoreId}
-                setSelectedItem={setSelectedStoreId}
-              />
+              <InputLabel label="휴대폰 번호" />
+              <View style={styles.inputWithButtonContainer}>
+                <View style={styles.inputContainer}>
+                  <Input
+                    ref={phoneNumberRef}
+                    inputMode="numeric"
+                    placeholder="사장님 계정에 등록된 전화번호를 입력해주세요."
+                    value={registrationForm.phoneNumber.value}
+                    error={registrationForm.phoneNumber.error}
+                    onChangeText={value => handleOnChange('phoneNumber', value)}
+                    returnKeyType="done"
+                    disabled={isAuthenticate}
+                  />
+                </View>
+                <View style={styles.buttonContainer}>
+                  <Button
+                    label={isSendAuthCode ? '재요청' : '인증요청'}
+                    size="medium"
+                    onPress={sendAuthenticationCode}
+                    disabled={isAuthenticate}
+                  />
+                </View>
+              </View>
             </View>
-          )}
+            <View>
+              <View style={styles.inputWithButtonContainer}>
+                <View style={styles.inputContainer}>
+                  <Input
+                    ref={authenticationCodeRef}
+                    inputMode="numeric"
+                    placeholder="인증번호를 입력해주세요."
+                    right={isSendAuthCode ? `${formatTime(authTime)}` : ''}
+                    value={registrationForm.code.value}
+                    error={registrationForm.code.error}
+                    onChangeText={value => handleOnChange('code', value)}
+                    disabled={isAuthenticate}
+                    returnKeyType="done"
+                    autoComplete="one-time-code"
+                  />
+                </View>
+                <View style={styles.buttonContainer}>
+                  <Button
+                    label="확인"
+                    size="medium"
+                    onPress={verifyAuthenticationCode}
+                    disabled={!isSendAuthCode || isAuthenticate}
+                  />
+                </View>
+              </View>
+            </View>
+            {stores && (
+              <View>
+                <InputLabel label="매장 선택" />
+                <Picker
+                  items={stores.map(store => ({
+                    label: store.name,
+                    value: store.id.toString(),
+                  }))}
+                  selectedItem={selectedStoreId}
+                  setSelectedItem={setSelectedStoreId}
+                />
+              </View>
+            )}
+          </View>
+          <Button
+            label="다음"
+            onPress={() =>
+              router.push({
+                pathname: '/device/registration-step2',
+                params: {
+                  userId: profile?.id.toString(),
+                  storeId: selectedStoreId,
+                },
+              })
+            }
+            disabled={!isAuthenticate || !stores}
+          />
         </View>
-        <Button
-          label="다음"
-          onPress={() =>
-            router.push({
-              pathname: '/device/registration-step2',
-              params: {
-                userId: profile?.id.toString(),
-                storeId: selectedStoreId,
-              },
-            })
-          }
-          disabled={!isAuthenticate || !stores}
-        />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   )
 }
 
