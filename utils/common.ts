@@ -1,5 +1,14 @@
 import { ForwardedRef } from 'react'
 
+import { isAxiosError } from 'axios'
+
+export const parseErrorMessage = (error: Error) => {
+  if (isAxiosError(error)) {
+    return error.response?.data.message ?? error.message
+  }
+  return error.message
+}
+
 export const mergeRefs = <T>(...refs: ForwardedRef<T>[]) => {
   return (node: T) => {
     refs.forEach(ref => {
