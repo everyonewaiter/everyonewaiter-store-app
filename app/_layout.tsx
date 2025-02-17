@@ -7,6 +7,7 @@ import { useFonts } from 'expo-font'
 import { useKeepAwake } from 'expo-keep-awake'
 import { SplashScreen, Stack } from 'expo-router'
 
+import { useReactQueryDevTools } from '@dev-plugins/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
 
 import { queryClient } from '@/api'
@@ -19,6 +20,7 @@ import { useDeviceType } from '@/hooks'
 void SplashScreen.preventAutoHideAsync()
 
 const RootLayout = () => {
+  useReactQueryDevTools(queryClient)
   useKeepAwake()
   const { isMobile } = useDeviceType()
 
