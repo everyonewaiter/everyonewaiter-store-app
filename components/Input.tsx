@@ -17,17 +17,16 @@ import { mergeRefs } from '@/utils'
 interface InputProps extends TextInputProps {
   label?: string
   right?: string
-  touched?: boolean
   error?: string
   disabled?: boolean
 }
 
 const Input = (
-  { label, right, touched, error, disabled = false, ...props }: InputProps,
+  { label, right, error, disabled = false, ...props }: InputProps,
   ref?: ForwardedRef<TextInput>,
 ) => {
   const innerRef = useRef<TextInput | null>(null)
-  const hasError = Boolean(error) && touched
+  const hasError = Boolean(error)
 
   return (
     <Pressable onPress={() => innerRef.current?.focus()}>
