@@ -12,10 +12,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.everyonewaiter.storeapp"
     },
     "androidStatusBar": {
-      "hidden": true
+      "hidden": true,
+      "backgroundColor": "#ffffff"
     },
     "androidNavigationBar": {
       "visible": "sticky-immersive"
@@ -44,6 +46,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d432ad2b-27dd-4214-acc1-556cca6a92ab"
+      }
+    },
+    "owner": "everyonewaiter",
+    "ios": {
+      "bundleIdentifier": "com.everyonewaiter.storeapp"
     }
   }
 }
