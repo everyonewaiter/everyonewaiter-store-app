@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
 import { router, useLocalSearchParams } from 'expo-router'
 
@@ -163,43 +164,48 @@ const RegistrationStep2Screen = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView style={styles.container}>
         <View style={styles.contentContainer}>
-          <View style={styles.headerContainer}>
-            <Text style={styles.headerTitle}>기기 등록</Text>
-            <Text>아래 버튼을 눌러 해당 기기의 용도를 선택하세요!</Text>
-          </View>
-          <View style={styles.selectBoxContainer}>
-            <RadioBox
-              items={purposes}
-              selectedItem={selectedPurpose}
-              setSelectedItem={setSelectedPurpose}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            {selectedPurpose === DevicePurpose.TABLE && (
+          <KeyboardAwareScrollView
+            bottomOffset={100}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerTitle}>기기 등록</Text>
+              <Text>아래 버튼을 눌러 해당 기기의 용도를 선택하세요!</Text>
+            </View>
+            <View style={styles.selectBoxContainer}>
+              <RadioBox
+                items={purposes}
+                selectedItem={selectedPurpose}
+                setSelectedItem={setSelectedPurpose}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              {selectedPurpose === DevicePurpose.TABLE && (
+                <Input
+                  label="테이블 번호"
+                  inputMode="numeric"
+                  placeholder="테이블 번호를 입력해주세요."
+                  value={registrationForm.tableNo.value}
+                  error={registrationForm.tableNo.error}
+                  onChangeText={handleOnChangeTableNo}
+                  returnKeyType="done"
+                />
+              )}
               <Input
-                label="테이블 번호"
-                inputMode="numeric"
-                placeholder="테이블 번호를 입력해주세요."
-                value={registrationForm.tableNo.value}
-                error={registrationForm.tableNo.error}
-                onChangeText={handleOnChangeTableNo}
+                label="기기 이름"
+                placeholder="기기 이름을 입력해주세요."
+                value={registrationForm.name.value}
+                error={registrationForm.name.error}
+                onChangeText={handleOnChangeName}
                 returnKeyType="done"
               />
-            )}
-            <Input
-              label="기기 이름"
-              placeholder="기기 이름을 입력해주세요."
-              value={registrationForm.name.value}
-              error={registrationForm.name.error}
-              onChangeText={handleOnChangeName}
-              returnKeyType="done"
+            </View>
+            <Button
+              label="기기 등록"
+              onPress={handleSubmit}
+              disabled={isLoading}
             />
-          </View>
-          <Button
-            label="기기 등록"
-            onPress={handleSubmit}
-            disabled={isLoading}
-          />
+          </KeyboardAwareScrollView>
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
