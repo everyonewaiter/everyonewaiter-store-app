@@ -21,6 +21,7 @@ import AuthenticationProvider, {
 import { useDeviceType } from '@/hooks'
 
 void SplashScreen.preventAutoHideAsync()
+void NavigationBar.setVisibilityAsync('hidden')
 void NavigationBar.setBehaviorAsync('overlay-swipe')
 
 const RootLayout = () => {
