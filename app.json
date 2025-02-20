@@ -19,9 +19,6 @@
       "hidden": true,
       "backgroundColor": "#ffffff"
     },
-    "androidNavigationBar": {
-      "visible": "sticky-immersive"
-    },
     "platforms": [
       "android"
     ],
