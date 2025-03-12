@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Alert,
   Keyboard,
@@ -16,9 +16,17 @@ import dayjs from 'dayjs'
 
 import { queryClient } from '@/api'
 import Button from '@/components/Button'
+import DevicePurposeSelectBox from '@/components/DevicePurposeSelectBox'
 import Input from '@/components/Input'
-import RadioBox from '@/components/RadioBox'
-import { DevicePurpose, fonts, queryKeys, storageKeys } from '@/constants'
+import InputLabel from '@/components/InputLabel'
+import PaymentTypeSelectBox from '@/components/PaymentTypeSelectBox'
+import {
+  DevicePurpose,
+  fonts,
+  PaymentType,
+  queryKeys,
+  storageKeys,
+} from '@/constants'
 import { useCreateDevice } from '@/hooks/useCreateDevice'
 import { parseErrorMessage, setItem, validateCreateDevice } from '@/utils'
 
@@ -42,6 +50,11 @@ const purposes = Object.values(DevicePurpose).map(value => ({
   value,
 }))
 
+const paymentTypes = Object.values(PaymentType).map(value => ({
+  label: value,
+  value,
+}))
+
 const generateDeviceName = (selectedPurpose: string) => {
   const timestamp = dayjs().format('YYMMDDHHmm')
   let name = timestamp
@@ -53,12 +66,6 @@ const generateDeviceName = (selectedPurpose: string) => {
     case DevicePurpose.WAITING:
       name = `웨이팅-${timestamp}`
       break
-    case DevicePurpose.HALL:
-      name = `홀-${timestamp}`
-      break
-    case DevicePurpose.POS:
-      name = `POS-${timestamp}`
-      break
   }
 
   return name
@@ -66,6 +73,9 @@ const generateDeviceName = (selectedPurpose: string) => {
 
 const RegistrationStep2Screen = () => {
   const [selectedPurpose, setSelectedPurpose] = useState(purposes[0].value)
+  const [selectedPaymentType, setSelectedPaymentType] = useState(
+    paymentTypes[1].value,
+  )
   const [registrationForm, setRegistrationForm] = useState<RegistrationForm>({
     name: { value: '', error: '' },
     tableNo: { value: '1', error: '' },
@@ -137,6 +147,10 @@ const RegistrationStep2Screen = () => {
         name: registrationForm.name.value,
         tableNo: parseInt(registrationForm.tableNo.value, 10),
         purpose: selectedPurpose,
+        paymentType:
+          selectedPurpose === DevicePurpose.TABLE
+            ? selectedPaymentType
+            : PaymentType.POSTPAID,
       },
       {
         onSuccess: ({ id, secretKey }) => {
@@ -173,11 +187,16 @@ const RegistrationStep2Screen = () => {
               <Text>아래 버튼을 눌러 해당 기기의 용도를 선택하세요!</Text>
             </View>
             <View style={styles.selectBoxContainer}>
-              <RadioBox
-                items={purposes}
-                selectedItem={selectedPurpose}
-                setSelectedItem={setSelectedPurpose}
-              />
+              <View style={styles.devicePurposeSelectBoxContainer}>
+                {purposes.map((purpose, index) => (
+                  <DevicePurposeSelectBox
+                    key={`${purpose.value}-${index}`}
+                    label={purpose.label}
+                    selected={selectedPurpose === purpose.value}
+                    onPress={() => setSelectedPurpose(purpose.value)}
+                  />
+                ))}
+              </View>
             </View>
             <View style={styles.inputContainer}>
               {selectedPurpose === DevicePurpose.TABLE && (
@@ -199,6 +218,23 @@ const RegistrationStep2Screen = () => {
                 onChangeText={handleOnChangeName}
                 returnKeyType="done"
               />
+              {selectedPurpose === DevicePurpose.TABLE && (
+                <View>
+                  <InputLabel label="결제 수단" />
+                  <View style={styles.paymentTypeSelectBoxContainer}>
+                    {paymentTypes.map((paymentType, index) => (
+                      <PaymentTypeSelectBox
+                        key={`${paymentType.value}-${index}`}
+                        label={paymentType.label}
+                        selected={selectedPaymentType === paymentType.value}
+                        onPress={() =>
+                          setSelectedPaymentType(paymentType.value)
+                        }
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
             </View>
             <Button
               label="기기 등록"
@@ -239,7 +275,17 @@ const styles = StyleSheet.create({
   selectBoxContainer: {
     marginBottom: 24,
   },
+  devicePurposeSelectBoxContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
+  },
+  paymentTypeSelectBoxContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
   inputContainer: {
+    gap: 12,
     marginBottom: 32,
   },
 })

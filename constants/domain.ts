@@ -6,8 +6,6 @@ export const AuthenticationPurpose = {
 export const DevicePurpose = {
   TABLE: '손님 테이블',
   WAITING: '웨이팅 등록',
-  HALL: '홀 관리',
-  POS: 'POS',
 } as const
 
 export const DeviceStatus = {
@@ -19,4 +17,9 @@ export const UserRole = {
   USER: '사용자',
   OWNER: '사장님',
   ADMIN: '관리자',
+} as const
+
+export const PaymentType = {
+  PREPAID: '선결제',
+  POSTPAID: '후결제',
 } as const

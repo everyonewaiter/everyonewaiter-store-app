@@ -1,4 +1,4 @@
-import { DevicePurpose, DeviceStatus } from '@/constants'
+import { DevicePurpose, DeviceStatus, PaymentType } from '@/constants'
 import { valueOf } from '@/types/common'
 
 export type Device = {
@@ -6,6 +6,7 @@ export type Device = {
   name: string
   tableNo: number
   purpose: valueOf<typeof DevicePurpose>
+  paymentType: valueOf<typeof PaymentType>
   status: valueOf<typeof DeviceStatus>
   createdAt: string
 }
