@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 12,
     borderColor: colors.GRAY5_E7,
+    paddingLeft: 8,
     justifyContent: 'center',
   },
   pickerItem: {

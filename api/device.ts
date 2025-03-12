@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/api/axios'
-import { DevicePurpose, storageKeys } from '@/constants'
+import { DevicePurpose, PaymentType, storageKeys } from '@/constants'
 import { Device, valueOf } from '@/types'
 import { getItemOrElseThrow } from '@/utils'
 
@@ -15,6 +15,7 @@ type CreateDeviceRequest = {
   name: string
   tableNo: number
   purpose: valueOf<typeof DevicePurpose>
+  paymentType: valueOf<typeof PaymentType>
 }
 
 type CreateDeviceResponse = {
