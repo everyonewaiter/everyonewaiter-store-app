@@ -2,12 +2,16 @@ import { Pressable, PressableProps, StyleSheet, Text } from 'react-native'
 
 import { colors, fonts } from '@/constants'
 
-interface RadioBoxItemProps extends PressableProps {
+interface DevicePurposeSelectBoxProps extends PressableProps {
   label: string
   selected: boolean
 }
 
-const RadioBoxItem = ({ label, selected, ...props }: RadioBoxItemProps) => {
+const DevicePurposeSelectBox = ({
+  label,
+  selected,
+  ...props
+}: DevicePurposeSelectBoxProps) => {
   return (
     <Pressable
       style={[styles.container, selected && styles.selectedContainer]}
@@ -43,4 +47,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default RadioBoxItem
+export default DevicePurposeSelectBox
