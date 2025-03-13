@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   'fill-gray': {
-    backgroundColor: colors.GRAY7_F7,
+    backgroundColor: colors.GRAY7_F1,
   },
   'outline-gray': {
     borderColor: colors.GRAY5_DA,
