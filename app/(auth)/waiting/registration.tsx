@@ -7,6 +7,7 @@ import { OrientationLock } from 'expo-screen-orientation'
 import { AdultIcon, BabyIcon } from '@/assets/icons'
 import Button from '@/components/Button'
 import LogoHeaderTitle from '@/components/LogoHeaderTitle'
+import { Modal } from '@/components/Modal'
 import NumPad from '@/components/NumPad'
 import PersonCountBox from '@/components/PersonCountBox'
 import { colors, fonts } from '@/constants'
@@ -107,6 +108,16 @@ const WaitingRegistrationScreen = () => {
           </View>
         </View>
       </View>
+      <Modal visible={true}>
+        <Modal.Container>
+          <Modal.Title color="red">010-1234-5678</Modal.Title>
+          <Modal.Content>위 번호로 웨이팅 등록을 하시겠습니까?</Modal.Content>
+          <Modal.ButtonContainer>
+            <Modal.Button label="닫기" color="gray" />
+            <Modal.Button label="등록하기" color="black" />
+          </Modal.ButtonContainer>
+        </Modal.Container>
+      </Modal>
     </SafeAreaView>
   )
 }
