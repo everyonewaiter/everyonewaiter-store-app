@@ -5,7 +5,9 @@ import { useFocusEffect } from 'expo-router'
 import { OrientationLock } from 'expo-screen-orientation'
 
 import { AdultIcon, BabyIcon } from '@/assets/icons'
+import Button from '@/components/Button'
 import LogoHeaderTitle from '@/components/LogoHeaderTitle'
+import NumPad from '@/components/NumPad'
 import PersonCountBox from '@/components/PersonCountBox'
 import { colors, fonts } from '@/constants'
 import { useOrientation } from '@/hooks'
@@ -71,7 +73,39 @@ const WaitingRegistrationScreen = () => {
         </View>
       </View>
       <View style={styles.numPadContainer}>
-        <Text>키패드</Text>
+        <View style={styles.numPadContent}>
+          <View style={styles.phoneNumberContainer}>
+            <Text style={styles.phoneNumberText}>010 -</Text>
+            <Text style={styles.phoneNumberSubText}>
+              실시간 웨이팅 안내를 받을 수 있는 번호를 입력해 주세요.
+            </Text>
+          </View>
+          <View style={{ flex: 3 }}>
+            <View style={styles.numPad}>
+              <NumPad label={1} positionX="left" positionY="top" />
+              <NumPad label={2} positionX="center" positionY="top" />
+              <NumPad label={3} positionX="right" positionY="top" />
+            </View>
+            <View style={styles.numPad}>
+              <NumPad label={4} positionX="left" positionY="center" />
+              <NumPad label={5} positionX="center" positionY="center" />
+              <NumPad label={6} positionX="right" positionY="center" />
+            </View>
+            <View style={styles.numPad}>
+              <NumPad label={7} positionX="left" positionY="center" />
+              <NumPad label={8} positionX="center" positionY="center" />
+              <NumPad label={9} positionX="right" positionY="center" />
+            </View>
+            <View style={styles.numPad}>
+              <NumPad label="reset" positionX="left" positionY="bottom" />
+              <NumPad label={0} positionX="center" positionY="bottom" />
+              <NumPad label="back" positionX="right" positionY="bottom" />
+            </View>
+          </View>
+          <View style={{ flex: 0.5, justifyContent: 'flex-end' }}>
+            <Button label="등록하기" color="black" />
+          </View>
+        </View>
       </View>
     </SafeAreaView>
   )
@@ -119,6 +153,33 @@ const styles = StyleSheet.create({
     backgroundColor: colors.WHITE,
     borderRadius: 20,
     padding: 32,
+  },
+  numPadContent: {
+    height: '100%',
+    borderRadius: 20,
+    backgroundColor: colors.WHITE,
+    paddingTop: 24,
+    paddingBottom: 16,
+    paddingHorizontal: 24,
+  },
+  phoneNumberContainer: {
+    flex: 0.5,
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 32,
+  },
+  phoneNumberText: {
+    fontFamily: fonts.PRETENDARD_BOLD,
+    fontSize: 40,
+  },
+  phoneNumberSubText: {
+    fontFamily: fonts.PRETENDARD_REGULAR,
+    fontSize: 24,
+    color: colors.GRAY3_99,
+  },
+  numPad: {
+    height: '25%',
+    flexDirection: 'row',
   },
 })
 

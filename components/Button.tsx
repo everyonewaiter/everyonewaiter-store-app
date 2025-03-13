@@ -5,7 +5,7 @@ import { colors, fonts } from '@/constants'
 interface ButtonProps extends PressableProps {
   label: string
   variant?: 'fill' | 'outline'
-  color?: 'red' | 'gray'
+  color?: 'red' | 'gray' | 'black'
   size?: 'small' | 'medium' | 'large'
   disabled?: boolean
 }
@@ -74,6 +74,13 @@ const styles = StyleSheet.create({
     borderColor: colors.GRAY5_DA,
     borderWidth: 1,
   },
+  'fill-black': {
+    backgroundColor: colors.GRAY0_22,
+  },
+  'outline-black': {
+    borderColor: colors.GRAY0_22,
+    borderWidth: 1,
+  },
   fillPressed: {
     opacity: 0.9,
   },
@@ -103,11 +110,17 @@ const styles = StyleSheet.create({
   'label-fill-gray': {
     color: colors.BLACK,
   },
+  'label-fill-black': {
+    color: colors.WHITE,
+  },
   'label-outline-red': {
     color: colors.PRIMARY_RED,
   },
   'label-outline-gray': {
     color: colors.GRAY2_55,
+  },
+  'label-outline-black': {
+    color: colors.GRAY0_22,
   },
   disabled: {
     opacity: 0.6,

@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   container: {
     borderColor: colors.GRAY5_E7,
     borderBottomWidth: 0.5,
-    paddingVertical: 12,
+    paddingVertical: 24,
   },
   contentContainer: {
     flexDirection: 'row',
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   countText: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   button: {
     width: 40,
