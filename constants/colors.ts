@@ -10,4 +10,5 @@ export const colors = {
   GRAY3_99: '#999999',
   GRAY2_55: '#555555',
   GRAY1_33: '#333333',
+  GRAY0_22: '#222222',
 } as const
