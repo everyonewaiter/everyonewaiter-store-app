@@ -9,7 +9,11 @@ const AuthenticationLayout = () => {
     return <Redirect href="/device/registration-step1" />
   }
 
-  return <Stack />
+  return (
+    <Stack>
+      <Stack.Screen name="waiting" options={{ headerShown: false }} />
+    </Stack>
+  )
 }
 
 export default AuthenticationLayout

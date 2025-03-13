@@ -32,5 +32,5 @@ export const useGetDevice = () => {
     }
   }, [isError, error])
 
-  return { isSuccess, isError, isPending }
+  return { device: data, isSuccess, isError, isPending }
 }
