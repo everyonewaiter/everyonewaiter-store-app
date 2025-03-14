@@ -1,6 +1,11 @@
 import { ForwardedRef } from 'react'
 
 import { isAxiosError } from 'axios'
+import CryptoJS from 'crypto-js'
+
+import { storageKeys } from '@/constants'
+import { Device } from '@/types'
+import { getItem } from '@/utils/storage'
 
 export const parseErrorMessage = (error: Error) => {
   if (isAxiosError(error)) {
@@ -24,5 +29,33 @@ export const mergeRefs = <T>(...refs: ForwardedRef<T>[]) => {
 export const clearNullableInterval = (interval: NodeJS.Timeout | null) => {
   if (interval) {
     clearInterval(interval)
+  }
+}
+
+export const makeSignatureHeader = async () => {
+  const [device, secretKey] = await Promise.all([
+    getItem<Device>(storageKeys.DEVICE),
+    getItem<string>(storageKeys.SECRET_KEY),
+  ])
+
+  if (!device || !secretKey) {
+    throw new Error('Device or Secret key not found')
+  }
+
+  const accessKey = device.id.toString()
+  const timestamp = Date.now().toString()
+  const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey)
+  hmac.update(`${device.purpose} ${device.name}`)
+  hmac.update('\n')
+  hmac.update(accessKey)
+  hmac.update('\n')
+  hmac.update(`${timestamp}`)
+  const hash = hmac.finalize()
+  const signature = hash.toString(CryptoJS.enc.Base64)
+
+  return {
+    'x-ew-access-key': accessKey,
+    'x-ew-signature': signature,
+    'x-ew-timestamp': timestamp,
   }
 }

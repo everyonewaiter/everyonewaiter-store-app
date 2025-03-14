@@ -13,7 +13,11 @@ interface NumPadProps extends PressableProps {
 const NumPad = ({ label, positionX, positionY, ...props }: NumPadProps) => {
   return (
     <Pressable
-      style={[styles.container, styles[`border-${positionX}-${positionY}`]]}
+      style={({ pressed }) => [
+        styles.container,
+        styles[`border-${positionX}-${positionY}`],
+        pressed && styles.pressed,
+      ]}
       {...props}
     >
       {typeof label === 'number' && <Text style={styles.label}>{label}</Text>}
@@ -81,6 +85,9 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: fonts.PRETENDARD_BOLD,
     fontSize: 40,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 })
 
