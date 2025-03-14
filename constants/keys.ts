@@ -13,4 +13,6 @@ export const queryKeys = {
   GET_STORE_NAMES: 'getStoreNames',
   USER: 'user',
   GET_PROFILE: 'getProfile',
+  WAITING: 'waiting',
+  GET_WAITING_COUNT: 'getWaitingCount',
 } as const

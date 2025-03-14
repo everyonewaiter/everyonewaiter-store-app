@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 
 import { useFocusEffect } from 'expo-router'
@@ -11,18 +11,98 @@ import { Modal } from '@/components/Modal'
 import NumPad from '@/components/NumPad'
 import PersonCountBox from '@/components/PersonCountBox'
 import { colors, fonts } from '@/constants'
-import { useOrientation } from '@/hooks'
+import { useCreateWaiting, useGetWaitingCount, useOrientation } from '@/hooks'
+import { formatPhoneNumber, parseErrorMessage } from '@/utils'
 
-const waitingCount = 0
+const PHONE_NUMBER_PREFIX = '010'
 
 const WaitingRegistrationScreen = () => {
   const { lockOrientation } = useOrientation()
+
+  const [personCount, setPersonCount] = useState({
+    adult: 0,
+    infant: 0,
+  })
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [isValidForm, setIsValidForm] = useState(false)
+  const [isVisibleSubmitModal, setIsVisibleSubmitModal] = useState(false)
+  const [isVisibleSuccessModal, setIsVisibleSuccessModal] = useState(false)
+  const [isVisibleErrorModal, setIsVisibleErrorModal] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const { waitingCount } = useGetWaitingCount()
+  const createWaiting = useCreateWaiting()
 
   useFocusEffect(
     useCallback(() => {
       void lockOrientation(OrientationLock.LANDSCAPE_RIGHT)
     }, [lockOrientation]),
   )
+
+  useEffect(() => {
+    if (personCount.adult > 0 && phoneNumber.length === 8) {
+      setIsValidForm(true)
+    }
+  }, [personCount.adult, phoneNumber])
+
+  const minusPersonCount = (key: 'adult' | 'infant') => {
+    if (personCount[key] > 0) {
+      setPersonCount(prev => ({ ...prev, [key]: prev[key] - 1 }))
+    }
+  }
+
+  const plusPersonCount = (key: 'adult' | 'infant') => {
+    if (personCount[key] <= 30) {
+      setPersonCount(prev => ({ ...prev, [key]: prev[key] + 1 }))
+    }
+  }
+
+  const addPhoneNumber = (num: number) => {
+    if (phoneNumber.length < 8) {
+      setPhoneNumber(prev => prev + num)
+    }
+  }
+
+  const removeLastPhoneNumber = () => {
+    setPhoneNumber(prev => prev.slice(0, -1))
+  }
+
+  const resetAll = () => {
+    setPersonCount({ adult: 0, infant: 0 })
+    setPhoneNumber('')
+    setIsLoading(false)
+    setIsValidForm(false)
+    setIsVisibleSubmitModal(false)
+    setIsVisibleSuccessModal(false)
+    setIsVisibleErrorModal(false)
+    setErrorMessage('')
+  }
+
+  const submitCreateWaiting = () => {
+    setIsLoading(true)
+    createWaiting.mutate(
+      {
+        phoneNumber: `${PHONE_NUMBER_PREFIX}${phoneNumber}`,
+        adult: personCount.adult,
+        infant: personCount.infant,
+      },
+      {
+        onSuccess: () => {
+          setIsVisibleSubmitModal(false)
+          setIsVisibleSuccessModal(true)
+        },
+        onError: error => {
+          setIsVisibleSubmitModal(false)
+          setErrorMessage(parseErrorMessage(error))
+          setIsVisibleErrorModal(true)
+        },
+        onSettled: () => {
+          setIsLoading(false)
+        },
+      },
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -58,16 +138,16 @@ const WaitingRegistrationScreen = () => {
               <PersonCountBox
                 icon={<AdultIcon />}
                 label="성인"
-                count={0}
-                minusHandler={() => {}}
-                plusHandler={() => {}}
+                count={personCount.adult}
+                minusHandler={() => minusPersonCount('adult')}
+                plusHandler={() => plusPersonCount('adult')}
               />
               <PersonCountBox
                 icon={<BabyIcon />}
                 label="유아"
-                count={0}
-                minusHandler={() => {}}
-                plusHandler={() => {}}
+                count={personCount.infant}
+                minusHandler={() => minusPersonCount('infant')}
+                plusHandler={() => plusPersonCount('infant')}
               />
             </View>
           </View>
@@ -76,45 +156,137 @@ const WaitingRegistrationScreen = () => {
       <View style={styles.numPadContainer}>
         <View style={styles.numPadContent}>
           <View style={styles.phoneNumberContainer}>
-            <Text style={styles.phoneNumberText}>010 -</Text>
+            <Text style={styles.phoneNumberText}>
+              {`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumber(phoneNumber)}`}
+            </Text>
             <Text style={styles.phoneNumberSubText}>
               실시간 웨이팅 안내를 받을 수 있는 번호를 입력해 주세요.
             </Text>
           </View>
           <View style={{ flex: 3 }}>
             <View style={styles.numPad}>
-              <NumPad label={1} positionX="left" positionY="top" />
-              <NumPad label={2} positionX="center" positionY="top" />
-              <NumPad label={3} positionX="right" positionY="top" />
+              <NumPad
+                label={1}
+                positionX="left"
+                positionY="top"
+                onPress={() => addPhoneNumber(1)}
+              />
+              <NumPad
+                label={2}
+                positionX="center"
+                positionY="top"
+                onPress={() => addPhoneNumber(2)}
+              />
+              <NumPad
+                label={3}
+                positionX="right"
+                positionY="top"
+                onPress={() => addPhoneNumber(3)}
+              />
             </View>
             <View style={styles.numPad}>
-              <NumPad label={4} positionX="left" positionY="center" />
-              <NumPad label={5} positionX="center" positionY="center" />
-              <NumPad label={6} positionX="right" positionY="center" />
+              <NumPad
+                label={4}
+                positionX="left"
+                positionY="center"
+                onPress={() => addPhoneNumber(4)}
+              />
+              <NumPad
+                label={5}
+                positionX="center"
+                positionY="center"
+                onPress={() => addPhoneNumber(5)}
+              />
+              <NumPad
+                label={6}
+                positionX="right"
+                positionY="center"
+                onPress={() => addPhoneNumber(6)}
+              />
             </View>
             <View style={styles.numPad}>
-              <NumPad label={7} positionX="left" positionY="center" />
-              <NumPad label={8} positionX="center" positionY="center" />
-              <NumPad label={9} positionX="right" positionY="center" />
+              <NumPad
+                label={7}
+                positionX="left"
+                positionY="center"
+                onPress={() => addPhoneNumber(7)}
+              />
+              <NumPad
+                label={8}
+                positionX="center"
+                positionY="center"
+                onPress={() => addPhoneNumber(8)}
+              />
+              <NumPad
+                label={9}
+                positionX="right"
+                positionY="center"
+                onPress={() => addPhoneNumber(9)}
+              />
             </View>
             <View style={styles.numPad}>
-              <NumPad label="reset" positionX="left" positionY="bottom" />
-              <NumPad label={0} positionX="center" positionY="bottom" />
-              <NumPad label="back" positionX="right" positionY="bottom" />
+              <NumPad
+                label="reset"
+                positionX="left"
+                positionY="bottom"
+                onPress={resetAll}
+              />
+              <NumPad
+                label={0}
+                positionX="center"
+                positionY="bottom"
+                onPress={() => addPhoneNumber(0)}
+              />
+              <NumPad
+                label="back"
+                positionX="right"
+                positionY="bottom"
+                onPress={removeLastPhoneNumber}
+              />
             </View>
           </View>
           <View style={{ flex: 0.5, justifyContent: 'flex-end' }}>
-            <Button label="등록하기" color="black" />
+            <Button
+              label="등록하기"
+              color="black"
+              onPress={() => setIsVisibleSubmitModal(true)}
+              disabled={!isValidForm}
+            />
           </View>
         </View>
       </View>
-      <Modal visible={true}>
+      <Modal visible={isVisibleSubmitModal}>
         <Modal.Container>
-          <Modal.Title color="red">010-1234-5678</Modal.Title>
+          <Modal.Title color="red">{`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumber(phoneNumber)}`}</Modal.Title>
           <Modal.Content>위 번호로 웨이팅 등록을 하시겠습니까?</Modal.Content>
           <Modal.ButtonContainer>
-            <Modal.Button label="닫기" color="gray" />
-            <Modal.Button label="등록하기" color="black" />
+            <Modal.Button label="닫기" color="gray" onPress={resetAll} />
+            <Modal.Button
+              label="등록하기"
+              color="black"
+              onPress={submitCreateWaiting}
+              disabled={isLoading}
+            />
+          </Modal.ButtonContainer>
+        </Modal.Container>
+      </Modal>
+      <Modal visible={isVisibleSuccessModal}>
+        <Modal.Container>
+          <Modal.Title color="black">웨이팅 등록 완료</Modal.Title>
+          <Modal.Content>
+            휴대폰 번호로 전송된 알림톡 또는 문자 메시지를 확인해 주세요.
+          </Modal.Content>
+          <Modal.ButtonContainer>
+            <Modal.Button label="확인" onPress={resetAll} />
+          </Modal.ButtonContainer>
+        </Modal.Container>
+      </Modal>
+      <Modal visible={isVisibleErrorModal}>
+        <Modal.Container>
+          <Modal.Title color="red">웨이팅 등록 실패</Modal.Title>
+          <Modal.Content>{errorMessage}</Modal.Content>
+          <Modal.ButtonContainer>
+            <Modal.Button label="확인" onPress={resetAll} />
           </Modal.ButtonContainer>
         </Modal.Container>
       </Modal>
