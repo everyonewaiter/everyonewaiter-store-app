@@ -1,10 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
-
-import { useFocusEffect } from 'expo-router'
-import { OrientationLock } from 'expo-screen-orientation'
 
 import { AdultIcon, BabyIcon } from '@/assets/icons'
 import Button from '@/components/Button'
@@ -13,7 +10,7 @@ import { Modal } from '@/components/Modal'
 import NumPad from '@/components/NumPad'
 import PersonCountBox from '@/components/PersonCountBox'
 import { colors, fonts, milliTimes } from '@/constants'
-import { useCreateWaiting, useGetWaitingCount, useOrientation } from '@/hooks'
+import { useCreateWaiting, useGetWaitingCount } from '@/hooks'
 import {
   clearNullableInterval,
   formatPhoneNumber,
@@ -23,8 +20,6 @@ import {
 const PHONE_NUMBER_PREFIX = '010'
 
 const WaitingRegistrationScreen = () => {
-  const { lockOrientation } = useOrientation()
-
   const [idleTime, setIdleTime] = useState(milliTimes.ONE_MINUTE)
   const [personCount, setPersonCount] = useState({
     adult: 0,
@@ -40,12 +35,6 @@ const WaitingRegistrationScreen = () => {
 
   const { waitingCount } = useGetWaitingCount()
   const createWaiting = useCreateWaiting()
-
-  useFocusEffect(
-    useCallback(() => {
-      void lockOrientation(OrientationLock.LANDSCAPE_RIGHT)
-    }, [lockOrientation]),
-  )
 
   useEffect(() => {
     if (personCount.adult > 0 && phoneNumber.length === 8) {
