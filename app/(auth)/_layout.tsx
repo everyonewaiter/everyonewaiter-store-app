@@ -1,6 +1,7 @@
 import { Redirect, Stack } from 'expo-router'
 
 import { useAuthentication } from '@/contexts/AuthenticationContext'
+import SseProvider from '@/contexts/SseContext'
 
 const AuthenticationLayout = () => {
   const { isAuthenticated } = useAuthentication()
@@ -10,9 +11,11 @@ const AuthenticationLayout = () => {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="waiting" options={{ headerShown: false }} />
-    </Stack>
+    <SseProvider>
+      <Stack>
+        <Stack.Screen name="waiting" options={{ headerShown: false }} />
+      </Stack>
+    </SseProvider>
   )
 }
 
