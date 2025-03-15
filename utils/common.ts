@@ -44,18 +44,26 @@ export const makeSignatureHeader = async () => {
 
   const accessKey = device.id.toString()
   const timestamp = Date.now().toString()
-  const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey)
-  hmac.update(`${device.purpose} ${device.name}`)
-  hmac.update('\n')
-  hmac.update(accessKey)
-  hmac.update('\n')
-  hmac.update(`${timestamp}`)
-  const hash = hmac.finalize()
-  const signature = hash.toString(CryptoJS.enc.Base64)
+  const signature = makeSignature(device, secretKey, timestamp)
 
   return {
     'x-ew-access-key': accessKey,
     'x-ew-signature': signature,
     'x-ew-timestamp': timestamp,
   }
+}
+
+export const makeSignature = (
+  device: Device,
+  secretKey: string,
+  timestamp: string,
+) => {
+  const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey)
+  hmac.update(`${device.purpose} ${device.name}`)
+  hmac.update('\n')
+  hmac.update(device.id.toString())
+  hmac.update('\n')
+  hmac.update(timestamp)
+  const hash = hmac.finalize()
+  return hash.toString(CryptoJS.enc.Base64)
 }

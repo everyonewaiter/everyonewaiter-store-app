@@ -6,7 +6,7 @@ import { queryKeys } from '@/constants'
 export const useGetWaitingCount = () => {
   const { data } = useQuery({
     queryKey: [queryKeys.WAITING, queryKeys.GET_WAITING_COUNT],
-    queryFn: () => getWaitingCount(),
+    queryFn: getWaitingCount,
   })
 
   return { waitingCount: data?.count ?? 0 }
