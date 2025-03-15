@@ -7,6 +7,7 @@ import {
   Orientation,
   OrientationLock,
   removeOrientationChangeListener,
+  unlockAsync,
 } from 'expo-screen-orientation'
 
 const PORTRAIT_ORIENTATIONS = [
@@ -20,6 +21,10 @@ const LANDSCAPE_ORIENTATIONS = [
 
 const lockOrientation = async (orientationLock: OrientationLock) => {
   await lockAsync(orientationLock)
+}
+
+const unlockOrientation = async () => {
+  await unlockAsync()
 }
 
 export const useOrientation = () => {
@@ -38,6 +43,7 @@ export const useOrientation = () => {
   return {
     orientation,
     lockOrientation,
+    unlockOrientation,
     isPortrait: PORTRAIT_ORIENTATIONS.includes(orientation),
     isLandscape: LANDSCAPE_ORIENTATIONS.includes(orientation),
   }
