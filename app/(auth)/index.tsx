@@ -1,29 +1,16 @@
-import { useEffect } from 'react'
+import { Redirect } from 'expo-router'
 
-import { router } from 'expo-router'
-
-import { DevicePurpose } from '@/constants'
 import { useGetDevice } from '@/hooks'
-import { Device } from '@/types'
-
-const navigate = async (device: Device | undefined) => {
-  switch (device?.purpose) {
-    case DevicePurpose.WAITING:
-      router.replace('/waiting/registration')
-      break
-    default:
-      throw new Error('Unknown device')
-  }
-}
+import { getNavigatePath } from '@/utils'
 
 const AuthenticationNavigator = () => {
   const { device } = useGetDevice()
 
-  useEffect(() => {
-    void navigate(device)
-  }, [device])
+  if (!device) {
+    return null
+  }
 
-  return null
+  return <Redirect href={`${getNavigatePath(device.purpose)}`} />
 }
 
 export default AuthenticationNavigator

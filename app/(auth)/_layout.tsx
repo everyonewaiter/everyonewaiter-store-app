@@ -14,6 +14,7 @@ const AuthenticationLayout = () => {
     <SseProvider>
       <Stack>
         <Stack.Screen name="waiting" options={{ headerShown: false }} />
+        <Stack.Screen name="table" options={{ headerShown: false }} />
       </Stack>
     </SseProvider>
   )

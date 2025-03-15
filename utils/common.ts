@@ -3,8 +3,8 @@ import { ForwardedRef } from 'react'
 import { isAxiosError } from 'axios'
 import CryptoJS from 'crypto-js'
 
-import { storageKeys } from '@/constants'
-import { Device } from '@/types'
+import { DevicePurpose, storageKeys } from '@/constants'
+import { Device, valueOf } from '@/types'
 import { getItem } from '@/utils/storage'
 
 export const parseErrorMessage = (error: Error) => {
@@ -29,6 +29,17 @@ export const mergeRefs = <T>(...refs: ForwardedRef<T>[]) => {
 export const clearNullableInterval = (interval: NodeJS.Timeout | null) => {
   if (interval) {
     clearInterval(interval)
+  }
+}
+
+export const getNavigatePath = (purpose: valueOf<typeof DevicePurpose>) => {
+  switch (purpose) {
+    case DevicePurpose.WAITING:
+      return '/waiting/registration'
+    case DevicePurpose.TABLE:
+      return '/table/customer'
+    default:
+      throw new Error('Unknown device purpose')
   }
 }
 
