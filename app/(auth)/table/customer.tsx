@@ -1,11 +1,11 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
-  Dimensions,
   FlatList,
   Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native'
 
@@ -108,8 +108,14 @@ const menus = [
 ]
 
 const CustomerTableScreen = () => {
+  const { width: screenWidth } = useWindowDimensions()
   const categoriesRef = useRef<FlatList | null>(null)
+  const [categoryContentWidth, setCategoryContentWidth] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState('전체')
+
+  useEffect(() => {
+    setCategoryContentWidth(screenWidth - 210)
+  }, [screenWidth])
 
   const handleSelectCategory = (label: string, index: number) => {
     setSelectedCategory(label)
@@ -128,7 +134,7 @@ const CustomerTableScreen = () => {
           </View>
         </View>
         <View style={styles.categoryContainer}>
-          <View style={{ width: Dimensions.get('window').width - 210 }}>
+          <View style={{ width: categoryContentWidth }}>
             <FlatList
               ref={categoriesRef}
               data={categories}

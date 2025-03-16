@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react'
 import {
-  Dimensions,
   Pressable,
   PressableProps,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native'
 
@@ -20,8 +21,6 @@ interface MenuProps extends PressableProps {
   rootPaddingHorizontal: number
 }
 
-const screenWidth = Dimensions.get('window').width
-
 const Menu = ({
   image,
   name,
@@ -31,12 +30,18 @@ const Menu = ({
   rootPaddingHorizontal,
   ...props
 }: MenuProps) => {
-  const availableSpace =
-    screenWidth - rootPaddingHorizontal * 2 - (rootNumColumns - 1) * rootGap
-  const width = availableSpace / rootNumColumns
+  const { width: screenWidth } = useWindowDimensions()
+  const [contentWidth, setContentWidth] = useState(0)
+
+  useEffect(() => {
+    const paddingHorizontalSpace = rootPaddingHorizontal * 2
+    const columnGapSpace = rootGap * (rootNumColumns - 1)
+    const availableSpace = screenWidth - paddingHorizontalSpace - columnGapSpace
+    setContentWidth(availableSpace / rootNumColumns)
+  }, [screenWidth, rootGap, rootNumColumns, rootPaddingHorizontal])
 
   return (
-    <Pressable style={[styles.container, { width }]} {...props}>
+    <Pressable style={[styles.container, { width: contentWidth }]} {...props}>
       <View style={styles.imageContainer}>
         <ImageBackground
           style={styles.image}
@@ -63,7 +68,7 @@ const styles = StyleSheet.create({
     borderColor: colors.GRAY5_E7,
   },
   imageContainer: {
-    flex: 2,
+    flex: 3,
     borderBottomWidth: 1,
     borderColor: colors.GRAY5_E7,
   },
