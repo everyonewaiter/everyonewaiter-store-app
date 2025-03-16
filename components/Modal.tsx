@@ -30,16 +30,18 @@ const Container = ({ children }: PropsWithChildren) => {
 interface TitleProps {
   color?: 'black' | 'red'
   position?: 'left' | 'center'
+  size?: 'medium' | 'large'
 }
 
 const Title = ({
   color = 'black',
   position = 'center',
+  size = 'large',
   children,
 }: PropsWithChildren<TitleProps>) => {
   return (
     <View style={position === 'center' && styles.titleCenter}>
-      <Text style={[styles.titleText, styles[`title-${color}`]]}>
+      <Text style={[styles[`titleText-${size}`], styles[`title-${color}`]]}>
         {children}
       </Text>
     </View>
@@ -113,7 +115,11 @@ const styles = StyleSheet.create({
   titleCenter: {
     alignItems: 'center',
   },
-  titleText: {
+  'titleText-medium': {
+    fontFamily: fonts.PRETENDARD_BOLD,
+    fontSize: 18,
+  },
+  'titleText-large': {
     fontFamily: fonts.PRETENDARD_BOLD,
     fontSize: 32,
   },

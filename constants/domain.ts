@@ -13,13 +13,18 @@ export const DeviceStatus = {
   INACTIVE: '비활성',
 } as const
 
+export const PaymentType = {
+  PREPAID: '선결제',
+  POSTPAID: '후결제',
+} as const
+
+export const StoreStatus = {
+  OPEN: '영업중',
+  CLOSE: '영업 마감',
+} as const
+
 export const UserRole = {
   USER: '사용자',
   OWNER: '사장님',
   ADMIN: '관리자',
-} as const
-
-export const PaymentType = {
-  PREPAID: '선결제',
-  POSTPAID: '후결제',
 } as const
