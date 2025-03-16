@@ -10,6 +10,7 @@ export const queryKeys = {
   DEVICE: 'device',
   GET_DEVICE: 'getDevice',
   STORE: 'store',
+  GET_STORE: 'getStore',
   GET_STORE_NAMES: 'getStoreNames',
   USER: 'user',
   GET_PROFILE: 'getProfile',
