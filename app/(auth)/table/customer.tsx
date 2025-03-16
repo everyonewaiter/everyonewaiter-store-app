@@ -12,8 +12,10 @@ import {
 import { BellIcon } from '@/assets/icons/BellIcon'
 import { ReceiptIcon } from '@/assets/icons/ReceiptIcon'
 import Category from '@/components/Category'
+import CountryOfOriginModal from '@/components/CountryOfOriginModal'
 import Menu from '@/components/Menu'
 import { colors, fonts } from '@/constants'
+import { useGetStore } from '@/hooks'
 
 const storeName = '나루 레스토랑'
 const tableNo = 1
@@ -109,9 +111,18 @@ const menus = [
 
 const CustomerTableScreen = () => {
   const { width: screenWidth } = useWindowDimensions()
+
+  // Store
+  const { data: store } = useGetStore()
+
+  // Category
   const categoriesRef = useRef<FlatList | null>(null)
   const [categoryContentWidth, setCategoryContentWidth] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState('전체')
+
+  // Modal
+  const [isVisibleCountryOfOriginModal, setIsVisibleCountryOfOriginModal] =
+    useState(false)
 
   useEffect(() => {
     setCategoryContentWidth(screenWidth - 210)
@@ -152,7 +163,10 @@ const CustomerTableScreen = () => {
             />
           </View>
           <View>
-            <Pressable style={styles.countryOfOrigin}>
+            <Pressable
+              style={styles.countryOfOrigin}
+              onPress={() => setIsVisibleCountryOfOriginModal(true)}
+            >
               <Text style={styles.countryOfOriginText}>원산지 정보</Text>
             </Pressable>
           </View>
@@ -199,6 +213,11 @@ const CustomerTableScreen = () => {
           </Pressable>
         </View>
       </View>
+      <CountryOfOriginModal
+        isVisible={isVisibleCountryOfOriginModal}
+        countryOfOrigins={store?.countryOfOrigins ?? []}
+        close={() => setIsVisibleCountryOfOriginModal(false)}
+      />
     </SafeAreaView>
   )
 }
