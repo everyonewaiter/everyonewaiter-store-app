@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 import { Redirect, Stack, useFocusEffect } from 'expo-router'
 import { OrientationLock } from 'expo-screen-orientation'
 
-import { DevicePurpose } from '@/constants'
+import { colors, DevicePurpose } from '@/constants'
 import { useGetDevice, useOrientation } from '@/hooks'
 import { getNavigatePath } from '@/utils'
 
@@ -27,7 +27,9 @@ const CustomerTableLayout = () => {
   }
 
   return (
-    <Stack>
+    <Stack
+      screenOptions={{ contentStyle: { backgroundColor: colors.GRAY7_F1 } }}
+    >
       <Stack.Screen name="customer" options={{ headerShown: false }} />
     </Stack>
   )
