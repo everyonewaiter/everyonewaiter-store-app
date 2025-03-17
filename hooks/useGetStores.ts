@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { getStore, getStoreNames } from '@/api/store'
+import { getSetting, getStore, getStoreNames } from '@/api/store'
 import { queryKeys } from '@/constants'
 
 export const useGetStores = (userId: bigint | undefined) => {
@@ -15,5 +15,12 @@ export const useGetStore = () => {
   return useQuery({
     queryKey: [queryKeys.STORE, queryKeys.GET_STORE],
     queryFn: getStore,
+  })
+}
+
+export const useGetSetting = () => {
+  return useQuery({
+    queryKey: [queryKeys.SETTING],
+    queryFn: getSetting,
   })
 }

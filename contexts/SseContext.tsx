@@ -27,10 +27,7 @@ const handleStoreActionEvent = (storeAction: string | StoreActionEvent) => {
       void queryClient.invalidateQueries({ queryKey: [queryKeys.STORE] })
       break
     case '설정':
-      console.log(
-        'Not implemented yet store action event:',
-        storeAction.category,
-      )
+      void queryClient.invalidateQueries({ queryKey: [queryKeys.SETTING] })
       break
     case '카테고리':
       console.log(
