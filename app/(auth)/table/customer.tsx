@@ -22,98 +22,15 @@ import Menu from '@/components/Menu'
 import { Modal } from '@/components/Modal'
 import StaffCallModal from '@/components/StaffCallModal'
 import { colors, fonts, milliTimes } from '@/constants'
-import { useGetDevice, useGetSetting, useGetStore, useStaffCall } from '@/hooks'
+import {
+  useGetCategories,
+  useGetDevice,
+  useGetMenus,
+  useGetSetting,
+  useGetStore,
+  useStaffCall,
+} from '@/hooks'
 import { parseErrorMessage } from '@/utils'
-
-const categories = [
-  { id: 0, name: '전체' },
-  { id: 1, name: '카테고리1' },
-  { id: 2, name: '카테고리2' },
-  { id: 3, name: '카테고리3' },
-  { id: 4, name: '카테고리4' },
-  { id: 5, name: '카테고리5' },
-  { id: 6, name: '카테고리6' },
-  { id: 7, name: '카테고리7' },
-  { id: 8, name: '카테고리8' },
-  { id: 9, name: '카테고리9' },
-  { id: 10, name: '카테고리10' },
-  { id: 11, name: '카테고리11' },
-  { id: 12, name: '카테고리12' },
-  { id: 13, name: '카테고리13' },
-  { id: 14, name: '카테고리14' },
-]
-const menus = [
-  {
-    id: BigInt(1),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴1',
-    price: BigInt(10000),
-  },
-  {
-    id: BigInt(2),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴2',
-    price: BigInt(8800),
-  },
-  {
-    id: BigInt(3),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴3',
-    price: BigInt(30000),
-  },
-  {
-    id: BigInt(4),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴4',
-    price: BigInt(30000),
-  },
-  {
-    id: BigInt(5),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴5',
-    price: BigInt(30000),
-  },
-  {
-    id: BigInt(6),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴6',
-    price: BigInt(30000),
-  },
-  {
-    id: BigInt(7),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴7',
-    price: BigInt(30000),
-  },
-  {
-    id: BigInt(8),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴8',
-    price: BigInt(30000),
-  },
-  {
-    id: BigInt(9),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴9',
-    price: BigInt(30000),
-  },
-  {
-    id: BigInt(10),
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwmrbKbttK8TgNRmIijBAHo1DN59jnAgG0g&s',
-    name: '메뉴10',
-    price: BigInt(30000),
-  },
-]
 
 const CustomerTableScreen = () => {
   const { width: screenWidth } = useWindowDimensions()
@@ -125,9 +42,14 @@ const CustomerTableScreen = () => {
   const { data: setting } = useGetSetting()
 
   // Category
+  const { categories } = useGetCategories()
   const categoriesRef = useRef<FlatList | null>(null)
   const [categoryContentWidth, setCategoryContentWidth] = useState(0)
-  const [selectedCategory, setSelectedCategory] = useState('전체')
+  const [selectedCategory, setSelectedCategory] = useState('0')
+
+  // Menu
+  const { menus } = useGetMenus()
+  const menusRef = useRef<FlatList | null>(null)
 
   // Order
   const staffCall = useStaffCall()
@@ -168,8 +90,8 @@ const CustomerTableScreen = () => {
     }
   })
 
-  const handleSelectCategory = (label: string, index: number) => {
-    setSelectedCategory(label)
+  const handleSelectCategory = (id: bigint, index: number) => {
+    setSelectedCategory(id.toString())
     categoriesRef.current?.scrollToIndex({ index })
   }
 
@@ -206,13 +128,15 @@ const CustomerTableScreen = () => {
   }
 
   const resetAll = () => {
-    setSelectedCategory('전체')
+    setSelectedCategory('0')
     setSelectedStaffCallOption('')
     setIsVisibleCountryOfOriginModal(false)
     setIsVisibleStaffCallModal(false)
     setIsVisibleStaffCallSuccessModal(false)
     setIsVisibleErrorModal(false)
     setError({ title: '', message: '' })
+    categoriesRef.current?.scrollToIndex({ index: 0 })
+    menusRef.current?.scrollToIndex({ index: 0 })
   }
 
   return (
@@ -229,21 +153,24 @@ const CustomerTableScreen = () => {
           </View>
           <View style={styles.categoryContainer}>
             <View style={{ width: categoryContentWidth }}>
-              <FlatList
-                ref={categoriesRef}
-                data={categories}
-                horizontal={true}
-                keyExtractor={item => String(item.id)}
-                contentContainerStyle={{ gap: 8, paddingBottom: 8 }}
-                renderItem={renderItem => (
-                  <Category
-                    label={renderItem.item.name}
-                    index={renderItem.index}
-                    selectedCategory={selectedCategory}
-                    handleSelectCategory={handleSelectCategory}
-                  />
-                )}
-              />
+              {categories && categories.length > 0 && (
+                <FlatList
+                  ref={categoriesRef}
+                  data={categories}
+                  horizontal={true}
+                  keyExtractor={(item, index) => `${item.id}-${index}`}
+                  contentContainerStyle={{ gap: 8, paddingBottom: 8 }}
+                  renderItem={renderItem => (
+                    <Category
+                      id={renderItem.item.id}
+                      label={renderItem.item.name}
+                      index={renderItem.index}
+                      selectedCategory={selectedCategory}
+                      handleSelectCategory={handleSelectCategory}
+                    />
+                  )}
+                />
+              )}
             </View>
             <View>
               <Pressable
@@ -255,27 +182,36 @@ const CustomerTableScreen = () => {
             </View>
           </View>
           <View style={styles.menuContainer}>
-            <FlatList
-              data={menus}
-              numColumns={4}
-              keyExtractor={item => String(item.id)}
-              columnWrapperStyle={{ gap: 16 }}
-              contentContainerStyle={{
-                gap: 16,
-                paddingHorizontal: 24,
-                paddingBottom: 130,
-              }}
-              renderItem={renderItem => (
-                <Menu
-                  image={renderItem.item.image}
-                  name={renderItem.item.name}
-                  price={renderItem.item.price}
-                  rootNumColumns={4}
-                  rootGap={16}
-                  rootPaddingHorizontal={24}
-                />
-              )}
-            />
+            {menus && menus.length > 0 && (
+              <FlatList
+                ref={menusRef}
+                data={
+                  selectedCategory === '0'
+                    ? menus
+                    : menus.filter(
+                        menu => menu.categoryId.toString() === selectedCategory,
+                      )
+                }
+                numColumns={4}
+                keyExtractor={item => String(item.id)}
+                columnWrapperStyle={{ gap: 16 }}
+                contentContainerStyle={{
+                  gap: 16,
+                  paddingHorizontal: 24,
+                  paddingBottom: 130,
+                }}
+                renderItem={renderItem => (
+                  <Menu
+                    image={renderItem.item.imageUri ?? ''}
+                    name={renderItem.item.name}
+                    price={renderItem.item.price}
+                    rootNumColumns={4}
+                    rootGap={16}
+                    rootPaddingHorizontal={24}
+                  />
+                )}
+              />
+            )}
           </View>
         </View>
         <View style={styles.footerContainer}>
