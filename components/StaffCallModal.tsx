@@ -1,0 +1,131 @@
+import { useEffect, useState } from 'react'
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native'
+
+import { Modal } from '@/components/Modal'
+import { colors, fonts } from '@/constants'
+
+interface StaffCallModalProps {
+  isVisible: boolean
+  staffCallOptions: string[]
+  selectedStaffCallOption: string
+  handleSelect: (option: string) => void
+  submit: () => void
+  close: () => void
+}
+
+const numColumns = 4
+const gap = 12
+
+const StaffCallModal = ({
+  isVisible,
+  staffCallOptions,
+  selectedStaffCallOption,
+  handleSelect,
+  submit,
+  close,
+}: StaffCallModalProps) => {
+  const { width: screenWidth } = useWindowDimensions()
+  const [contentWidth, setContentWidth] = useState(0)
+
+  useEffect(() => {
+    const modalWidth = screenWidth * 0.5
+    const paddingHorizontalSpace = 32 * 2
+    const columnGapSpace = gap * (numColumns - 1)
+    const availableSpace = modalWidth - paddingHorizontalSpace - columnGapSpace
+    setContentWidth(availableSpace / numColumns)
+  }, [screenWidth])
+
+  return (
+    <Modal visible={isVisible}>
+      <Modal.Container>
+        <Modal.Title color="black" size="medium" position="left">
+          직원 호출
+        </Modal.Title>
+        <FlatList
+          data={staffCallOptions}
+          numColumns={numColumns}
+          keyExtractor={(item, index) => `${item}-${index}`}
+          columnWrapperStyle={{ gap }}
+          contentContainerStyle={{ gap }}
+          renderItem={renderItem => (
+            <Pressable
+              style={[
+                styles.staffCallOption,
+                { width: contentWidth },
+                selectedStaffCallOption === renderItem.item &&
+                  styles.selectedStaffCallOption,
+              ]}
+              onPress={() => handleSelect(renderItem.item)}
+            >
+              <View style={styles.center}>
+                <Text style={styles.staffCallOptionText}>
+                  {renderItem.item}
+                </Text>
+              </View>
+            </Pressable>
+          )}
+        />
+        <Modal.ButtonContainer>
+          <Modal.Button label="닫기" color="gray" onPress={close} />
+          <Modal.Button
+            label="호출하기"
+            color="black"
+            disabled={!selectedStaffCallOption}
+            onPress={submit}
+          />
+        </Modal.ButtonContainer>
+      </Modal.Container>
+    </Modal>
+  )
+}
+
+const styles = StyleSheet.create({
+  subjectContainer: {
+    height: 48,
+    flexDirection: 'row',
+    backgroundColor: colors.GRAY7_F1,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  subjectText: {
+    fontFamily: fonts.PRETENDARD_MEDIUM,
+    fontSize: 15,
+  },
+  contentContainer: {
+    height: 48,
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: colors.GRAY5_E7,
+  },
+  contentText: {
+    fontFamily: fonts.PRETENDARD_REGULAR,
+    fontSize: 14,
+  },
+  staffCallOption: {
+    height: 118,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.GRAY5_E7,
+  },
+  selectedStaffCallOption: {
+    borderColor: colors.PRIMARY_RED,
+  },
+  staffCallOptionText: {
+    fontFamily: fonts.PRETENDARD_REGULAR,
+    fontSize: 15,
+  },
+})
+
+export default StaffCallModal

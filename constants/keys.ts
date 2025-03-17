@@ -9,6 +9,7 @@ export const storageKeys = {
 export const queryKeys = {
   DEVICE: 'device',
   GET_DEVICE: 'getDevice',
+  SETTING: 'setting',
   STORE: 'store',
   GET_STORE: 'getStore',
   GET_STORE_NAMES: 'getStoreNames',
