@@ -53,7 +53,7 @@ const Menu = ({
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.menuName}>{name}</Text>
-        <Text style={styles.menuPrice}>{price.toPrice()}원</Text>
+        <Text style={styles.menuPrice}>{BigInt(price).toPrice()}원</Text>
       </View>
     </Pressable>
   )

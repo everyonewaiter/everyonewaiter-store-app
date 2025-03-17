@@ -3,13 +3,15 @@ import { Pressable, StyleSheet, Text } from 'react-native'
 import { colors, fonts } from '@/constants'
 
 interface CategoryProps {
+  id: bigint
   label: string
   index: number
   selectedCategory: string
-  handleSelectCategory: (label: string, index: number) => void
+  handleSelectCategory: (id: bigint, index: number) => void
 }
 
 const Category = ({
+  id,
   label,
   index,
   selectedCategory,
@@ -19,16 +21,16 @@ const Category = ({
     <Pressable
       style={[
         styles.category,
-        label === selectedCategory
+        id.toString() === selectedCategory
           ? styles.selectedCategory
           : styles.notSelectedCategory,
       ]}
-      onPress={() => handleSelectCategory(label, index)}
+      onPress={() => handleSelectCategory(id, index)}
     >
       <Text
         style={[
           styles.categoryText,
-          label === selectedCategory
+          id.toString() === selectedCategory
             ? styles.selectedCategoryText
             : styles.notSelectedCategoryText,
         ]}

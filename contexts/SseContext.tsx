@@ -30,16 +30,10 @@ const handleStoreActionEvent = (storeAction: string | StoreActionEvent) => {
       void queryClient.invalidateQueries({ queryKey: [queryKeys.SETTING] })
       break
     case '카테고리':
-      console.log(
-        'Not implemented yet store action event:',
-        storeAction.category,
-      )
+      void queryClient.invalidateQueries({ queryKey: [queryKeys.CATEGORY] })
       break
     case '메뉴':
-      console.log(
-        'Not implemented yet store action event:',
-        storeAction.category,
-      )
+      void queryClient.invalidateQueries({ queryKey: [queryKeys.MENU] })
       break
     case '웨이팅':
       void queryClient.invalidateQueries({ queryKey: [queryKeys.WAITING] })

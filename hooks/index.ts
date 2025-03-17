@@ -1,5 +1,6 @@
 export * from '@/hooks/useDeviceType'
 export * from '@/hooks/useGetDevice'
+export * from '@/hooks/useGetMenu'
 export * from '@/hooks/useGetProfile'
 export * from '@/hooks/useGetStores'
 export * from '@/hooks/useOrientation'
