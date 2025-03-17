@@ -13,6 +13,11 @@ export const DeviceStatus = {
   INACTIVE: '비활성',
 } as const
 
+export const KitchenPrinterLocation = {
+  POS: 'POS',
+  HALL: '홀 관리',
+} as const
+
 export const PaymentType = {
   PREPAID: '선결제',
   POSTPAID: '후결제',

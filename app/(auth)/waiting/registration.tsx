@@ -5,17 +5,14 @@ import { runOnJS } from 'react-native-reanimated'
 
 import { AdultIcon, BabyIcon } from '@/assets/icons'
 import Button from '@/components/Button'
+import ErrorModal from '@/components/ErrorModal'
 import LogoHeaderTitle from '@/components/LogoHeaderTitle'
 import { Modal } from '@/components/Modal'
 import NumPad from '@/components/NumPad'
 import PersonCountBox from '@/components/PersonCountBox'
 import { colors, fonts, milliTimes } from '@/constants'
 import { useCreateWaiting, useGetWaitingCount } from '@/hooks'
-import {
-  clearNullableInterval,
-  formatPhoneNumber,
-  parseErrorMessage,
-} from '@/utils'
+import { formatPhoneNumber, parseErrorMessage } from '@/utils'
 
 const PHONE_NUMBER_PREFIX = '010'
 
@@ -52,8 +49,7 @@ const WaitingRegistrationScreen = () => {
         setIdleTime(prev => prev - milliTimes.ONE_SECOND)
       }
     }, milliTimes.ONE_SECOND)
-
-    return () => clearNullableInterval(interval)
+    return () => clearInterval(interval)
   }, [personCount, phoneNumber])
 
   useEffect(() => {
@@ -305,15 +301,12 @@ const WaitingRegistrationScreen = () => {
             </Modal.ButtonContainer>
           </Modal.Container>
         </Modal>
-        <Modal visible={isVisibleErrorModal}>
-          <Modal.Container>
-            <Modal.Title color="red">웨이팅 등록 실패</Modal.Title>
-            <Modal.Content>{errorMessage}</Modal.Content>
-            <Modal.ButtonContainer>
-              <Modal.Button label="확인" onPress={resetAll} />
-            </Modal.ButtonContainer>
-          </Modal.Container>
-        </Modal>
+        <ErrorModal
+          isVisible={isVisibleErrorModal}
+          title="웨이팅 등록 실패"
+          message={errorMessage}
+          close={resetAll}
+        />
       </SafeAreaView>
     </GestureDetector>
   )
