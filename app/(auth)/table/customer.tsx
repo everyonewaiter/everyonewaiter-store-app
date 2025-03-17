@@ -16,7 +16,7 @@ import { ReceiptIcon } from '@/assets/icons/ReceiptIcon'
 import CategoryButton from '@/components/CategoryButton'
 import CountryOfOriginModal from '@/components/CountryOfOriginModal'
 import ErrorModal from '@/components/ErrorModal'
-import Menu from '@/components/Menu'
+import MenuCard from '@/components/MenuCard'
 import StaffCallModal from '@/components/StaffCallModal'
 import SuccessModal from '@/components/SuccessModal'
 import { colors, defaultCategory, fonts, images, milliTimes } from '@/constants'
@@ -190,10 +190,8 @@ const CustomerTableScreen = () => {
                   paddingBottom: 130,
                 }}
                 renderItem={renderItem => (
-                  <Menu
-                    image={renderItem.item.imageUri ?? ''}
-                    name={renderItem.item.name}
-                    price={renderItem.item.price}
+                  <MenuCard
+                    menu={renderItem.item}
                     rootNumColumns={4}
                     rootGap={16}
                     rootPaddingHorizontal={24}

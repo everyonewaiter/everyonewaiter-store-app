@@ -3,6 +3,7 @@ export const colors = {
   BLACK: '#000000',
   PRIMARY_RED: '#F22020',
   STATUS_ERROR: '#EC2E12',
+  ORANGE: '#FF9000',
   GRAY7_F1: '#F1F1F1',
   GRAY7_F7: '#F7F7F7',
   GRAY5_DA: '#DADADA',
