@@ -10,26 +10,24 @@ import {
 
 import { ImageBackground } from 'expo-image'
 
-import { colors, fonts } from '@/constants'
+import Badge from '@/components/Badge'
+import { colors, fonts, MenuLabel } from '@/constants'
+import { Menu } from '@/types'
 
-interface MenuProps extends PressableProps {
-  image: string
-  name: string
-  price: bigint
+interface MenuCardProps extends PressableProps {
+  menu: Menu
   rootNumColumns: number
   rootGap: number
   rootPaddingHorizontal: number
 }
 
-const Menu = ({
-  image,
-  name,
-  price,
+const MenuCard = ({
+  menu,
   rootNumColumns,
   rootGap,
   rootPaddingHorizontal,
   ...props
-}: MenuProps) => {
+}: MenuCardProps) => {
   const { width: screenWidth } = useWindowDimensions()
   const [contentWidth, setContentWidth] = useState(0)
 
@@ -46,14 +44,21 @@ const Menu = ({
         <ImageBackground
           style={styles.image}
           imageStyle={styles.imageBorder}
-          source={{ uri: image }}
-          alt={name}
+          source={{ uri: menu.imageUri }}
+          alt={menu.name}
           contentFit="cover"
-        />
+        >
+          {menu.label !== MenuLabel.DEFAULT && <Badge label={menu.label} />}
+        </ImageBackground>
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.menuName}>{name}</Text>
-        <Text style={styles.menuPrice}>{BigInt(price).toPrice()}원</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={styles.menuName}>{menu.name}</Text>
+          {menu.spicy > 0 && (
+            <Text style={styles.menuSpicy}> {'🌶'.repeat(menu.spicy)}</Text>
+          )}
+        </View>
+        <Text style={styles.menuPrice}>{BigInt(menu.price).toPrice()}원</Text>
       </View>
     </Pressable>
   )
@@ -90,6 +95,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PRETENDARD_MEDIUM,
     fontSize: 15,
   },
+  menuSpicy: {
+    fontFamily: fonts.PRETENDARD_REGULAR,
+    fontSize: 13,
+  },
   menuPrice: {
     fontFamily: fonts.PRETENDARD_MEDIUM,
     fontSize: 20,
@@ -97,4 +106,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Menu
+export default MenuCard
