@@ -7,8 +7,12 @@ export const storageKeys = {
 } as const
 
 export const queryKeys = {
+  CATEGORY: 'category',
+  GET_CATEGORIES: 'getCategories',
   DEVICE: 'device',
   GET_DEVICE: 'getDevice',
+  MENU: 'menu',
+  GET_MENUS: 'getMenus',
   SETTING: 'setting',
   STORE: 'store',
   GET_STORE: 'getStore',

@@ -1,5 +1,6 @@
 export * from '@/types/common'
 export * from '@/types/device'
+export * from '@/types/menu'
 export * from '@/types/store'
 export * from '@/types/user'
 export * from '@/types/waiting'

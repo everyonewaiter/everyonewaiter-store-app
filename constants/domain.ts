@@ -18,6 +18,24 @@ export const KitchenPrinterLocation = {
   HALL: '홀 관리',
 } as const
 
+export const MenuLabel = {
+  DEFAULT: '기본',
+  NEW: 'NEW',
+  BEST: 'BEST',
+  RECOMMEND: '추천',
+} as const
+
+export const MenuOptionGroupType = {
+  MANDATORY: '필수',
+  CHOICE: '선택',
+} as const
+
+export const MenuStatus = {
+  DEFAULT: '기본',
+  HIDE: '숨김',
+  SOLD_OUT: '품절',
+} as const
+
 export const PaymentType = {
   PREPAID: '선결제',
   POSTPAID: '후결제',

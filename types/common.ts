@@ -1,5 +1,9 @@
 export type valueOf<T> = T[keyof T]
 
+export type ImageAccessUri = {
+  accessUri: string
+}
+
 export type StoreActionEvent = {
   category: valueOf<StoreActionCategory>
   actionType: valueOf<StoreActionType>

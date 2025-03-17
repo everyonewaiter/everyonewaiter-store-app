@@ -1,6 +1,7 @@
 export * from '@/api/auth'
 export * from '@/api/axios'
 export * from '@/api/device'
+export * from '@/api/menu'
 export * from '@/api/order'
 export * from '@/api/queryClient'
 export * from '@/api/user'
