@@ -1,41 +1,40 @@
 import { Pressable, StyleSheet, Text } from 'react-native'
 
 import { colors, fonts } from '@/constants'
+import { Category } from '@/types'
 
-interface CategoryProps {
-  id: bigint
-  label: string
+interface CategoryButtonProps {
   index: number
-  selectedCategory: string
-  handleSelectCategory: (id: bigint, index: number) => void
+  category: Category
+  selectedCategory: Category
+  handleSelectCategory: (category: Category, index: number) => void
 }
 
-const Category = ({
-  id,
-  label,
+const CategoryButton = ({
   index,
+  category,
   selectedCategory,
   handleSelectCategory,
-}: CategoryProps) => {
+}: CategoryButtonProps) => {
+  const isSelected = category.id.toString() === selectedCategory.id.toString()
+
   return (
     <Pressable
       style={[
         styles.category,
-        id.toString() === selectedCategory
-          ? styles.selectedCategory
-          : styles.notSelectedCategory,
+        isSelected ? styles.selectedCategory : styles.notSelectedCategory,
       ]}
-      onPress={() => handleSelectCategory(id, index)}
+      onPress={() => handleSelectCategory(category, index)}
     >
       <Text
         style={[
           styles.categoryText,
-          id.toString() === selectedCategory
+          isSelected
             ? styles.selectedCategoryText
             : styles.notSelectedCategoryText,
         ]}
       >
-        {label}
+        {category.name}
       </Text>
     </Pressable>
   )
@@ -68,4 +67,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Category
+export default CategoryButton
