@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   FlatList,
   Pressable,
@@ -13,9 +13,9 @@ import { colors, fonts } from '@/constants'
 
 interface StaffCallModalProps {
   isVisible: boolean
-  staffCallOptions: string[]
-  selectedStaffCallOption: string
-  handleSelect: (option: string) => void
+  options: string[]
+  selectedOption: string
+  setSelectedOption: React.Dispatch<React.SetStateAction<string>>
   submit: () => void
   close: () => void
 }
@@ -25,9 +25,9 @@ const gap = 12
 
 const StaffCallModal = ({
   isVisible,
-  staffCallOptions,
-  selectedStaffCallOption,
-  handleSelect,
+  options,
+  selectedOption,
+  setSelectedOption,
   submit,
   close,
 }: StaffCallModalProps) => {
@@ -49,7 +49,7 @@ const StaffCallModal = ({
           직원 호출
         </Modal.Title>
         <FlatList
-          data={staffCallOptions}
+          data={options}
           numColumns={numColumns}
           keyExtractor={(item, index) => `${item}-${index}`}
           columnWrapperStyle={{ gap }}
@@ -59,10 +59,9 @@ const StaffCallModal = ({
               style={[
                 styles.staffCallOption,
                 { width: contentWidth },
-                selectedStaffCallOption === renderItem.item &&
-                  styles.selectedStaffCallOption,
+                selectedOption === renderItem.item && styles.selectedOption,
               ]}
-              onPress={() => handleSelect(renderItem.item)}
+              onPress={() => setSelectedOption(renderItem.item)}
             >
               <View style={styles.center}>
                 <Text style={styles.staffCallOptionText}>
@@ -77,7 +76,7 @@ const StaffCallModal = ({
           <Modal.Button
             label="호출하기"
             color="black"
-            disabled={!selectedStaffCallOption}
+            disabled={!selectedOption}
             onPress={submit}
           />
         </Modal.ButtonContainer>
@@ -119,7 +118,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.GRAY5_E7,
   },
-  selectedStaffCallOption: {
+  selectedOption: {
     borderColor: colors.PRIMARY_RED,
   },
   staffCallOptionText: {

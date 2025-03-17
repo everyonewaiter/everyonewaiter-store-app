@@ -11,41 +11,43 @@ import {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 
-import { Image } from 'expo-image'
-
 import { BellIcon } from '@/assets/icons/BellIcon'
 import { ReceiptIcon } from '@/assets/icons/ReceiptIcon'
-import Category from '@/components/Category'
+import CategoryButton from '@/components/CategoryButton'
 import CountryOfOriginModal from '@/components/CountryOfOriginModal'
 import ErrorModal from '@/components/ErrorModal'
 import Menu from '@/components/Menu'
-import { Modal } from '@/components/Modal'
 import StaffCallModal from '@/components/StaffCallModal'
-import { colors, fonts, milliTimes } from '@/constants'
+import SuccessModal from '@/components/SuccessModal'
+import { colors, defaultCategory, fonts, images, milliTimes } from '@/constants'
 import {
   useGetCategories,
   useGetDevice,
   useGetMenus,
   useGetSetting,
   useGetStore,
+  useModal,
   useStaffCall,
 } from '@/hooks'
+import { Category } from '@/types'
 import { parseErrorMessage } from '@/utils'
 
 const CustomerTableScreen = () => {
+  // Common
   const { width: screenWidth } = useWindowDimensions()
   const { device } = useGetDevice()
   const [idleTime, setIdleTime] = useState(milliTimes.ONE_MINUTE)
+  const [error, setError] = useState({ title: '', message: '' })
 
   // Store
   const { data: store } = useGetStore()
   const { data: setting } = useGetSetting()
 
-  // Category
+  // CategoryButton
   const { categories } = useGetCategories()
   const categoriesRef = useRef<FlatList | null>(null)
   const [categoryContentWidth, setCategoryContentWidth] = useState(0)
-  const [selectedCategory, setSelectedCategory] = useState('0')
+  const [selectedCategory, setSelectedCategory] = useState(defaultCategory)
 
   // Menu
   const { menus } = useGetMenus()
@@ -56,16 +58,10 @@ const CustomerTableScreen = () => {
   const [selectedStaffCallOption, setSelectedStaffCallOption] = useState('')
 
   // Modal
-  const [isVisibleCountryOfOriginModal, setIsVisibleCountryOfOriginModal] =
-    useState(false)
-  const [isVisibleStaffCallModal, setIsVisibleStaffCallModal] = useState(false)
-  const [isVisibleStaffCallSuccessModal, setIsVisibleStaffCallSuccessModal] =
-    useState(false)
-  const [isVisibleErrorModal, setIsVisibleErrorModal] = useState(false)
-  const [error, setError] = useState({
-    title: '',
-    message: '',
-  })
+  const countryOfOriginModal = useModal()
+  const staffCallModal = useModal()
+  const staffCallSuccessModal = useModal()
+  const errorModal = useModal()
 
   useEffect(() => {
     setCategoryContentWidth(screenWidth - 210)
@@ -90,51 +86,48 @@ const CustomerTableScreen = () => {
     }
   })
 
-  const handleSelectCategory = (id: bigint, index: number) => {
-    setSelectedCategory(id.toString())
-    categoriesRef.current?.scrollToIndex({ index })
-  }
-
-  const handleSelectStaffCallOption = (option: string) => {
-    setSelectedStaffCallOption(option)
-  }
-
-  const closeStaffCallModal = () => {
-    setSelectedStaffCallOption('')
-    setIsVisibleStaffCallModal(false)
-  }
-
-  const callStaff = () => {
-    if (!selectedStaffCallOption) {
-      return
+  const filterMenus = () => {
+    if (!menus) {
+      return []
     }
-
-    setIsVisibleStaffCallModal(false)
-    staffCall.mutate(
-      { callOption: selectedStaffCallOption },
-      {
-        onSuccess: () => {
-          setIsVisibleStaffCallSuccessModal(true)
-        },
-        onError: error => {
-          setError({
-            title: '직원 호출 실패',
-            message: parseErrorMessage(error),
-          })
-          setIsVisibleErrorModal(true)
-        },
-      },
+    if (selectedCategory.id.toString() === '0') {
+      return menus
+    }
+    return menus.filter(
+      menu => menu.categoryId.toString() === selectedCategory.id.toString(),
     )
   }
 
+  const callStaff = () => {
+    if (selectedStaffCallOption) {
+      staffCallModal.close()
+      staffCall.mutate(
+        { callOption: selectedStaffCallOption },
+        {
+          onSuccess: () => {
+            staffCallSuccessModal.open()
+          },
+          onError: error => {
+            setError({
+              title: '직원 호출 실패',
+              message: parseErrorMessage(error),
+            })
+            errorModal.open()
+          },
+        },
+      )
+    }
+  }
+
   const resetAll = () => {
-    setSelectedCategory('0')
-    setSelectedStaffCallOption('')
-    setIsVisibleCountryOfOriginModal(false)
-    setIsVisibleStaffCallModal(false)
-    setIsVisibleStaffCallSuccessModal(false)
-    setIsVisibleErrorModal(false)
+    setIdleTime(milliTimes.ONE_MINUTE)
     setError({ title: '', message: '' })
+    setSelectedCategory(defaultCategory)
+    setSelectedStaffCallOption('')
+    countryOfOriginModal.close()
+    staffCallModal.close()
+    staffCallSuccessModal.close()
+    errorModal.close()
     categoriesRef.current?.scrollToIndex({ index: 0 })
     menusRef.current?.scrollToIndex({ index: 0 })
   }
@@ -161,12 +154,14 @@ const CustomerTableScreen = () => {
                   keyExtractor={(item, index) => `${item.id}-${index}`}
                   contentContainerStyle={{ gap: 8, paddingBottom: 8 }}
                   renderItem={renderItem => (
-                    <Category
-                      id={renderItem.item.id}
-                      label={renderItem.item.name}
+                    <CategoryButton
+                      category={renderItem.item}
                       index={renderItem.index}
                       selectedCategory={selectedCategory}
-                      handleSelectCategory={handleSelectCategory}
+                      handleSelectCategory={(category: Category, index) => {
+                        setSelectedCategory(category)
+                        categoriesRef.current?.scrollToIndex({ index })
+                      }}
                     />
                   )}
                 />
@@ -175,7 +170,7 @@ const CustomerTableScreen = () => {
             <View>
               <Pressable
                 style={styles.countryOfOrigin}
-                onPress={() => setIsVisibleCountryOfOriginModal(true)}
+                onPress={countryOfOriginModal.open}
               >
                 <Text style={styles.countryOfOriginText}>원산지 정보</Text>
               </Pressable>
@@ -185,13 +180,7 @@ const CustomerTableScreen = () => {
             {menus && menus.length > 0 && (
               <FlatList
                 ref={menusRef}
-                data={
-                  selectedCategory === '0'
-                    ? menus
-                    : menus.filter(
-                        menu => menu.categoryId.toString() === selectedCategory,
-                      )
-                }
+                data={filterMenus()}
                 numColumns={4}
                 keyExtractor={item => String(item.id)}
                 columnWrapperStyle={{ gap: 16 }}
@@ -222,10 +211,7 @@ const CustomerTableScreen = () => {
             </Pressable>
           </View>
           <View style={styles.footerRight}>
-            <Pressable
-              style={styles.staffCall}
-              onPress={() => setIsVisibleStaffCallModal(true)}
-            >
+            <Pressable style={styles.staffCall} onPress={staffCallModal.open}>
               <BellIcon />
               <Text style={styles.staffCallText}>직원 호출</Text>
             </Pressable>
@@ -236,55 +222,38 @@ const CustomerTableScreen = () => {
           </View>
         </View>
         <CountryOfOriginModal
-          isVisible={isVisibleCountryOfOriginModal}
+          isVisible={countryOfOriginModal.isOpen}
           countryOfOrigins={store?.countryOfOrigins ?? []}
-          close={() => setIsVisibleCountryOfOriginModal(false)}
+          close={countryOfOriginModal.close}
         />
         <StaffCallModal
-          isVisible={isVisibleStaffCallModal}
-          staffCallOptions={setting?.staffCallOptions ?? []}
-          selectedStaffCallOption={selectedStaffCallOption}
-          handleSelect={handleSelectStaffCallOption}
+          isVisible={staffCallModal.isOpen}
+          options={setting?.staffCallOptions ?? []}
+          selectedOption={selectedStaffCallOption}
+          setSelectedOption={setSelectedStaffCallOption}
           submit={callStaff}
-          close={closeStaffCallModal}
+          close={() => {
+            setSelectedStaffCallOption('')
+            staffCallModal.close()
+          }}
         />
-        <Modal visible={isVisibleStaffCallSuccessModal}>
-          <Modal.Container>
-            <Modal.Title color="black" size="medium" position="left">
-              {selectedStaffCallOption}
-            </Modal.Title>
-            <View style={{ alignItems: 'center' }}>
-              <Image
-                source={require('@/assets/images/bell-animation.gif')}
-                style={{ width: 100, height: 100 }}
-              />
-              <Text
-                style={{
-                  fontFamily: fonts.PRETENDARD_REGULAR,
-                  fontSize: 20,
-                }}
-              >
-                직원을 호출했습니다. 잠시만 기다려주세요!
-              </Text>
-            </View>
-            <Modal.ButtonContainer>
-              <Modal.Button
-                label="확인"
-                onPress={() => {
-                  setSelectedStaffCallOption('')
-                  setIsVisibleStaffCallSuccessModal(false)
-                }}
-              />
-            </Modal.ButtonContainer>
-          </Modal.Container>
-        </Modal>
+        <SuccessModal
+          isVisible={staffCallSuccessModal.isOpen}
+          title={selectedStaffCallOption}
+          image={images.BELL_ANIMATION}
+          message="직원을 호출했습니다. 잠시만 기다려주세요!"
+          close={() => {
+            setSelectedStaffCallOption('')
+            staffCallSuccessModal.close()
+          }}
+        />
         <ErrorModal
-          isVisible={isVisibleErrorModal}
+          isVisible={errorModal.isOpen}
           title={error.title}
           message={error.message}
           close={() => {
             setError({ title: '', message: '' })
-            setIsVisibleErrorModal(false)
+            errorModal.close()
           }}
         />
       </SafeAreaView>

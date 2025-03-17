@@ -10,8 +10,9 @@ import LogoHeaderTitle from '@/components/LogoHeaderTitle'
 import { Modal } from '@/components/Modal'
 import NumPad from '@/components/NumPad'
 import PersonCountBox from '@/components/PersonCountBox'
+import SuccessModal from '@/components/SuccessModal'
 import { colors, fonts, milliTimes } from '@/constants'
-import { useCreateWaiting, useGetWaitingCount } from '@/hooks'
+import { useCreateWaiting, useGetWaitingCount, useModal } from '@/hooks'
 import { formatPhoneNumber, parseErrorMessage } from '@/utils'
 
 const PHONE_NUMBER_PREFIX = '010'
@@ -23,15 +24,15 @@ const WaitingRegistrationScreen = () => {
     infant: 0,
   })
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const [isValidForm, setIsValidForm] = useState(false)
-  const [isVisibleSubmitModal, setIsVisibleSubmitModal] = useState(false)
-  const [isVisibleSuccessModal, setIsVisibleSuccessModal] = useState(false)
-  const [isVisibleErrorModal, setIsVisibleErrorModal] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
   const { waitingCount } = useGetWaitingCount()
   const createWaiting = useCreateWaiting()
+
+  const submitModal = useModal()
+  const successModal = useModal()
+  const errorModal = useModal()
 
   useEffect(() => {
     if (personCount.adult > 0 && phoneNumber.length === 8) {
@@ -86,20 +87,8 @@ const WaitingRegistrationScreen = () => {
     setPhoneNumber(prev => prev.slice(0, -1))
   }
 
-  const resetAll = () => {
-    setIdleTime(milliTimes.ONE_MINUTE)
-    setPersonCount({ adult: 0, infant: 0 })
-    setPhoneNumber('')
-    setIsLoading(false)
-    setIsValidForm(false)
-    setIsVisibleSubmitModal(false)
-    setIsVisibleSuccessModal(false)
-    setIsVisibleErrorModal(false)
-    setErrorMessage('')
-  }
-
   const submitCreateWaiting = () => {
-    setIsLoading(true)
+    submitModal.close()
     createWaiting.mutate(
       {
         phoneNumber: `${PHONE_NUMBER_PREFIX}${phoneNumber}`,
@@ -108,19 +97,25 @@ const WaitingRegistrationScreen = () => {
       },
       {
         onSuccess: () => {
-          setIsVisibleSubmitModal(false)
-          setIsVisibleSuccessModal(true)
+          successModal.open()
         },
         onError: error => {
-          setIsVisibleSubmitModal(false)
           setErrorMessage(parseErrorMessage(error))
-          setIsVisibleErrorModal(true)
-        },
-        onSettled: () => {
-          setIsLoading(false)
+          errorModal.open()
         },
       },
     )
+  }
+
+  const resetAll = () => {
+    setIdleTime(milliTimes.ONE_MINUTE)
+    setPersonCount({ adult: 0, infant: 0 })
+    setPhoneNumber('')
+    setIsValidForm(false)
+    submitModal.close()
+    successModal.close()
+    errorModal.close()
+    setErrorMessage('')
   }
 
   return (
@@ -269,13 +264,13 @@ const WaitingRegistrationScreen = () => {
               <Button
                 label="등록하기"
                 color="black"
-                onPress={() => setIsVisibleSubmitModal(true)}
+                onPress={submitModal.open}
                 disabled={!isValidForm}
               />
             </View>
           </View>
         </View>
-        <Modal visible={isVisibleSubmitModal}>
+        <Modal visible={submitModal.isOpen}>
           <Modal.Container>
             <Modal.Title color="red">{`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumber(phoneNumber)}`}</Modal.Title>
             <Modal.Content>위 번호로 웨이팅 등록을 하시겠습니까?</Modal.Content>
@@ -285,24 +280,18 @@ const WaitingRegistrationScreen = () => {
                 label="등록하기"
                 color="black"
                 onPress={submitCreateWaiting}
-                disabled={isLoading}
               />
             </Modal.ButtonContainer>
           </Modal.Container>
         </Modal>
-        <Modal visible={isVisibleSuccessModal}>
-          <Modal.Container>
-            <Modal.Title color="black">웨이팅 등록 완료</Modal.Title>
-            <Modal.Content>
-              휴대폰 번호로 전송된 알림톡 또는 문자 메시지를 확인해 주세요.
-            </Modal.Content>
-            <Modal.ButtonContainer>
-              <Modal.Button label="확인" onPress={resetAll} />
-            </Modal.ButtonContainer>
-          </Modal.Container>
-        </Modal>
+        <SuccessModal
+          isVisible={successModal.isOpen}
+          title="웨이팅 등록 완료"
+          message="휴대폰 번호로 전송된 알림톡 또는 문자 메시지를 확인해 주세요."
+          close={resetAll}
+        />
         <ErrorModal
-          isVisible={isVisibleErrorModal}
+          isVisible={errorModal.isOpen}
           title="웨이팅 등록 실패"
           message={errorMessage}
           close={resetAll}

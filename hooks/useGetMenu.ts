@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import { getCategories, getMenuImage, getMenus } from '@/api'
-import { queryKeys } from '@/constants'
+import { defaultCategory, queryKeys } from '@/constants'
 
 export const useGetCategories = () => {
   const { data, isSuccess } = useQuery({
@@ -13,7 +13,7 @@ export const useGetCategories = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      data?.unshift({ id: BigInt(0), name: '전체', position: 0 })
+      data?.unshift(defaultCategory)
     }
   }, [isSuccess, data])
 
