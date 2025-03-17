@@ -1,6 +1,8 @@
 import React, { PropsWithChildren } from 'react'
 import { Pressable, PressableProps, StyleSheet, Text, View } from 'react-native'
 
+import { Image } from 'expo-image'
+
 import { colors, fonts } from '@/constants'
 
 interface MainModalProps {
@@ -48,9 +50,14 @@ const Title = ({
   )
 }
 
-const Content = ({ children }: PropsWithChildren) => {
+interface ContentProps {
+  image?: string
+}
+
+const Content = ({ image, children }: PropsWithChildren<ContentProps>) => {
   return (
     <View style={styles.contentCenter}>
+      {image && <Image source={image} style={styles.image} />}
       <Text style={styles.contentText}>{children}</Text>
     </View>
   )
@@ -135,6 +142,10 @@ const styles = StyleSheet.create({
   contentText: {
     fontFamily: fonts.PRETENDARD_REGULAR,
     fontSize: 20,
+  },
+  image: {
+    width: 100,
+    height: 100,
   },
   buttonContainer: {
     flexDirection: 'row',

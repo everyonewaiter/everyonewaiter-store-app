@@ -1,3 +1,5 @@
+import { Category } from '@/types'
+
 export const AuthenticationPurpose = {
   SIGN_UP: '회원가입',
   DEVICE_REGISTRATION: '기기인증',
@@ -12,6 +14,12 @@ export const DeviceStatus = {
   ACTIVE: '활성',
   INACTIVE: '비활성',
 } as const
+
+export const defaultCategory: Category = {
+  id: BigInt(0),
+  name: '전체',
+  position: 0,
+}
 
 export const KitchenPrinterLocation = {
   POS: 'POS',
