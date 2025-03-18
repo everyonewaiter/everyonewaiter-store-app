@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   FlatList,
   Pressable,
@@ -63,6 +63,19 @@ const CustomerTableScreen = () => {
   const staffCallSuccessModal = useModal()
   const errorModal = useModal()
 
+  const resetAll = useCallback(() => {
+    setIdleTime(milliTimes.ONE_MINUTE)
+    setError({ title: '', message: '' })
+    setSelectedCategory(defaultCategory)
+    setSelectedStaffCallOption('')
+    countryOfOriginModal.close()
+    staffCallModal.close()
+    staffCallSuccessModal.close()
+    errorModal.close()
+    categoriesRef.current?.scrollToIndex({ index: 0 })
+    menusRef.current?.scrollToIndex({ index: 0 })
+  }, [countryOfOriginModal, errorModal, staffCallModal, staffCallSuccessModal])
+
   useEffect(() => {
     setCategoryContentWidth(screenWidth - 210)
   }, [screenWidth])
@@ -78,7 +91,7 @@ const CustomerTableScreen = () => {
     if (idleTime <= milliTimes.ZERO) {
       resetAll()
     }
-  }, [idleTime])
+  }, [idleTime, resetAll])
 
   const resetIdleTime = Gesture.Tap().onStart(() => {
     if (idleTime < milliTimes.ONE_MINUTE) {
@@ -117,19 +130,6 @@ const CustomerTableScreen = () => {
         },
       )
     }
-  }
-
-  const resetAll = () => {
-    setIdleTime(milliTimes.ONE_MINUTE)
-    setError({ title: '', message: '' })
-    setSelectedCategory(defaultCategory)
-    setSelectedStaffCallOption('')
-    countryOfOriginModal.close()
-    staffCallModal.close()
-    staffCallSuccessModal.close()
-    errorModal.close()
-    categoriesRef.current?.scrollToIndex({ index: 0 })
-    menusRef.current?.scrollToIndex({ index: 0 })
   }
 
   return (
