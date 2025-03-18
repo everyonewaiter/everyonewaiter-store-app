@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
@@ -34,6 +34,17 @@ const WaitingRegistrationScreen = () => {
   const successModal = useModal()
   const errorModal = useModal()
 
+  const resetAll = useCallback(() => {
+    setIdleTime(milliTimes.ONE_MINUTE)
+    setPersonCount({ adult: 0, infant: 0 })
+    setPhoneNumber('')
+    setIsValidForm(false)
+    submitModal.close()
+    successModal.close()
+    errorModal.close()
+    setErrorMessage('')
+  }, [errorModal, submitModal, successModal])
+
   useEffect(() => {
     if (personCount.adult > 0 && phoneNumber.length === 8) {
       setIsValidForm(true)
@@ -57,7 +68,7 @@ const WaitingRegistrationScreen = () => {
     if (idleTime <= milliTimes.ZERO) {
       resetAll()
     }
-  }, [idleTime])
+  }, [idleTime, resetAll])
 
   const resetIdleTime = Gesture.Tap().onStart(() => {
     if (idleTime < milliTimes.ONE_MINUTE) {
@@ -105,17 +116,6 @@ const WaitingRegistrationScreen = () => {
         },
       },
     )
-  }
-
-  const resetAll = () => {
-    setIdleTime(milliTimes.ONE_MINUTE)
-    setPersonCount({ adult: 0, infant: 0 })
-    setPhoneNumber('')
-    setIsValidForm(false)
-    submitModal.close()
-    successModal.close()
-    errorModal.close()
-    setErrorMessage('')
   }
 
   return (
