@@ -1,5 +1,5 @@
 declare global {
-  interface BigInt {
+  interface Number {
     toPrice: () => string
   }
 }

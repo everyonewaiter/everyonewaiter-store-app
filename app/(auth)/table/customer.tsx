@@ -17,6 +17,7 @@ import CategoryButton from '@/components/CategoryButton'
 import CountryOfOriginModal from '@/components/CountryOfOriginModal'
 import ErrorModal from '@/components/ErrorModal'
 import MenuCard from '@/components/MenuCard'
+import MenuModal from '@/components/MenuModal'
 import StaffCallModal from '@/components/StaffCallModal'
 import SuccessModal from '@/components/SuccessModal'
 import { colors, defaultCategory, fonts, images, milliTimes } from '@/constants'
@@ -29,14 +30,14 @@ import {
   useModal,
   useStaffCall,
 } from '@/hooks'
-import { Category } from '@/types'
+import { Category, Menu, OrderCreate } from '@/types'
 import { parseErrorMessage } from '@/utils'
 
 const CustomerTableScreen = () => {
   // Common
   const { width: screenWidth } = useWindowDimensions()
   const { device } = useGetDevice()
-  const [idleTime, setIdleTime] = useState(milliTimes.ONE_MINUTE)
+  const [idleTime, setIdleTime] = useState(milliTimes.FIVE_MINUTE)
   const [error, setError] = useState({ title: '', message: '' })
 
   // Store
@@ -52,29 +53,39 @@ const CustomerTableScreen = () => {
   // Menu
   const { menus } = useGetMenus()
   const menusRef = useRef<FlatList | null>(null)
+  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
 
   // Order
   const staffCall = useStaffCall()
   const [selectedStaffCallOption, setSelectedStaffCallOption] = useState('')
+  const [cart, setCart] = useState<OrderCreate[]>([])
 
   // Modal
   const countryOfOriginModal = useModal()
+  const menuModal = useModal()
   const staffCallModal = useModal()
   const staffCallSuccessModal = useModal()
   const errorModal = useModal()
 
   const resetAll = useCallback(() => {
-    setIdleTime(milliTimes.ONE_MINUTE)
+    setIdleTime(milliTimes.FIVE_MINUTE)
     setError({ title: '', message: '' })
     setSelectedCategory(defaultCategory)
     setSelectedStaffCallOption('')
     countryOfOriginModal.close()
+    menuModal.close()
     staffCallModal.close()
     staffCallSuccessModal.close()
     errorModal.close()
     categoriesRef.current?.scrollToIndex({ index: 0 })
     menusRef.current?.scrollToIndex({ index: 0 })
-  }, [countryOfOriginModal, errorModal, staffCallModal, staffCallSuccessModal])
+  }, [
+    countryOfOriginModal,
+    menuModal,
+    staffCallModal,
+    staffCallSuccessModal,
+    errorModal,
+  ])
 
   useEffect(() => {
     setCategoryContentWidth(screenWidth - 210)
@@ -94,21 +105,16 @@ const CustomerTableScreen = () => {
   }, [idleTime, resetAll])
 
   const resetIdleTime = Gesture.Tap().onStart(() => {
-    if (idleTime < milliTimes.ONE_MINUTE) {
-      runOnJS(setIdleTime)(milliTimes.ONE_MINUTE)
+    if (idleTime < milliTimes.FIVE_MINUTE) {
+      runOnJS(setIdleTime)(milliTimes.FIVE_MINUTE)
     }
   })
 
-  const filterMenus = () => {
-    if (!menus) {
-      return []
+  const handleOpenMenuModalOrAddToCart = (menu: Menu) => {
+    setSelectedMenu(menu)
+    if (setting?.showMenuPopup || menu.optionGroups.length > 0) {
+      menuModal.open()
     }
-    if (selectedCategory.id.toString() === '0') {
-      return menus
-    }
-    return menus.filter(
-      menu => menu.categoryId.toString() === selectedCategory.id.toString(),
-    )
   }
 
   const callStaff = () => {
@@ -180,7 +186,7 @@ const CustomerTableScreen = () => {
             {menus && menus.length > 0 && (
               <FlatList
                 ref={menusRef}
-                data={filterMenus()}
+                data={menus}
                 numColumns={4}
                 keyExtractor={item => String(item.id)}
                 columnWrapperStyle={{ gap: 16 }}
@@ -192,9 +198,13 @@ const CustomerTableScreen = () => {
                 renderItem={renderItem => (
                   <MenuCard
                     menu={renderItem.item}
+                    selectedCategory={selectedCategory}
                     rootNumColumns={4}
                     rootGap={16}
                     rootPaddingHorizontal={24}
+                    onPress={() =>
+                      handleOpenMenuModalOrAddToCart(renderItem.item)
+                    }
                   />
                 )}
               />
@@ -215,7 +225,7 @@ const CustomerTableScreen = () => {
             </Pressable>
             <Pressable style={styles.cart}>
               <Text style={styles.cartText}>장바구니</Text>
-              <Text style={styles.cartCountText}>3</Text>
+              <Text style={styles.cartCountText}>{cart.length}</Text>
             </Pressable>
           </View>
         </View>
@@ -223,6 +233,16 @@ const CustomerTableScreen = () => {
           isVisible={countryOfOriginModal.isOpen}
           countryOfOrigins={store?.countryOfOrigins ?? []}
           close={countryOfOriginModal.close}
+        />
+        <MenuModal
+          visible={menuModal.isOpen}
+          selectedMenu={selectedMenu}
+          cart={cart}
+          setCart={setCart}
+          close={() => {
+            setSelectedMenu(null)
+            menuModal.close()
+          }}
         />
         <StaffCallModal
           isVisible={staffCallModal.isOpen}
