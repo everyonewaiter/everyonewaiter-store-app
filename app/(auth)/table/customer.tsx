@@ -13,20 +13,31 @@ import { runOnJS } from 'react-native-reanimated'
 
 import { BellIcon } from '@/assets/icons/BellIcon'
 import { ReceiptIcon } from '@/assets/icons/ReceiptIcon'
+import CartModal from '@/components/CartModal'
 import CategoryButton from '@/components/CategoryButton'
 import CountryOfOriginModal from '@/components/CountryOfOriginModal'
 import ErrorModal from '@/components/ErrorModal'
 import MenuCard from '@/components/MenuCard'
 import MenuModal from '@/components/MenuModal'
+import OrderHistoryModal from '@/components/OrderHistoryModal'
 import StaffCallModal from '@/components/StaffCallModal'
 import SuccessModal from '@/components/SuccessModal'
-import { colors, defaultCategory, fonts, images, milliTimes } from '@/constants'
 import {
+  colors,
+  defaultCategory,
+  fonts,
+  images,
+  milliTimes,
+  PaymentType,
+} from '@/constants'
+import {
+  useCreateTableOrder,
   useGetCategories,
   useGetDevice,
   useGetMenus,
   useGetSetting,
   useGetStore,
+  useGetTableOrderHistories,
   useModal,
   useStaffCall,
 } from '@/hooks'
@@ -58,6 +69,8 @@ const CustomerTableScreen = () => {
   // Order
   const staffCall = useStaffCall()
   const [selectedStaffCallOption, setSelectedStaffCallOption] = useState('')
+  const { histories } = useGetTableOrderHistories(device?.tableNo)
+  const createTableOrder = useCreateTableOrder()
   const [cart, setCart] = useState<OrderCreate[]>([])
 
   // Modal
@@ -65,6 +78,9 @@ const CustomerTableScreen = () => {
   const menuModal = useModal()
   const staffCallModal = useModal()
   const staffCallSuccessModal = useModal()
+  const cartModal = useModal()
+  const orderHistoryModal = useModal()
+  const orderSuccessModal = useModal()
   const errorModal = useModal()
 
   const resetAll = useCallback(() => {
@@ -72,10 +88,14 @@ const CustomerTableScreen = () => {
     setError({ title: '', message: '' })
     setSelectedCategory(defaultCategory)
     setSelectedStaffCallOption('')
+    setCart([])
     countryOfOriginModal.close()
     menuModal.close()
     staffCallModal.close()
     staffCallSuccessModal.close()
+    cartModal.close()
+    orderHistoryModal.close()
+    orderSuccessModal.close()
     errorModal.close()
     categoriesRef.current?.scrollToIndex({ index: 0 })
     menusRef.current?.scrollToIndex({ index: 0 })
@@ -84,6 +104,9 @@ const CustomerTableScreen = () => {
     menuModal,
     staffCallModal,
     staffCallSuccessModal,
+    cartModal,
+    orderHistoryModal,
+    orderSuccessModal,
     errorModal,
   ])
 
@@ -111,9 +134,18 @@ const CustomerTableScreen = () => {
   })
 
   const handleOpenMenuModalOrAddToCart = (menu: Menu) => {
-    setSelectedMenu(menu)
     if (setting?.showMenuPopup || menu.optionGroups.length > 0) {
+      setSelectedMenu(menu)
       menuModal.open()
+    } else {
+      const copy = [...cart]
+      const index = copy.findIndex(item => item.menuId === menu.id)
+      if (index === -1) {
+        copy.push({ menuId: menu.id, count: 1, optionGroups: [] })
+      } else {
+        copy[index].count += 1
+      }
+      setCart(copy)
     }
   }
 
@@ -136,6 +168,36 @@ const CustomerTableScreen = () => {
         },
       )
     }
+  }
+
+  const submitCreateOrder = () => {
+    if (cart.length <= 0) {
+      return
+    }
+    if (device?.paymentType === PaymentType.PREPAID) {
+      // TODO: 결제 기능 추가
+    } else {
+      createOrder()
+    }
+  }
+
+  const createOrder = () => {
+    createTableOrder.mutate(
+      { menus: cart },
+      {
+        onSuccess: () => {
+          cartModal.close()
+          orderSuccessModal.open()
+        },
+        onError: error => {
+          setError({
+            title: '주문 실패',
+            message: parseErrorMessage(error),
+          })
+          errorModal.open()
+        },
+      },
+    )
   }
 
   return (
@@ -213,7 +275,14 @@ const CustomerTableScreen = () => {
         </View>
         <View style={styles.footerContainer}>
           <View style={styles.footerLeft}>
-            <Pressable style={styles.receipt}>
+            <Pressable
+              style={styles.receipt}
+              onPress={() => {
+                if (histories.length > 0) {
+                  orderHistoryModal.open()
+                }
+              }}
+            >
               <ReceiptIcon />
               <Text style={styles.receiptText}>주문 내역</Text>
             </Pressable>
@@ -223,7 +292,14 @@ const CustomerTableScreen = () => {
               <BellIcon />
               <Text style={styles.staffCallText}>직원 호출</Text>
             </Pressable>
-            <Pressable style={styles.cart}>
+            <Pressable
+              style={styles.cart}
+              onPress={() => {
+                if (cart.length > 0) {
+                  cartModal.open()
+                }
+              }}
+            >
               <Text style={styles.cartText}>장바구니</Text>
               <Text style={styles.cartCountText}>{cart.length}</Text>
             </Pressable>
@@ -264,6 +340,28 @@ const CustomerTableScreen = () => {
             setSelectedStaffCallOption('')
             staffCallSuccessModal.close()
           }}
+        />
+        <CartModal
+          visible={cartModal.isOpen}
+          menus={menus ?? []}
+          cart={cart}
+          setCart={setCart}
+          paymentType={device?.paymentType ?? PaymentType.POSTPAID}
+          submit={submitCreateOrder}
+          close={cartModal.close}
+        />
+        <OrderHistoryModal
+          isVisible={orderHistoryModal.isOpen}
+          histories={histories}
+          setting={setting}
+          close={orderHistoryModal.close}
+        />
+        <SuccessModal
+          isVisible={orderSuccessModal.isOpen}
+          title="주문 완료"
+          image={images.COMPLETE_ANIMATION}
+          message="주문이 완료되었습니다."
+          close={resetAll}
         />
         <ErrorModal
           isVisible={errorModal.isOpen}

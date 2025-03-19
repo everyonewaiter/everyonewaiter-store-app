@@ -39,28 +39,19 @@ const handleStoreActionEvent = (storeAction: string | StoreActionEvent) => {
       void queryClient.invalidateQueries({ queryKey: [queryKeys.WAITING] })
       break
     case '주문':
-      console.log(
-        'Not implemented yet store action event:',
-        storeAction.category,
-      )
+      if (storeAction.hasResource && storeAction.resourceName === 'TableNo') {
+        void queryClient.invalidateQueries({
+          queryKey: [queryKeys.ORDER, storeAction.resource],
+        })
+      } else {
+        void queryClient.invalidateQueries({ queryKey: [queryKeys.ORDER] })
+      }
       break
     case '직원 호출':
-      console.log(
-        'Not implemented yet store action event:',
-        storeAction.category,
-      )
       break
     case '레시피':
-      console.log(
-        'Not implemented yet store action event:',
-        storeAction.category,
-      )
       break
     case 'POS':
-      console.log(
-        'Not implemented yet store action event:',
-        storeAction.category,
-      )
       break
     default:
       console.log('Unhandled store action event:', storeAction)

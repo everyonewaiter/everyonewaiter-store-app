@@ -1,6 +1,7 @@
 export const colors = {
   WHITE: '#FFFFFF',
   BLACK: '#000000',
+  BLUE: '#2E7BB3',
   PRIMARY_RED: '#F22020',
   STATUS_ERROR: '#EC2E12',
   ORANGE: '#FF9000',

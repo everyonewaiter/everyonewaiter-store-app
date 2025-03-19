@@ -44,6 +44,17 @@ export const MenuStatus = {
   SOLD_OUT: '품절',
 } as const
 
+export const OrderCategory = {
+  INITIAL: '주문',
+  ADDITIONAL: '추가',
+} as const
+
+export const OrderStatus = {
+  ORDERED: '주문',
+  CANCEL: '취소',
+  COMPLETE: '완료',
+} as const
+
 export const PaymentType = {
   PREPAID: '선결제',
   POSTPAID: '후결제',
