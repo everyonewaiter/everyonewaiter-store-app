@@ -220,7 +220,6 @@ const MenuModal = ({
                   <View style={styles.divider} />
                   <SectionList
                     style={{ height: selectedMenu.description ? 320 : 360 }}
-                    contentContainerStyle={{ gap: 12 }}
                     sections={optionGroups}
                     keyExtractor={item => String(item.id)}
                     renderItem={({ item }) => (
@@ -347,7 +346,8 @@ const styles = StyleSheet.create({
   thinDivider: {
     height: 1,
     backgroundColor: colors.GRAY7_F1,
-    marginVertical: 4,
+    marginTop: 4,
+    marginBottom: 16,
   },
   quantityButton: {
     width: 40,
@@ -373,6 +373,7 @@ const styles = StyleSheet.create({
   },
   optionGroupContainer: {
     gap: 12,
+    marginBottom: 12,
   },
   optionGroup: {
     backgroundColor: colors.GRAY7_F1,
@@ -389,6 +390,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PRETENDARD_MEDIUM,
     fontSize: 20,
     fontWeight: '600',
+    marginBottom: 12,
   },
   rowCenter: {
     flexDirection: 'row',
