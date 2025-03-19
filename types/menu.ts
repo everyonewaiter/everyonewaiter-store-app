@@ -14,7 +14,7 @@ export type Menu = {
   imageUri?: string
   name: string
   description: string
-  price: bigint
+  price: number
   spicy: number
   status: valueOf<typeof MenuStatus>
   label: valueOf<typeof MenuLabel>
@@ -34,5 +34,5 @@ export type MenuOptionGroup = {
 export type MenuOption = {
   id: bigint
   name: string
-  price: bigint
+  price: number
 }

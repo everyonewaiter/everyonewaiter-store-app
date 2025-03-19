@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Pressable,
   PressableProps,
@@ -8,14 +8,15 @@ import {
   View,
 } from 'react-native'
 
-import { ImageBackground } from 'expo-image'
+import { ImageBackground, useImage } from 'expo-image'
 
 import Badge from '@/components/Badge'
-import { colors, fonts, MenuLabel } from '@/constants'
-import { Menu } from '@/types'
+import { colors, fonts, images, MenuLabel } from '@/constants'
+import { Category, Menu } from '@/types'
 
 interface MenuCardProps extends PressableProps {
   menu: Menu
+  selectedCategory: Category
   rootNumColumns: number
   rootGap: number
   rootPaddingHorizontal: number
@@ -23,6 +24,7 @@ interface MenuCardProps extends PressableProps {
 
 const MenuCard = ({
   menu,
+  selectedCategory,
   rootNumColumns,
   rootGap,
   rootPaddingHorizontal,
@@ -30,6 +32,7 @@ const MenuCard = ({
 }: MenuCardProps) => {
   const { width: screenWidth } = useWindowDimensions()
   const [contentWidth, setContentWidth] = useState(0)
+  const image = useImage(menu.imageUri ?? images.PREPARATION)
 
   useEffect(() => {
     const paddingHorizontalSpace = rootPaddingHorizontal * 2
@@ -38,18 +41,33 @@ const MenuCard = ({
     setContentWidth(availableSpace / rootNumColumns)
   }, [screenWidth, rootGap, rootNumColumns, rootPaddingHorizontal])
 
+  const selectedCategoryId = selectedCategory.id.toString()
+  const menuCategoryId = menu.categoryId.toString()
+  const isVisible =
+    selectedCategoryId === '0' || menuCategoryId === selectedCategoryId
+
   return (
-    <Pressable style={[styles.container, { width: contentWidth }]} {...props}>
+    <Pressable
+      style={[
+        styles.container,
+        { width: contentWidth },
+        !isVisible && styles.hide,
+      ]}
+      disabled={!isVisible}
+      {...props}
+    >
       <View style={styles.imageContainer}>
-        <ImageBackground
-          style={styles.image}
-          imageStyle={styles.imageBorder}
-          source={{ uri: menu.imageUri }}
-          alt={menu.name}
-          contentFit="cover"
-        >
-          {menu.label !== MenuLabel.DEFAULT && <Badge label={menu.label} />}
-        </ImageBackground>
+        {image && (
+          <ImageBackground
+            style={styles.image}
+            imageStyle={styles.imageBorder}
+            source={image}
+            alt={menu.name}
+            contentFit="cover"
+          >
+            {menu.label !== MenuLabel.DEFAULT && <Badge label={menu.label} />}
+          </ImageBackground>
+        )}
       </View>
       <View style={styles.textContainer}>
         <View style={{ flexDirection: 'row' }}>
@@ -58,7 +76,7 @@ const MenuCard = ({
             <Text style={styles.menuSpicy}> {'🌶'.repeat(menu.spicy)}</Text>
           )}
         </View>
-        <Text style={styles.menuPrice}>{BigInt(menu.price).toPrice()}원</Text>
+        <Text style={styles.menuPrice}>{menu.price.toPrice()}원</Text>
       </View>
     </Pressable>
   )
@@ -71,6 +89,9 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: 12,
     borderColor: colors.GRAY5_E7,
+  },
+  hide: {
+    display: 'none',
   },
   imageContainer: {
     flex: 3,
