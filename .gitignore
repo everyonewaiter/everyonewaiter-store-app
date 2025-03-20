@@ -41,3 +41,5 @@ yarn-error.*
 .idea
 .vscode
 .env
+local.properties
+build
