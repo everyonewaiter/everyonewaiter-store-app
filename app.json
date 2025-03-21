@@ -39,7 +39,10 @@
           "initialOrientation": "DEFAULT"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "./plugins/manifest.js"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
