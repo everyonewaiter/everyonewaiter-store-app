@@ -41,8 +41,10 @@ import {
   useModal,
   useStaffCall,
 } from '@/hooks'
+import { useCreateCardPayment } from '@/hooks/usePayment'
+import KscatModule, { KscatResponse } from '@/modules/kscat'
 import { Category, Menu, OrderCreate } from '@/types'
-import { parseErrorMessage } from '@/utils'
+import { calculateService, calculateVat, parseErrorMessage } from '@/utils'
 
 const CustomerTableScreen = () => {
   // Common
@@ -72,6 +74,7 @@ const CustomerTableScreen = () => {
   const { histories } = useGetTableOrderHistories(device?.tableNo)
   const createTableOrder = useCreateTableOrder()
   const [cart, setCart] = useState<OrderCreate[]>([])
+  const createCardPayment = useCreateCardPayment()
 
   // Modal
   const countryOfOriginModal = useModal()
@@ -149,6 +152,37 @@ const CustomerTableScreen = () => {
     }
   }
 
+  const calculateCartTotalPrice = () => {
+    let totalPrice = 0
+    for (const orderCreate of cart) {
+      const menu = menus?.find(
+        menu => menu.id.toString() === orderCreate.menuId.toString(),
+      )
+      if (!menu) {
+        setCart([])
+        throw new Error('변경된 메뉴 항목이 있습니다. 다시 시도해 주세요.')
+      }
+
+      let optionPrice = 0
+      const menuOptions = menu.optionGroups.flatMap(group => group.options)
+      orderCreate.optionGroups
+        .flatMap(group => group.options)
+        .forEach(option => {
+          const menuOption = menuOptions.find(
+            menuOption =>
+              menuOption.id.toString() === option.optionId.toString(),
+          )
+          if (!menuOption) {
+            setCart([])
+            throw new Error('변경된 메뉴 항목이 있습니다. 다시 시도해 주세요.')
+          }
+          optionPrice += menuOption.price
+        })
+      totalPrice += (menu.price + optionPrice) * orderCreate.count
+    }
+    return totalPrice
+  }
+
   const callStaff = () => {
     if (selectedStaffCallOption) {
       staffCallModal.close()
@@ -170,15 +204,77 @@ const CustomerTableScreen = () => {
     }
   }
 
-  const submitCreateOrder = () => {
+  const submitCreateOrder = async () => {
     if (cart.length <= 0) {
       return
     }
+    if (!setting || setting.ksnetDeviceNo.length < 8) {
+      setError({
+        title: '단말기 번호가 등록되지 않았습니다.',
+        message: '설정 페이지에서 Ksnet 단말기 번호를 등록해주세요.',
+      })
+      errorModal.open()
+      return
+    }
     if (device?.paymentType === PaymentType.PREPAID) {
-      // TODO: 결제 기능 추가
+      try {
+        const amount = calculateCartTotalPrice()
+        const installment = '00'
+        const response = await KscatModule.approveIC(
+          setting.ksnetDeviceNo,
+          installment,
+          amount,
+        )
+        createPayment(amount, installment, response)
+      } catch (exception: any) {
+        if (exception.code === 'FAIL') {
+          setError({ title: '결제 실패', message: exception.message })
+          errorModal.open()
+        } else {
+          setError({ title: '결제 오류', message: exception.message })
+          errorModal.open()
+        }
+      }
     } else {
       createOrder()
     }
+  }
+
+  const createPayment = (
+    amount: number,
+    installment: string,
+    response: KscatResponse,
+  ) => {
+    const service = calculateService(amount, 0)
+    const vat = calculateVat(amount, service, 10)
+    createCardPayment.mutate(
+      {
+        tableNo: device?.tableNo ?? 0,
+        amount: amount,
+        approvalNo: response.approvalNo,
+        installment: installment,
+        cardNo: response.filler,
+        issuerName: response.message1,
+        purchaseName: response.purchaseCompanyName,
+        merchantNo: response.merchantNo,
+        tradeTime: response.transferDate,
+        tradeUniqueNo: response.transactionUniqueNo,
+        vat: vat,
+        supplyAmount: amount - service - vat,
+      },
+      {
+        onSuccess: () => {
+          createOrder()
+        },
+        onError: error => {
+          setError({
+            title: '오류: 직원을 호출하여 결제를 취소하세요.',
+            message: parseErrorMessage(error),
+          })
+          errorModal.open()
+        },
+      },
+    )
   }
 
   const createOrder = () => {

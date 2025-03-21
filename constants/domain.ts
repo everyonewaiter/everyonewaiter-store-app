@@ -5,6 +5,12 @@ export const AuthenticationPurpose = {
   DEVICE_REGISTRATION: '기기인증',
 } as const
 
+export const CashReceiptType = {
+  NONE: '미발행',
+  DEDUCTION: '소득공제',
+  PROOF: '지출증빙',
+} as const
+
 export const DevicePurpose = {
   TABLE: '손님 테이블',
   WAITING: '웨이팅 등록',
@@ -53,6 +59,11 @@ export const OrderStatus = {
   ORDERED: '주문',
   CANCEL: '취소',
   COMPLETE: '완료',
+} as const
+
+export const PaymentMethod = {
+  CARD: '카드',
+  CASH: '현금',
 } as const
 
 export const PaymentType = {
