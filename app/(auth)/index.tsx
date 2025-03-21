@@ -1,10 +1,10 @@
 import { Redirect } from 'expo-router'
 
-import { useGetDevice } from '@/hooks'
+import { useAuthentication } from '@/contexts/AuthenticationContext'
 import { getNavigatePath } from '@/utils'
 
 const AuthenticationNavigator = () => {
-  const { device } = useGetDevice()
+  const { device } = useAuthentication()
 
   if (!device) {
     return null
