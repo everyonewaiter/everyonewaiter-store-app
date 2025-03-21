@@ -1,13 +1,16 @@
 import { createContext, PropsWithChildren, useContext } from 'react'
 
 import { useGetDevice } from '@/hooks'
+import { Device } from '@/types'
 
 interface AuthenticationContextProps {
+  device: Device | null
   isAuthenticated: boolean
   isLoading: boolean
 }
 
 const AuthenticationContext = createContext<AuthenticationContextProps>({
+  device: null,
   isAuthenticated: false,
   isLoading: false,
 })
@@ -17,11 +20,12 @@ export const useAuthentication = () => {
 }
 
 const AuthenticationProvider = ({ children }: PropsWithChildren) => {
-  const { isSuccess, isPending } = useGetDevice()
+  const { device, isSuccess, isPending } = useGetDevice()
 
   return (
     <AuthenticationContext.Provider
       value={{
+        device: device ?? null,
         isAuthenticated: isSuccess,
         isLoading: isPending,
       }}

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Alert } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
@@ -7,7 +6,8 @@ import 'react-native-reanimated'
 import { useFonts } from 'expo-font'
 import { useKeepAwake } from 'expo-keep-awake'
 import * as NavigationBar from 'expo-navigation-bar'
-import { SplashScreen, Stack } from 'expo-router'
+import { Stack } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 
 import { useReactQueryDevTools } from '@dev-plugins/react-query'
@@ -21,6 +21,7 @@ import AuthenticationProvider, {
 import { useDeviceType } from '@/hooks'
 
 void SplashScreen.preventAutoHideAsync()
+SplashScreen.setOptions({ duration: 500, fade: true })
 void NavigationBar.setVisibilityAsync('hidden')
 void NavigationBar.setBehaviorAsync('overlay-swipe')
 
@@ -51,12 +52,6 @@ const RootLayout = () => {
 const EveryoneWaiterApplication = () => {
   const [loaded] = useFonts(fontAssets)
   const { isLoading } = useAuthentication()
-
-  useEffect(() => {
-    if (loaded && !isLoading) {
-      SplashScreen.hideAsync()
-    }
-  }, [loaded, isLoading])
 
   if (!loaded || isLoading) {
     return null

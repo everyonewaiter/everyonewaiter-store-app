@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 
 import { Redirect, Stack, useFocusEffect } from 'expo-router'
 import { OrientationLock } from 'expo-screen-orientation'
+import * as SplashScreen from 'expo-splash-screen'
 
 import { colors, DevicePurpose } from '@/constants'
 import { useGetDevice, useOrientation } from '@/hooks'
@@ -13,6 +14,7 @@ const CustomerTableLayout = () => {
 
   useFocusEffect(
     useCallback(() => {
+      void SplashScreen.hideAsync()
       void lockOrientation(OrientationLock.LANDSCAPE_RIGHT)
       return () => unlockOrientation()
     }, [lockOrientation, unlockOrientation]),
