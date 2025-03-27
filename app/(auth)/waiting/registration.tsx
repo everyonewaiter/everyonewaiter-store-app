@@ -48,6 +48,8 @@ const WaitingRegistrationScreen = () => {
   useEffect(() => {
     if (personCount.adult > 0 && phoneNumber.length === 8) {
       setIsValidForm(true)
+    } else {
+      setIsValidForm(false)
     }
   }, [personCount.adult, phoneNumber])
 
