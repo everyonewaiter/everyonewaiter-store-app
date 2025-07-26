@@ -5,10 +5,8 @@ import 'react-native-reanimated'
 
 import { useFonts } from 'expo-font'
 import { useKeepAwake } from 'expo-keep-awake'
-import * as NavigationBar from 'expo-navigation-bar'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
-import { StatusBar } from 'expo-status-bar'
 
 import { useReactQueryDevTools } from '@dev-plugins/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -19,11 +17,11 @@ import AuthenticationProvider, {
   useAuthentication,
 } from '@/contexts/AuthenticationContext'
 import { useDeviceType } from '@/hooks'
+import UtilityModule from '@/modules/utility'
 
 void SplashScreen.preventAutoHideAsync()
 SplashScreen.setOptions({ duration: 500, fade: true })
-void NavigationBar.setVisibilityAsync('hidden')
-void NavigationBar.setBehaviorAsync('overlay-swipe')
+UtilityModule.hideNavigationBar()
 
 const RootLayout = () => {
   useReactQueryDevTools(queryClient)
@@ -65,7 +63,6 @@ const EveryoneWaiterApplication = () => {
           <Stack.Screen name="device" />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <StatusBar hidden={true} />
       </GestureHandlerRootView>
     </KeyboardProvider>
   )
