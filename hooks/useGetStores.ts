@@ -3,11 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import { getSetting, getStore, getStoreNames } from '@/api/store'
 import { queryKeys } from '@/constants'
 
-export const useGetStores = (userId: bigint | undefined) => {
+export const useGetStores = (accountId: string | undefined, enabled = true) => {
   return useQuery({
     queryKey: [queryKeys.STORE, queryKeys.GET_STORE_NAMES],
-    queryFn: () => getStoreNames(userId!),
-    enabled: Boolean(userId),
+    queryFn: () => getStoreNames(accountId!),
+    enabled: Boolean(accountId) && enabled,
   })
 }
 

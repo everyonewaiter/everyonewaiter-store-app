@@ -1,12 +1,21 @@
-import { DevicePurpose, DeviceStatus, PaymentType } from '@/constants'
-import { valueOf } from '@/types/common'
+import { DevicePurpose, DeviceState, PaymentType } from '@/constants'
+
+export type AuthenticationCode = {
+  code: string
+  phoneNumber: string
+}
+
+export type SendAuthenticationCode = Omit<AuthenticationCode, 'code'>
 
 export type Device = {
-  id: bigint
+  deviceId: string
+  storeId: string
+  storeName: string
   name: string
+  purpose: keyof typeof DevicePurpose
   tableNo: number
-  purpose: valueOf<typeof DevicePurpose>
-  paymentType: valueOf<typeof PaymentType>
-  status: valueOf<typeof DeviceStatus>
+  state: keyof typeof DeviceState
+  paymentType: keyof typeof PaymentType
   createdAt: string
+  updatedAt: string
 }

@@ -5,7 +5,7 @@ import { queryKeys } from '@/constants'
 
 export const useGetProfile = (phoneNumber: string, enabled = true) => {
   return useQuery({
-    queryKey: [queryKeys.USER, queryKeys.GET_PROFILE],
+    queryKey: [queryKeys.ACCOUNT, queryKeys.GET_PROFILE],
     queryFn: () => getProfile(phoneNumber),
     enabled,
   })

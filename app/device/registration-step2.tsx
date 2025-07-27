@@ -28,11 +28,13 @@ import {
   storageKeys,
 } from '@/constants'
 import { useCreateDevice } from '@/hooks/useCreateDevice'
+import { Entries } from '@/types'
 import { parseErrorMessage, setItem, validateCreateDevice } from '@/utils'
 
 type RegistrationPageParams = {
-  userId: string
+  accountId: string
   storeId: string
+  phoneNumber: string
 }
 
 interface RegistrationForm {
@@ -45,25 +47,15 @@ interface RegistrationFormProps {
   error: string
 }
 
-const purposes = Object.values(DevicePurpose).map(value => ({
-  label: value,
-  value,
-}))
-
-const paymentTypes = Object.values(PaymentType).map(value => ({
-  label: value,
-  value,
-}))
-
-const generateDeviceName = (selectedPurpose: string) => {
+const generateDeviceName = (selectedPurpose: keyof typeof DevicePurpose) => {
   const timestamp = dayjs().format('YYMMDDHHmm')
   let name = timestamp
 
   switch (selectedPurpose) {
-    case DevicePurpose.TABLE:
+    case 'TABLE':
       name = '1번 테이블'
       break
-    case DevicePurpose.WAITING:
+    case 'WAITING':
       name = `웨이팅-${timestamp}`
       break
   }
@@ -72,24 +64,25 @@ const generateDeviceName = (selectedPurpose: string) => {
 }
 
 const RegistrationStep2Screen = () => {
-  const [selectedPurpose, setSelectedPurpose] = useState(purposes[0].value)
-  const [selectedPaymentType, setSelectedPaymentType] = useState(
-    paymentTypes[1].value,
-  )
+  const [selectedPurpose, setSelectedPurpose] =
+    useState<keyof typeof DevicePurpose>('TABLE')
+  const [selectedPaymentType, setSelectedPaymentType] =
+    useState<keyof typeof PaymentType>('POSTPAID')
   const [registrationForm, setRegistrationForm] = useState<RegistrationForm>({
     name: { value: '', error: '' },
     tableNo: { value: '1', error: '' },
   })
   const [isLoading, setIsLoading] = useState(false)
 
-  const { userId, storeId } = useLocalSearchParams<RegistrationPageParams>()
+  const { accountId, storeId, phoneNumber } =
+    useLocalSearchParams<RegistrationPageParams>()
   const createDevice = useCreateDevice()
 
   useEffect(() => {
-    if (!userId || !storeId) {
+    if (!accountId || !storeId || !phoneNumber) {
       router.replace('/device/registration-step1')
     }
-  }, [userId, storeId])
+  }, [accountId, storeId, phoneNumber])
 
   useEffect(() => {
     setRegistrationForm(prev => ({
@@ -142,23 +135,25 @@ const RegistrationStep2Screen = () => {
     setIsLoading(true)
     createDevice.mutate(
       {
-        userId: BigInt(userId),
-        storeId: BigInt(storeId),
+        storeId: storeId,
+        phoneNumber,
         name: registrationForm.name.value,
-        tableNo: parseInt(registrationForm.tableNo.value, 10),
         purpose: selectedPurpose,
-        paymentType:
-          selectedPurpose === DevicePurpose.TABLE
-            ? selectedPaymentType
-            : PaymentType.POSTPAID,
+        tableNo: parseInt(registrationForm.tableNo.value, 10),
+        paymentType: selectedPaymentType,
       },
       {
-        onSuccess: ({ id, secretKey }) => {
+        onSuccess: ({ deviceId, secretKey }) => {
           Promise.all([
-            setItem<string>(storageKeys.DEVICE_ID, id.toString()),
+            setItem<string>(storageKeys.DEVICE_ID, deviceId),
+            setItem<string>(storageKeys.DEVICE_PURPOSE, selectedPurpose),
+            setItem<string>(
+              storageKeys.DEVICE_NAME,
+              registrationForm.name.value,
+            ),
             setItem<string>(storageKeys.SECRET_KEY, secretKey),
             setItem<string>(storageKeys.STORE_ID, storeId),
-            setItem<string>(storageKeys.USER_ID, userId),
+            setItem<string>(storageKeys.ACCOUNT_ID, accountId),
           ]).then(() => {
             void queryClient.invalidateQueries({
               queryKey: [queryKeys.DEVICE, queryKeys.GET_DEVICE],
@@ -188,18 +183,20 @@ const RegistrationStep2Screen = () => {
             </View>
             <View style={styles.selectBoxContainer}>
               <View style={styles.devicePurposeSelectBoxContainer}>
-                {purposes.map((purpose, index) => (
+                {(
+                  Object.entries(DevicePurpose) as Entries<typeof DevicePurpose>
+                ).map(([key, value], index) => (
                   <DevicePurposeSelectBox
-                    key={`${purpose.value}-${index}`}
-                    label={purpose.label}
-                    selected={selectedPurpose === purpose.value}
-                    onPress={() => setSelectedPurpose(purpose.value)}
+                    key={`${key}-${index}`}
+                    label={value}
+                    selected={selectedPurpose === key}
+                    onPress={() => setSelectedPurpose(key)}
                   />
                 ))}
               </View>
             </View>
             <View style={styles.inputContainer}>
-              {selectedPurpose === DevicePurpose.TABLE && (
+              {selectedPurpose === 'TABLE' && (
                 <Input
                   label="테이블 번호"
                   inputMode="numeric"
@@ -218,18 +215,18 @@ const RegistrationStep2Screen = () => {
                 onChangeText={handleOnChangeName}
                 returnKeyType="done"
               />
-              {selectedPurpose === DevicePurpose.TABLE && (
+              {selectedPurpose === 'TABLE' && (
                 <View>
                   <InputLabel label="결제 수단" />
                   <View style={styles.paymentTypeSelectBoxContainer}>
-                    {paymentTypes.map((paymentType, index) => (
+                    {(
+                      Object.entries(PaymentType) as Entries<typeof PaymentType>
+                    ).map(([key, value], index) => (
                       <PaymentTypeSelectBox
-                        key={`${paymentType.value}-${index}`}
-                        label={paymentType.label}
-                        selected={selectedPaymentType === paymentType.value}
-                        onPress={() =>
-                          setSelectedPaymentType(paymentType.value)
-                        }
+                        key={`${key}-${index}`}
+                        label={value}
+                        selected={selectedPaymentType === key}
+                        onPress={() => setSelectedPaymentType(key)}
                       />
                     ))}
                   </View>

@@ -1,35 +1,52 @@
 import { axiosInstance } from '@/api/axios'
-import { DevicePurpose, PaymentType, storageKeys } from '@/constants'
-import { Device, valueOf } from '@/types'
-import { getItemOrElseThrow } from '@/utils'
+import { DevicePurpose, PaymentType } from '@/constants'
+import { AuthenticationCode, Device, SendAuthenticationCode } from '@/types'
+import { makeSignatureHeader } from '@/utils'
 
 export const getDevice = async (): Promise<Device> => {
-  const deviceId = await getItemOrElseThrow<string>(storageKeys.DEVICE_ID)
-  const { data } = await axiosInstance.get(`/devices/${deviceId}`)
+  const requestMethod = 'GET'
+  const requestURI = `/v1/devices`
+  const headers = await makeSignatureHeader(requestMethod, requestURI)
+  const { data } = await axiosInstance.get(requestURI, { headers })
   return data
 }
 
+export const sendAuthenticationCode = async ({
+  phoneNumber,
+}: SendAuthenticationCode): Promise<void> => {
+  return await axiosInstance.post(`/v1/devices/send-auth-code`, { phoneNumber })
+}
+
+export const verifyAuthenticationCode = async ({
+  code,
+  phoneNumber,
+}: AuthenticationCode): Promise<void> => {
+  return await axiosInstance.post(`/v1/devices/verify-auth-code`, {
+    code,
+    phoneNumber,
+  })
+}
+
 type CreateDeviceRequest = {
-  userId: bigint
-  storeId: bigint
+  storeId: string
+  phoneNumber: string
   name: string
   tableNo: number
-  purpose: valueOf<typeof DevicePurpose>
-  paymentType: valueOf<typeof PaymentType>
+  purpose: keyof typeof DevicePurpose
+  paymentType: keyof typeof PaymentType
 }
 
 type CreateDeviceResponse = {
-  id: bigint
+  deviceId: string
   secretKey: string
 }
 
 export const createDevice = async ({
-  userId,
   storeId,
   ...requestBody
 }: CreateDeviceRequest): Promise<CreateDeviceResponse> => {
   const { data } = await axiosInstance.post(
-    `/users/${userId}/stores/${storeId}/devices`,
+    `/v1/stores/${storeId}/devices`,
     requestBody,
   )
   return data
