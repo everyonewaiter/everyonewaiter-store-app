@@ -1,62 +1,17 @@
 import { createContext, PropsWithChildren, useEffect, useRef } from 'react'
 import EventSource from 'react-native-sse'
 
-import JSONBig from 'json-bigint'
 import 'react-native-url-polyfill/auto'
 
 import { queryClient } from '@/api'
 import { milliTimes, queryKeys, storageKeys } from '@/constants'
 import { useGetDevice } from '@/hooks'
-import { StoreActionEvent } from '@/types'
+import { SseEvent } from '@/types'
 import { getItem, makeSignature } from '@/utils'
 
-type SseEvent = 'sse'
+type SseName = 'sse'
 
 const SseContext = createContext(null)
-
-const handleStoreActionEvent = (storeAction: string | StoreActionEvent) => {
-  if (typeof storeAction === 'string') {
-    return
-  }
-
-  switch (storeAction.category) {
-    case '기기':
-      void queryClient.invalidateQueries({ queryKey: [queryKeys.DEVICE] })
-      break
-    case '매장':
-      void queryClient.invalidateQueries({ queryKey: [queryKeys.STORE] })
-      break
-    case '설정':
-      void queryClient.invalidateQueries({ queryKey: [queryKeys.SETTING] })
-      break
-    case '카테고리':
-      void queryClient.invalidateQueries({ queryKey: [queryKeys.CATEGORY] })
-      break
-    case '메뉴':
-      void queryClient.invalidateQueries({ queryKey: [queryKeys.MENU] })
-      break
-    case '웨이팅':
-      void queryClient.invalidateQueries({ queryKey: [queryKeys.WAITING] })
-      break
-    case '주문':
-      if (storeAction.hasResource && storeAction.resourceName === 'TableNo') {
-        void queryClient.invalidateQueries({
-          queryKey: [queryKeys.ORDER, storeAction.resource],
-        })
-      } else {
-        void queryClient.invalidateQueries({ queryKey: [queryKeys.ORDER] })
-      }
-      break
-    case '직원 호출':
-      break
-    case '레시피':
-      break
-    case 'POS':
-      break
-    default:
-      console.log('Unhandled store action event:', storeAction)
-  }
-}
 
 const SseProvider = ({ children }: PropsWithChildren) => {
   const { device } = useGetDevice()
@@ -77,20 +32,30 @@ const SseProvider = ({ children }: PropsWithChildren) => {
   }, [])
 
   useEffect(() => {
-    const sseEndpoint = process.env.EXPO_PUBLIC_SSE_SERVER_URL
+    const requestMethod = 'GET'
+    const requestURI = '/v1/stores/subscribe'
+    const sseEndpoint = process.env.EXPO_PUBLIC_API_SERVER_URL + requestURI
     if (!sseEndpoint || !device || !secretKeyRef.current) {
       return
     }
 
     const url = new URL(sseEndpoint)
-    const eventSource = new EventSource<SseEvent>(url, {
+    const eventSource = new EventSource<SseName>(url, {
       headers: {
         'x-ew-access-key': {
           toString: () => device.deviceId,
         },
         'x-ew-signature': {
           toString: () =>
-            makeSignature(device, secretKeyRef.current, timestampRef.current),
+            makeSignature(
+              requestMethod,
+              requestURI,
+              device.deviceId,
+              device.purpose,
+              device.name,
+              secretKeyRef.current,
+              timestampRef.current,
+            ),
         },
         'x-ew-timestamp': {
           toString: () => timestampRef.current,
@@ -102,8 +67,40 @@ const SseProvider = ({ children }: PropsWithChildren) => {
       if (!event.data) {
         return
       }
-      const storeAction: StoreActionEvent = JSONBig.parse(event.data)
-      handleStoreActionEvent(storeAction)
+
+      const sseEvent: string | SseEvent = JSON.parse(event.data)
+      if (typeof sseEvent === 'string') {
+        return
+      }
+
+      switch (sseEvent.category) {
+        case 'DEVICE':
+          void queryClient.invalidateQueries({ queryKey: [queryKeys.DEVICE] })
+          break
+        case 'STORE':
+          void queryClient.invalidateQueries({ queryKey: [queryKeys.STORE] })
+          break
+        case 'CATEGORY':
+          void queryClient.invalidateQueries({ queryKey: [queryKeys.CATEGORY] })
+          break
+        case 'MENU':
+          void queryClient.invalidateQueries({ queryKey: [queryKeys.MENU] })
+          break
+        case 'WAITING':
+          void queryClient.invalidateQueries({ queryKey: [queryKeys.WAITING] })
+          break
+        case 'ORDER':
+          void queryClient.invalidateQueries({ queryKey: [queryKeys.ORDER] })
+          break
+        case 'STAFF_CALL':
+          break
+        case 'RECEIPT':
+          break
+        case 'POS':
+          break
+        default:
+          console.log('Unhandled store action event:', sseEvent)
+      }
     })
 
     return () => {

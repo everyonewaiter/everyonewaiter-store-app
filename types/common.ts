@@ -8,18 +8,17 @@ export type ImageAccessUri = {
   accessUri: string
 }
 
-export type StoreActionEvent = {
-  category: valueOf<StoreActionCategory>
-  actionType: valueOf<StoreActionType>
-  hasResource: boolean
-  resourceName: string
-  resource: string
+export type SseEvent = {
+  storeId: string
+  category: keyof SseCategory
+  action: keyof ServerAction
+  hasData: boolean
+  data: string
 }
 
-export type StoreActionCategory = {
+export type SseCategory = {
   DEVICE: '기기'
   STORE: '매장'
-  SETTING: '설정'
   CATEGORY: '카테고리'
   MENU: '메뉴'
   WAITING: '웨이팅'
@@ -29,7 +28,8 @@ export type StoreActionCategory = {
   POS: 'POS'
 }
 
-export type StoreActionType = {
+export type ServerAction = {
+  GET: '조회'
   CREATE: '생성'
   UPDATE: '수정'
   DELETE: '삭제'

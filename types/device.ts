@@ -7,6 +7,20 @@ export type AuthenticationCode = {
 
 export type SendAuthenticationCode = Omit<AuthenticationCode, 'code'>
 
+export type CreateDeviceRequest = {
+  storeId: string
+  phoneNumber: string
+  name: string
+  tableNo: number
+  purpose: keyof typeof DevicePurpose
+  paymentType: keyof typeof PaymentType
+}
+
+export type CreateDeviceResponse = {
+  deviceId: string
+  secretKey: string
+}
+
 export type Device = {
   deviceId: string
   storeId: string

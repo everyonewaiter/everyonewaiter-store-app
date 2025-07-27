@@ -1,6 +1,11 @@
 import { axiosInstance } from '@/api/axios'
-import { DevicePurpose, PaymentType } from '@/constants'
-import { AuthenticationCode, Device, SendAuthenticationCode } from '@/types'
+import {
+  AuthenticationCode,
+  CreateDeviceRequest,
+  CreateDeviceResponse,
+  Device,
+  SendAuthenticationCode,
+} from '@/types'
 import { makeSignatureHeader } from '@/utils'
 
 export const getDevice = async (): Promise<Device> => {
@@ -25,20 +30,6 @@ export const verifyAuthenticationCode = async ({
     code,
     phoneNumber,
   })
-}
-
-type CreateDeviceRequest = {
-  storeId: string
-  phoneNumber: string
-  name: string
-  tableNo: number
-  purpose: keyof typeof DevicePurpose
-  paymentType: keyof typeof PaymentType
-}
-
-type CreateDeviceResponse = {
-  deviceId: string
-  secretKey: string
 }
 
 export const createDevice = async ({

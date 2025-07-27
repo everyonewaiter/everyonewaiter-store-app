@@ -16,7 +16,6 @@ export const queryKeys = {
   GET_MENUS: 'getMenus',
   ORDER: 'order',
   GET_ORDER_HISTORIES: 'getOrderHistories',
-  SETTING: 'setting',
   STORE: 'store',
   GET_STORE: 'getStore',
   GET_STORE_NAMES: 'getStoreNames',

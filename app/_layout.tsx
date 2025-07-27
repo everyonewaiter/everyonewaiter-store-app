@@ -7,6 +7,7 @@ import { useFonts } from 'expo-font'
 import { useKeepAwake } from 'expo-keep-awake'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
+import { StatusBar } from 'expo-status-bar'
 
 import { useReactQueryDevTools } from '@dev-plugins/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -40,9 +41,13 @@ const RootLayout = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthenticationProvider>
-        <EveryoneWaiterApplication />
-      </AuthenticationProvider>
+      <KeyboardProvider>
+        <GestureHandlerRootView>
+          <AuthenticationProvider>
+            <EveryoneWaiterApplication />
+          </AuthenticationProvider>
+        </GestureHandlerRootView>
+      </KeyboardProvider>
     </QueryClientProvider>
   )
 }
@@ -56,15 +61,14 @@ const EveryoneWaiterApplication = () => {
   }
 
   return (
-    <KeyboardProvider>
-      <GestureHandlerRootView>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="device" />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </GestureHandlerRootView>
-    </KeyboardProvider>
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="device" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar hidden={true} />
+    </>
   )
 }
 
