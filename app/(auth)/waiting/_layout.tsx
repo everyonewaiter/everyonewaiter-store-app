@@ -4,7 +4,7 @@ import { Redirect, Stack, useFocusEffect } from 'expo-router'
 import { OrientationLock } from 'expo-screen-orientation'
 import * as SplashScreen from 'expo-splash-screen'
 
-import { colors, DevicePurpose } from '@/constants'
+import { colors } from '@/constants'
 import { useGetDevice, useOrientation } from '@/hooks'
 import { getNavigatePath } from '@/utils'
 
@@ -24,7 +24,7 @@ const WaitingLayout = () => {
     return null
   }
 
-  if (device.purpose !== DevicePurpose.WAITING) {
+  if (device.purpose !== 'WAITING') {
     return <Redirect href={`${getNavigatePath(device.purpose)}`} />
   }
 
