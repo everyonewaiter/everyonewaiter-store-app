@@ -1,5 +1,4 @@
 import { DevicePurpose } from '@/constants'
-import { valueOf } from '@/types'
 
 const phoneNumberRegex = /^01[016789]\d{7,8}$/
 const authenticationCodeRegex = /^\d{6}$/
@@ -45,14 +44,14 @@ const validateDeviceName = (name: string) => {
 }
 
 export const validateCreateDevice = (
-  purpose: valueOf<typeof DevicePurpose>,
+  purpose: keyof typeof DevicePurpose,
   name: string,
   tableNo: string,
 ) => {
   const error = { name: '', tableNo: '' }
 
   error.name = validateDeviceName(name)
-  if (purpose === DevicePurpose.TABLE) {
+  if (purpose === 'TABLE') {
     error.tableNo = validateTableNo(tableNo)
   }
 

@@ -16,7 +16,7 @@ export const DevicePurpose = {
   WAITING: '웨이팅 등록',
 } as const
 
-export const DeviceStatus = {
+export const DeviceState = {
   ACTIVE: '활성',
   INACTIVE: '비활성',
 } as const
@@ -76,7 +76,7 @@ export const StoreStatus = {
   CLOSE: '영업 마감',
 } as const
 
-export const UserRole = {
+export const AccountPermission = {
   USER: '사용자',
   OWNER: '사장님',
   ADMIN: '관리자',

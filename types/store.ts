@@ -2,7 +2,7 @@ import { KitchenPrinterLocation, StoreStatus } from '@/constants'
 import { valueOf } from '@/types/common'
 
 export type StoreName = {
-  id: bigint
+  storeId: string
   name: string
 }
 

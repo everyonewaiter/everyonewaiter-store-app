@@ -4,7 +4,6 @@ import { isAxiosError } from 'axios'
 import CryptoJS from 'crypto-js'
 
 import { DevicePurpose, storageKeys } from '@/constants'
-import { Device, valueOf } from '@/types'
 import { getItem } from '@/utils/storage'
 
 export const parseErrorMessage = (error: Error) => {
@@ -32,30 +31,43 @@ export const clearNullableInterval = (interval: NodeJS.Timeout | null) => {
   }
 }
 
-export const getNavigatePath = (purpose: valueOf<typeof DevicePurpose>) => {
+export const getNavigatePath = (purpose: keyof typeof DevicePurpose) => {
   switch (purpose) {
-    case DevicePurpose.WAITING:
+    case 'WAITING':
       return '/waiting/registration'
-    case DevicePurpose.TABLE:
+    case 'TABLE':
       return '/table/customer'
     default:
       throw new Error('Unknown device purpose')
   }
 }
 
-export const makeSignatureHeader = async () => {
-  const [device, secretKey] = await Promise.all([
-    getItem<Device>(storageKeys.DEVICE),
+export const makeSignatureHeader = async (
+  requestMethod: string,
+  requestURI: string,
+) => {
+  const [deviceId, devicePurpose, deviceName, secretKey] = await Promise.all([
+    getItem<string>(storageKeys.DEVICE_ID),
+    getItem<string>(storageKeys.DEVICE_PURPOSE),
+    getItem<string>(storageKeys.DEVICE_NAME),
     getItem<string>(storageKeys.SECRET_KEY),
   ])
 
-  if (!device || !secretKey) {
-    throw new Error('Device or Secret key not found')
+  if (!deviceId || !devicePurpose || !deviceName || !secretKey) {
+    throw new Error('Device information not found')
   }
 
-  const accessKey = device.id.toString()
+  const accessKey = deviceId
   const timestamp = Date.now().toString()
-  const signature = makeSignature(device, secretKey, timestamp)
+  const signature = makeSignature(
+    requestMethod,
+    requestURI,
+    deviceId,
+    devicePurpose,
+    deviceName,
+    secretKey,
+    timestamp,
+  )
 
   return {
     'x-ew-access-key': accessKey,
@@ -65,14 +77,18 @@ export const makeSignatureHeader = async () => {
 }
 
 export const makeSignature = (
-  device: Device,
+  requestMethod: string,
+  requestURI: string,
+  deviceId: string,
+  devicePurpose: string,
+  deviceName: string,
   secretKey: string,
   timestamp: string,
 ) => {
   const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey)
-  hmac.update(`${device.purpose} ${device.name}`)
+  hmac.update(`${requestMethod} ${requestURI}`)
   hmac.update('\n')
-  hmac.update(device.id.toString())
+  hmac.update(`${deviceId} ${devicePurpose} ${deviceName}`)
   hmac.update('\n')
   hmac.update(timestamp)
   const hash = hmac.finalize()

@@ -86,7 +86,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
     const eventSource = new EventSource<SseEvent>(url, {
       headers: {
         'x-ew-access-key': {
-          toString: () => device.id.toString(),
+          toString: () => device.deviceId,
         },
         'x-ew-signature': {
           toString: () =>

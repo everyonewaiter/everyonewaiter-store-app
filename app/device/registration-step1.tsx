@@ -17,7 +17,7 @@ import Button from '@/components/Button'
 import Input from '@/components/Input'
 import InputLabel from '@/components/InputLabel'
 import Picker from '@/components/Picker'
-import { AuthenticationPurpose, fonts, milliTimes } from '@/constants'
+import { fonts, milliTimes } from '@/constants'
 import {
   useGetProfile,
   useGetStores,
@@ -61,8 +61,8 @@ const RegistrationStep1Screen = () => {
     registrationForm.phoneNumber.value,
     isAuthenticate,
   )
-  const { id } = profile || {}
-  const { data: stores } = useGetStores(id)
+  const { accountId } = profile || {}
+  const { data: stores } = useGetStores(accountId, isAuthenticate)
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
@@ -82,7 +82,7 @@ const RegistrationStep1Screen = () => {
     if (!stores) return
 
     if (stores.length > 0) {
-      setSelectedStoreId(stores[0].id.toString())
+      setSelectedStoreId(stores[0].storeId)
     } else {
       Alert.alert('알림', '매장을 먼저 등록해주세요.', [
         {
@@ -119,7 +119,6 @@ const RegistrationStep1Screen = () => {
     sendAuthCode.mutate(
       {
         phoneNumber: phoneNumber,
-        purpose: AuthenticationPurpose.DEVICE_REGISTRATION,
       },
       {
         onSuccess: () => {
@@ -148,7 +147,6 @@ const RegistrationStep1Screen = () => {
       {
         code: registrationForm.code.value,
         phoneNumber: registrationForm.phoneNumber.value,
-        purpose: AuthenticationPurpose.DEVICE_REGISTRATION,
       },
       {
         onSuccess: () => {
@@ -231,7 +229,7 @@ const RegistrationStep1Screen = () => {
                   <Picker
                     items={stores.map(store => ({
                       label: store.name,
-                      value: store.id.toString(),
+                      value: store.storeId,
                     }))}
                     selectedItem={selectedStoreId}
                     setSelectedItem={setSelectedStoreId}
@@ -245,8 +243,9 @@ const RegistrationStep1Screen = () => {
                 router.push({
                   pathname: '/device/registration-step2',
                   params: {
-                    userId: profile?.id.toString(),
+                    accountId: profile?.accountId,
                     storeId: selectedStoreId,
+                    phoneNumber: registrationForm.phoneNumber.value,
                   },
                 })
               }

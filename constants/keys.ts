@@ -1,9 +1,10 @@
 export const storageKeys = {
-  DEVICE: 'device',
   DEVICE_ID: 'deviceId',
+  DEVICE_NAME: 'deviceName',
+  DEVICE_PURPOSE: 'devicePurpose',
   SECRET_KEY: 'secretKey',
   STORE_ID: 'storeId',
-  USER_ID: 'userId',
+  ACCOUNT_ID: 'accountId',
 } as const
 
 export const queryKeys = {
@@ -19,7 +20,7 @@ export const queryKeys = {
   STORE: 'store',
   GET_STORE: 'getStore',
   GET_STORE_NAMES: 'getStoreNames',
-  USER: 'user',
+  ACCOUNT: 'account',
   GET_PROFILE: 'getProfile',
   WAITING: 'waiting',
   GET_WAITING_COUNT: 'getWaitingCount',
