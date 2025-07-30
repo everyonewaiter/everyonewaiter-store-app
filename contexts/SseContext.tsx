@@ -14,7 +14,7 @@ type SseName = 'sse'
 const SseContext = createContext(null)
 
 const SseProvider = ({ children }: PropsWithChildren) => {
-  const { device } = useGetDevice()
+  const { device, isSuccess } = useGetDevice()
   const secretKeyRef = useRef('')
   const timestampRef = useRef(Date.now().toString())
 
@@ -35,7 +35,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
     const requestMethod = 'GET'
     const requestURI = '/v1/stores/subscribe'
     const sseEndpoint = process.env.EXPO_PUBLIC_API_SERVER_URL + requestURI
-    if (!sseEndpoint || !device || !secretKeyRef.current) {
+    if (!device || !isSuccess) {
       return
     }
 
@@ -68,11 +68,11 @@ const SseProvider = ({ children }: PropsWithChildren) => {
         return
       }
 
-      const sseEvent: string | SseEvent = JSON.parse(event.data)
-      if (typeof sseEvent === 'string') {
+      if (event.data === 'CONNECTED!') {
         return
       }
 
+      const sseEvent: SseEvent = JSON.parse(event.data)
       switch (sseEvent.category) {
         case 'DEVICE':
           void queryClient.invalidateQueries({ queryKey: [queryKeys.DEVICE] })
@@ -81,7 +81,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
           void queryClient.invalidateQueries({ queryKey: [queryKeys.STORE] })
           break
         case 'CATEGORY':
-          void queryClient.invalidateQueries({ queryKey: [queryKeys.CATEGORY] })
+          void queryClient.invalidateQueries({ queryKey: [queryKeys.MENU] })
           break
         case 'MENU':
           void queryClient.invalidateQueries({ queryKey: [queryKeys.MENU] })
@@ -107,7 +107,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
       eventSource.removeAllEventListeners()
       eventSource.close()
     }
-  }, [device])
+  }, [device, isSuccess])
 
   return <SseContext.Provider value={null}>{children}</SseContext.Provider>
 }

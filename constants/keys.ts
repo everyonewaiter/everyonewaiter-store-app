@@ -9,7 +9,6 @@ export const storageKeys = {
 
 export const queryKeys = {
   CATEGORY: 'category',
-  GET_CATEGORIES: 'getCategories',
   DEVICE: 'device',
   GET_DEVICE: 'getDevice',
   MENU: 'menu',

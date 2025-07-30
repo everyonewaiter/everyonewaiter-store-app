@@ -6,7 +6,7 @@ import { Category } from '@/types'
 interface CategoryButtonProps {
   index: number
   category: Category
-  selectedCategory: Category
+  selectedCategory: Category | null
   handleSelectCategory: (category: Category, index: number) => void
 }
 
@@ -16,7 +16,7 @@ const CategoryButton = ({
   selectedCategory,
   handleSelectCategory,
 }: CategoryButtonProps) => {
-  const isSelected = category.id.toString() === selectedCategory.id.toString()
+  const isSelected = category.categoryId === selectedCategory?.categoryId
 
   return (
     <Pressable

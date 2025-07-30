@@ -11,12 +11,12 @@ import {
 import { ImageBackground, useImage } from 'expo-image'
 
 import Badge from '@/components/Badge'
-import { colors, fonts, images, MenuLabel } from '@/constants'
+import { colors, fonts } from '@/constants'
 import { Category, Menu } from '@/types'
 
 interface MenuCardProps extends PressableProps {
   menu: Menu
-  selectedCategory: Category
+  selectedCategory: Category | null
   rootNumColumns: number
   rootGap: number
   rootPaddingHorizontal: number
@@ -32,7 +32,7 @@ const MenuCard = ({
 }: MenuCardProps) => {
   const { width: screenWidth } = useWindowDimensions()
   const [contentWidth, setContentWidth] = useState(0)
-  const image = useImage(menu.imageUri ?? images.PREPARATION)
+  const image = useImage(process.env.EXPO_PUBLIC_CDN_URL + `/${menu.image}`)
 
   useEffect(() => {
     const paddingHorizontalSpace = rootPaddingHorizontal * 2
@@ -41,8 +41,8 @@ const MenuCard = ({
     setContentWidth(availableSpace / rootNumColumns)
   }, [screenWidth, rootGap, rootNumColumns, rootPaddingHorizontal])
 
-  const selectedCategoryId = selectedCategory.id.toString()
-  const menuCategoryId = menu.categoryId.toString()
+  const selectedCategoryId = selectedCategory?.categoryId
+  const menuCategoryId = menu.categoryId
   const isVisible =
     selectedCategoryId === '0' || menuCategoryId === selectedCategoryId
 
@@ -65,7 +65,7 @@ const MenuCard = ({
             alt={menu.name}
             contentFit="cover"
           >
-            {menu.label !== MenuLabel.DEFAULT && <Badge label={menu.label} />}
+            {menu.label !== 'DEFAULT' && <Badge label={menu.label} />}
           </ImageBackground>
         )}
       </View>

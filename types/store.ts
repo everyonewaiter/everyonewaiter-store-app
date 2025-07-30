@@ -1,5 +1,4 @@
 import { KitchenPrinterLocation, StoreStatus } from '@/constants'
-import { valueOf } from '@/types/common'
 
 export type StoreName = {
   storeId: string
@@ -7,31 +6,33 @@ export type StoreName = {
 }
 
 export type Store = {
-  id: bigint
-  ceoName: string
+  storeId: string
+  accountId: string
   name: string
-  license: string
+  ceoName: string
   address: string
   landline: string
-  status: valueOf<typeof StoreStatus>
-  countryOfOrigins: CountryOfOrigin[]
+  license: string
+  image: string
+  status: keyof typeof StoreStatus
+  lastOpenedAt: string
+  lastClosedAt: string
+  setting: Setting
   createdAt: string
   updatedAt: string
 }
 
-export type CountryOfOrigin = {
-  id: bigint
-  item: string
-  origin: string
-}
-
 export type Setting = {
-  id: bigint
-  storeId: bigint
-  extraTableCount: number
   ksnetDeviceNo: string
-  kitchenPrinterLocation: valueOf<typeof KitchenPrinterLocation>
+  extraTableCount: number
+  kitchenPrinterLocation: keyof typeof KitchenPrinterLocation
   showMenuPopup: boolean
   showOrderTotalPrice: boolean
+  countryOfOrigins: CountryOfOrigin[]
   staffCallOptions: string[]
+}
+
+export type CountryOfOrigin = {
+  item: string
+  origin: string
 }

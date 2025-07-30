@@ -1,7 +1,5 @@
 import { axiosInstance } from '@/api/axios'
-import { storageKeys } from '@/constants'
-import { Setting, Store, StoreName } from '@/types'
-import { getItem, makeSignatureHeader } from '@/utils'
+import { Store, StoreName } from '@/types'
 
 export const getStoreNames = async (
   accountId: string,
@@ -10,14 +8,7 @@ export const getStoreNames = async (
   return data.stores
 }
 
-export const getStore = async (): Promise<Store> => {
-  const storeId = await getItem<string>(storageKeys.STORE_ID)
-  const { data } = await axiosInstance.get(`/stores/${storeId}`)
-  return data
-}
-
-export const getSetting = async (): Promise<Setting> => {
-  const headers = await makeSignatureHeader()
-  const { data } = await axiosInstance.get(`/settings`, { headers })
+export const getStore = async (storeId: string): Promise<Store> => {
+  const { data } = await axiosInstance.get(`/v1/stores/${storeId}`)
   return data
 }

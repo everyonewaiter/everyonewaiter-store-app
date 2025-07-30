@@ -1,31 +1,29 @@
 import { axiosInstance } from '@/api/axios'
-import { Order, OrderCreate } from '@/types'
+import { CreateStaffCallRequest, CreateTableOrderRequest, Order } from '@/types'
 import { makeSignatureHeader } from '@/utils'
-
-type CreateStaffCallRequest = {
-  callOption: string
-}
 
 export const createStaffCall = async ({
   ...requestBody
 }: CreateStaffCallRequest): Promise<void> => {
-  const headers = await makeSignatureHeader()
-  return await axiosInstance.post(`/staff/call`, requestBody, { headers })
-}
-
-type CreateTableOrderRequest = {
-  menus: OrderCreate[]
+  const requestMethod = 'POST'
+  const requestURI = `/v1/orders/staff-calls`
+  const headers = await makeSignatureHeader(requestMethod, requestURI)
+  return await axiosInstance.post(requestURI, requestBody, { headers })
 }
 
 export const createTableOrder = async ({
   ...requestBody
 }: CreateTableOrderRequest) => {
-  const headers = await makeSignatureHeader()
-  return await axiosInstance.post(`/orders/table`, requestBody, { headers })
+  const requestMethod = 'POST'
+  const requestURI = `/v1/orders`
+  const headers = await makeSignatureHeader(requestMethod, requestURI)
+  return await axiosInstance.post(requestURI, requestBody, { headers })
 }
 
 export const getTableOrderHistories = async (): Promise<Order[]> => {
-  const headers = await makeSignatureHeader()
-  const { data } = await axiosInstance.get(`/orders/table`, { headers })
+  const requestMethod = 'GET'
+  const requestURI = `/v1/orders/tables`
+  const headers = await makeSignatureHeader(requestMethod, requestURI)
+  const { data } = await axiosInstance.get(requestURI, { headers })
   return data.orders
 }

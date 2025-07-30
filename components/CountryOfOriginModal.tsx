@@ -33,7 +33,9 @@ const CountryOfOriginModal = ({
           <FlatList
             style={{ height: 300 }}
             data={countryOfOrigins}
-            keyExtractor={item => String(item.id)}
+            keyExtractor={(item, index) =>
+              `${item.item}-${item.origin}-${index}`
+            }
             renderItem={renderItem => (
               <View style={styles.contentContainer}>
                 <View style={styles.center}>
