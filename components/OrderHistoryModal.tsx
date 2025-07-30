@@ -20,11 +20,11 @@ const OrderHistoryModal = ({
   const calculateTotalPrice = () => {
     let totalPrice = 0
     for (const history of histories) {
-      totalPrice += history.menus.reduce((acc, menu) => {
-        const optionPrice = menu.optionGroups
-          .flatMap(group => group.options)
+      totalPrice += history.orderMenus.reduce((acc, menu) => {
+        const optionPrice = menu.orderOptionGroups
+          .flatMap(group => group.orderOptions)
           .reduce((acc, option) => acc + option.price, 0)
-        return acc + (menu.price + optionPrice) * menu.count
+        return acc + (menu.price + optionPrice) * menu.quantity
       }, 0)
     }
     return totalPrice
@@ -40,7 +40,7 @@ const OrderHistoryModal = ({
           <FlatList
             style={{ height: 300 }}
             data={histories}
-            keyExtractor={item => String(item.id)}
+            keyExtractor={item => item.orderId}
             contentContainerStyle={{ gap: 14 }}
             renderItem={({ item, index }) => (
               <View
@@ -52,17 +52,20 @@ const OrderHistoryModal = ({
               >
                 <Text style={styles.indexNumber}>{index + 1}</Text>
                 <View style={styles.orderContainer}>
-                  {item.menus.map(menu => (
-                    <View key={`${item.id}-${menu.id}`} style={{ flex: 1 }}>
+                  {item.orderMenus.map((menu, index) => (
+                    <View
+                      key={`${item.orderId}-${menu.orderMenuId}-${index}`}
+                      style={{ flex: 1 }}
+                    >
                       <View style={[styles.spaceBetween]}>
                         <Text style={styles.menuName}>{menu.name}</Text>
-                        <Text style={styles.menuName}>{menu.count}개</Text>
+                        <Text style={styles.menuName}>{menu.quantity}개</Text>
                       </View>
-                      {menu.optionGroups
-                        .flatMap(group => group.options)
-                        .map(option => (
+                      {menu.orderOptionGroups
+                        .flatMap(group => group.orderOptions)
+                        .map((option, index) => (
                           <Text
-                            key={String(option.id)}
+                            key={`${option.name}-${option.price}-${index}`}
                             style={styles.menuOption}
                           >
                             + {option.name}

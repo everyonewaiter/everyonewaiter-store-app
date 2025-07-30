@@ -22,9 +22,9 @@ export const DeviceState = {
 } as const
 
 export const defaultCategory: Category = {
-  id: BigInt(0),
+  categoryId: '0',
   name: '전체',
-  position: 0,
+  menus: [],
 }
 
 export const KitchenPrinterLocation = {
@@ -41,10 +41,10 @@ export const MenuLabel = {
 
 export const MenuOptionGroupType = {
   MANDATORY: '필수',
-  CHOICE: '선택',
+  OPTIONAL: '선택',
 } as const
 
-export const MenuStatus = {
+export const MenuState = {
   DEFAULT: '기본',
   HIDE: '숨김',
   SOLD_OUT: '품절',
@@ -55,10 +55,9 @@ export const OrderCategory = {
   ADDITIONAL: '추가',
 } as const
 
-export const OrderStatus = {
-  ORDERED: '주문',
+export const OrderState = {
+  ORDER: '주문',
   CANCEL: '취소',
-  COMPLETE: '완료',
 } as const
 
 export const PaymentMethod = {

@@ -1,43 +1,65 @@
-import { OrderCategory, OrderStatus, PaymentType } from '@/constants'
-import { valueOf } from '@/types/common'
-import { MenuOptionGroup } from '@/types/menu'
+import { OrderCategory, OrderState, PaymentType } from '@/constants'
+
+export type CreateStaffCallRequest = {
+  optionName: string
+}
+
+export type CreateTableOrderRequest = {
+  tableNo: number
+  memo: string
+  orderMenus: OrderCreate[]
+}
 
 export type OrderCreate = {
-  menuId: bigint
-  count: number
-  optionGroups: OrderCreateOptionGroup[]
+  menuId: string
+  quantity: number
+  menuOptionGroups: OrderCreateOptionGroup[]
 }
 
 export type OrderCreateOptionGroup = {
-  groupId: bigint
-  options: OrderCreateOption[]
+  menuOptionGroupId: string
+  orderOptions: OrderCreateOption[]
 }
 
 export type OrderCreateOption = {
-  optionId: bigint
+  name: string
+  price: number
 }
 
 export type Order = {
-  id: bigint
-  storeId: bigint
-  tableNo: number
-  category: valueOf<typeof OrderCategory>
-  paymentType: valueOf<typeof PaymentType>
+  orderId: string
+  storeId: string
+  category: keyof typeof OrderCategory
+  type: keyof typeof PaymentType
+  state: keyof typeof OrderState
+  price: number
   memo: string
-  status: valueOf<typeof OrderStatus>
-  isServed: boolean
+  served: boolean
   servedTime: string
-  menus: OrderMenu[]
+  orderMenus: OrderMenu[]
   createdAt: string
   updatedAt: string
 }
 
 export type OrderMenu = {
-  id: bigint
+  orderMenuId: string
   name: string
   price: number
-  count: number
-  isServed: boolean
-  isPrintEnabled: boolean
-  optionGroups: Omit<MenuOptionGroup[], 'type'>
+  quantity: number
+  served: boolean
+  servedTime: string
+  printEnabled: boolean
+  orderOptionGroups: OrderOptionGroup[]
+}
+
+export type OrderOptionGroup = {
+  orderOptionGroupId: string
+  name: string
+  printEnabled: boolean
+  orderOptions: OrderOption[]
+}
+
+export type OrderOption = {
+  name: string
+  price: number
 }

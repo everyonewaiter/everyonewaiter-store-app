@@ -13,14 +13,14 @@ import { AntDesign } from '@expo/vector-icons'
 import Button from '@/components/Button'
 import CartMenu from '@/components/CartMenu'
 import { colors, fonts, PaymentType } from '@/constants'
-import { Menu, OrderCreate, valueOf } from '@/types'
+import { Menu, OrderCreate } from '@/types'
 
 interface CartModalProps {
   visible: boolean
   menus: Menu[]
   cart: OrderCreate[]
   setCart: React.Dispatch<React.SetStateAction<OrderCreate[]>>
-  paymentType: valueOf<typeof PaymentType>
+  paymentType: keyof typeof PaymentType
   submit: () => void
   close: () => void
 }
@@ -43,14 +43,14 @@ const CartModal = ({
 
   const addQuantity = (index: number) => {
     const copy = [...cart]
-    copy[index].count += 1
+    copy[index].quantity += 1
     setCart(copy)
   }
 
   const minusQuantity = (index: number) => {
-    if (cart[index].count > 1) {
+    if (cart[index].quantity > 1) {
       const copy = [...cart]
-      copy[index].count -= 1
+      copy[index].quantity -= 1
       setCart(copy)
     }
   }
@@ -100,9 +100,7 @@ const CartModal = ({
                 renderItem={({ item, index }) => (
                   <CartMenu
                     index={index}
-                    menu={menus.find(
-                      menu => menu.id.toString() === item.menuId.toString(),
-                    )}
+                    menu={menus.find(menu => menu.menuId === item.menuId)}
                     item={item}
                     addQuantity={addQuantity}
                     minusQuantity={minusQuantity}
@@ -125,9 +123,7 @@ const CartModal = ({
               <View style={{ flex: 2 }}>
                 <Button
                   label={
-                    paymentType === PaymentType.PREPAID
-                      ? '결제하고 주문하기'
-                      : '주문하기'
+                    paymentType === 'PREPAID' ? '결제하고 주문하기' : '주문하기'
                   }
                   onPress={submit}
                 />

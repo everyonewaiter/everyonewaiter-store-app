@@ -3,12 +3,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { RadioOffIcon, RadioOnIcon } from '@/assets/icons'
 import { colors, fonts, MenuOptionGroupType } from '@/constants'
-import { MenuOption, OrderCreateOptionGroup, valueOf } from '@/types'
+import { MenuOption, OrderCreateOptionGroup } from '@/types'
 import { formatPriceText } from '@/utils'
 
 interface MenuOptionSelectBoxProps {
-  groupId: bigint
-  type: valueOf<typeof MenuOptionGroupType>
+  groupId: string
+  type: keyof typeof MenuOptionGroupType
   options: MenuOption[]
   selectedOptions: OrderCreateOptionGroup[]
   setSelectedOptions: React.Dispatch<
@@ -25,55 +25,69 @@ const MenuOptionSelectBox = ({
 }: MenuOptionSelectBoxProps) => {
   const isSelectedOption = (option: MenuOption) => {
     const selectedOption = selectedOptions.find(
-      option => option.groupId.toString() === groupId.toString(),
+      option => option.menuOptionGroupId === groupId,
     )
     if (!selectedOption) {
       return false
     }
-    return selectedOption.options.some(
+    return selectedOption.orderOptions.some(
       selectedOption =>
-        selectedOption.optionId.toString() === option.id.toString(),
+        selectedOption.name === option.name &&
+        selectedOption.price === option.price,
     )
   }
 
   const handleSelectOption = (option: MenuOption) => {
     const copy = [...selectedOptions]
-    const index = copy.findIndex(
-      option => option.groupId.toString() === groupId.toString(),
-    )
+    const index = copy.findIndex(option => option.menuOptionGroupId === groupId)
     if (index === -1) {
-      copy.push({ groupId, options: [{ optionId: option.id }] })
+      copy.push({
+        menuOptionGroupId: groupId,
+        orderOptions: [{ name: option.name, price: option.price }],
+      })
     } else {
-      if (type === MenuOptionGroupType.MANDATORY) {
-        copy[index].options = [{ optionId: option.id }]
+      if (type === 'MANDATORY') {
+        copy[index].orderOptions = [{ name: option.name, price: option.price }]
       } else {
-        const optionIndex = copy[index].options.findIndex(
+        const optionIndex = copy[index].orderOptions.findIndex(
           selectedOption =>
-            selectedOption.optionId.toString() === option.id.toString(),
+            selectedOption.name === option.name &&
+            selectedOption.price === option.price,
         )
         if (optionIndex === -1) {
-          copy[index].options.push({ optionId: option.id })
+          copy[index].orderOptions.push({
+            name: option.name,
+            price: option.price,
+          })
         } else {
-          copy[index].options.splice(optionIndex, 1)
+          copy[index].orderOptions.splice(optionIndex, 1)
         }
-        if (copy[index].options.length === 0) {
+        if (copy[index].orderOptions.length === 0) {
           copy.splice(index, 1)
         }
       }
     }
 
-    copy.sort((a, b) => Number(a.groupId - b.groupId))
+    copy.sort((a, b) =>
+      a.menuOptionGroupId < b.menuOptionGroupId
+        ? -1
+        : a.menuOptionGroupId > b.menuOptionGroupId
+          ? 1
+          : 0,
+    )
     copy.forEach(group =>
-      group.options.sort((a, b) => Number(a.optionId - b.optionId)),
+      group.orderOptions.sort((a, b) =>
+        a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+      ),
     )
     setSelectedOptions(copy)
   }
 
   return (
     <View style={styles.container}>
-      {options.map(option => (
+      {options.map((option, index) => (
         <Pressable
-          key={String(option.id)}
+          key={`${option.name}-${option.price}-${index}`}
           style={{
             flexDirection: 'row',
             alignItems: 'center',

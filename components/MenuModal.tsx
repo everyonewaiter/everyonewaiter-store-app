@@ -7,7 +7,7 @@ import { AntDesign } from '@expo/vector-icons'
 
 import Button from '@/components/Button'
 import MenuOptionSelectBox from '@/components/MenuOptionSelectBox'
-import { colors, fonts, images, MenuOptionGroupType } from '@/constants'
+import { colors, fonts, images, MenuLabel } from '@/constants'
 import { Menu, OrderCreate, OrderCreateOptionGroup } from '@/types'
 
 interface MenuModalProps {
@@ -25,7 +25,11 @@ const MenuModal = ({
   setCart,
   close,
 }: MenuModalProps) => {
-  const image = useImage(selectedMenu?.imageUri ?? images.PREPARATION)
+  const image = useImage(
+    selectedMenu?.image
+      ? process.env.EXPO_PUBLIC_CDN_URL + `/${selectedMenu.image}`
+      : images.PREPARATION,
+  )
   const [quantity, setQuantity] = useState(1)
   const [selectedOptions, setSelectedOptions] = useState<
     OrderCreateOptionGroup[]
@@ -34,13 +38,16 @@ const MenuModal = ({
   useEffect(() => {
     if (selectedMenu) {
       setSelectedOptions(
-        selectedMenu.optionGroups
-          .filter(
-            optionGroup => optionGroup.type === MenuOptionGroupType.MANDATORY,
-          )
+        selectedMenu.menuOptionGroups
+          .filter(optionGroup => optionGroup.type === 'MANDATORY')
           .map(optionGroup => ({
-            groupId: optionGroup.id,
-            options: [{ optionId: optionGroup.options[0].id }],
+            menuOptionGroupId: optionGroup.menuOptionGroupId,
+            orderOptions: [
+              {
+                name: optionGroup.menuOptions[0].name,
+                price: optionGroup.menuOptions[0].price,
+              },
+            ],
           })),
       )
     }
@@ -50,11 +57,11 @@ const MenuModal = ({
     return null
   }
 
-  const mandatoryOptionGroups = selectedMenu.optionGroups.filter(
-    optionGroup => optionGroup.type === MenuOptionGroupType.MANDATORY,
+  const mandatoryOptionGroups = selectedMenu.menuOptionGroups.filter(
+    optionGroup => optionGroup.type === 'MANDATORY',
   )
-  const choiceOptionGroups = selectedMenu.optionGroups.filter(
-    optionGroup => optionGroup.type === MenuOptionGroupType.CHOICE,
+  const choiceOptionGroups = selectedMenu.menuOptionGroups.filter(
+    optionGroup => optionGroup.type === 'OPTIONAL',
   )
   const optionGroups = [
     { title: '필수 옵션', data: mandatoryOptionGroups },
@@ -78,12 +85,16 @@ const MenuModal = ({
   }
 
   const calculateTotalPrice = () => {
-    const options = selectedOptions.flatMap(optionGroup => optionGroup.options)
+    const options = selectedOptions.flatMap(
+      optionGroup => optionGroup.orderOptions,
+    )
     const optionPrice = options.reduce((acc, option) => {
-      const selectedOption = selectedMenu.optionGroups
-        .flatMap(optionGroup => optionGroup.options)
+      const selectedOption = selectedMenu.menuOptionGroups
+        .flatMap(optionGroup => optionGroup.menuOptions)
         .find(
-          menuOption => menuOption.id.toString() === option.optionId.toString(),
+          menuOption =>
+            menuOption.name === option.name &&
+            menuOption.price === option.price,
         )
       return acc + (selectedOption?.price ?? 0)
     }, 0)
@@ -94,16 +105,16 @@ const MenuModal = ({
   const addCart = () => {
     const copy = [...cart]
     const index = cart.findIndex(item =>
-      compareOptionGroups(item.optionGroups, selectedOptions),
+      compareOptionGroups(item.menuOptionGroups, selectedOptions),
     )
     if (index === -1) {
       copy.push({
-        menuId: selectedMenu.id,
-        count: quantity,
-        optionGroups: selectedOptions,
+        menuId: selectedMenu.menuId,
+        quantity: quantity,
+        menuOptionGroups: selectedOptions,
       })
     } else {
-      copy[index].count += quantity
+      copy[index].quantity += quantity
     }
     setCart(copy)
     handleClose()
@@ -132,18 +143,18 @@ const MenuModal = ({
     group1: OrderCreateOptionGroup,
     group2: OrderCreateOptionGroup,
   ) => {
-    if (group1.groupId.toString() !== group2.groupId.toString()) {
+    if (group1.menuOptionGroupId !== group2.menuOptionGroupId) {
       return false
     }
 
-    if (group1.options.length !== group2.options.length) {
+    if (group1.orderOptions.length !== group2.orderOptions.length) {
       return false
     }
 
-    for (let i = 0; i < group1.options.length; i++) {
-      const option1 = group1.options[i]
-      const option2 = group2.options[i]
-      if (option1.optionId.toString() !== option2.optionId.toString()) {
+    for (let i = 0; i < group1.orderOptions.length; i++) {
+      const option1 = group1.orderOptions[i]
+      const option2 = group2.orderOptions[i]
+      if (option1.name !== option2.name || option1.price !== option2.price) {
         return false
       }
     }
@@ -172,7 +183,9 @@ const MenuModal = ({
               <View style={{ flex: 1 }}>
                 <View style={styles.info}>
                   <View style={{ flexDirection: 'row' }}>
-                    <Text style={styles.infoLabel}>{selectedMenu.label}</Text>
+                    <Text style={styles.infoLabel}>
+                      {MenuLabel[selectedMenu.label]}
+                    </Text>
                     <Pressable style={styles.closeButton} onPress={handleClose}>
                       <AntDesign name="close" size={28} color="black" />
                     </Pressable>
@@ -221,7 +234,7 @@ const MenuModal = ({
                   <SectionList
                     style={{ height: selectedMenu.description ? 320 : 360 }}
                     sections={optionGroups}
-                    keyExtractor={item => String(item.id)}
+                    keyExtractor={item => item.menuOptionGroupId}
                     renderItem={({ item }) => (
                       <View style={styles.optionGroupContainer}>
                         <View style={styles.optionGroup}>
@@ -229,9 +242,9 @@ const MenuModal = ({
                             {item.name}
                           </Text>
                           <MenuOptionSelectBox
-                            groupId={item.id}
+                            groupId={item.menuOptionGroupId}
                             type={item.type}
-                            options={item.options}
+                            options={item.menuOptions}
                             selectedOptions={selectedOptions}
                             setSelectedOptions={setSelectedOptions}
                           />

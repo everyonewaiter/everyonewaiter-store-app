@@ -4,10 +4,6 @@ export type Entries<T> = {
   [K in keyof T]: [K, T[K]]
 }[keyof T][]
 
-export type ImageAccessUri = {
-  accessUri: string
-}
-
 export type SseEvent = {
   storeId: string
   category: keyof SseCategory

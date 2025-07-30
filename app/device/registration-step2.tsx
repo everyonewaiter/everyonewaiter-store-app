@@ -153,7 +153,6 @@ const RegistrationStep2Screen = () => {
             ),
             setItem<string>(storageKeys.SECRET_KEY, secretKey),
             setItem<string>(storageKeys.STORE_ID, storeId),
-            setItem<string>(storageKeys.ACCOUNT_ID, accountId),
           ]).then(() => {
             void queryClient.invalidateQueries({
               queryKey: [queryKeys.DEVICE, queryKeys.GET_DEVICE],

@@ -1,18 +1,19 @@
 import { StyleSheet, Text, View } from 'react-native'
 
 import { colors, fonts, MenuLabel } from '@/constants'
-import { valueOf } from '@/types'
 
 interface BadgeProps {
-  label: valueOf<typeof MenuLabel>
+  label: keyof typeof MenuLabel
 }
 
 const Badge = ({ label }: BadgeProps) => {
-  const color = label === MenuLabel.BEST ? colors.ORANGE : colors.PRIMARY_RED
+  const color = label === 'BEST' ? colors.ORANGE : colors.PRIMARY_RED
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.badge, { backgroundColor: color }]}>{label}</Text>
+      <Text style={[styles.badge, { backgroundColor: color }]}>
+        {MenuLabel[label]}
+      </Text>
     </View>
   )
 }

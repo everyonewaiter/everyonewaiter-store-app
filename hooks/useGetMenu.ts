@@ -2,41 +2,27 @@ import { useEffect } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 
-import { getCategories, getMenuImage, getMenus } from '@/api'
-import { defaultCategory, queryKeys } from '@/constants'
+import { getMenus } from '@/api'
+import { queryKeys } from '@/constants'
 
-export const useGetCategories = () => {
-  const { data, isSuccess } = useQuery({
-    queryKey: [queryKeys.CATEGORY, queryKeys.GET_CATEGORIES],
-    queryFn: getCategories,
+export const useGetMenus = (storeId: string | undefined, enabled = true) => {
+  const { data, isPending, isSuccess } = useQuery({
+    queryKey: [queryKeys.MENU, queryKeys.GET_MENUS],
+    queryFn: () => getMenus(storeId!),
+    enabled: Boolean(storeId) && enabled,
   })
 
   useEffect(() => {
-    if (isSuccess) {
-      data?.unshift(defaultCategory)
+    if (!isPending && isSuccess) {
+      if (data && !data.some(category => category.categoryId === '0')) {
+        data.unshift({
+          categoryId: '0',
+          name: '전체',
+          menus: data?.flatMap(category => category.menus),
+        })
+      }
     }
-  }, [isSuccess, data])
+  }, [isPending, isSuccess, data])
 
   return { categories: data }
-}
-
-export const useGetMenus = () => {
-  const { data, isSuccess } = useQuery({
-    queryKey: [queryKeys.MENU, queryKeys.GET_MENUS],
-    queryFn: getMenus,
-  })
-
-  useEffect(() => {
-    if (isSuccess) {
-      Promise.all(
-        data?.map(menu => menu.imageId).map(imageId => getMenuImage(imageId)),
-      ).then(images =>
-        data?.forEach(
-          (menu, index) => (menu.imageUri = images[index].accessUri),
-        ),
-      )
-    }
-  }, [isSuccess, data])
-
-  return { menus: data }
 }

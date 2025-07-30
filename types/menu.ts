@@ -1,38 +1,34 @@
-import { MenuLabel, MenuOptionGroupType, MenuStatus } from '@/constants'
-import { valueOf } from '@/types/common'
+import { MenuLabel, MenuOptionGroupType, MenuState } from '@/constants'
 
 export type Category = {
-  id: bigint
+  categoryId: string
   name: string
-  position: number
+  menus: Menu[]
 }
 
 export type Menu = {
-  id: bigint
-  categoryId: bigint
-  imageId: bigint
-  imageUri?: string
+  menuId: string
+  categoryId: string
   name: string
   description: string
   price: number
   spicy: number
-  status: valueOf<typeof MenuStatus>
-  label: valueOf<typeof MenuLabel>
-  isPrintEnabled: boolean
-  position: number
-  optionGroups: MenuOptionGroup[]
+  state: keyof typeof MenuState
+  label: keyof typeof MenuLabel
+  image: string
+  printEnabled: boolean
+  menuOptionGroups: MenuOptionGroup[]
 }
 
 export type MenuOptionGroup = {
-  id: bigint
+  menuOptionGroupId: string
   name: string
-  type: valueOf<typeof MenuOptionGroupType>
-  isPrintEnabled: boolean
-  options: MenuOption[]
+  type: keyof typeof MenuOptionGroupType
+  printEnabled: boolean
+  menuOptions: MenuOption[]
 }
 
 export type MenuOption = {
-  id: bigint
   name: string
   price: number
 }

@@ -27,17 +27,20 @@ const CartMenu = ({
     return null
   }
 
-  const selectedOptions = item.optionGroups.flatMap(group => group.options)
-  const findOptions = menu.optionGroups
-    .flatMap(group => group.options)
+  const selectedOptions = item.menuOptionGroups.flatMap(
+    group => group.orderOptions,
+  )
+  const findOptions = menu.menuOptionGroups
+    .flatMap(group => group.menuOptions)
     .filter(menuOption =>
       selectedOptions.some(
-        option => option.optionId.toString() === menuOption.id.toString(),
+        option =>
+          option.name === menuOption.name && option.price === menuOption.price,
       ),
     )
   const totalPrice =
     (menu.price + findOptions.reduce((acc, option) => acc + option.price, 0)) *
-    item.count
+    item.quantity
 
   return (
     <View style={styles.container}>
@@ -47,8 +50,11 @@ const CartMenu = ({
       </View>
       {findOptions.length > 0 && (
         <View style={{ gap: 4 }}>
-          {findOptions.map(option => (
-            <View key={String(option.id)} style={styles.menuOptionContainer}>
+          {findOptions.map((option, index) => (
+            <View
+              key={`${option.name}-${option.price}-${index}`}
+              style={styles.menuOptionContainer}
+            >
               <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.menuOption}>+ {option.name}</Text>
               </View>
@@ -66,7 +72,7 @@ const CartMenu = ({
           >
             <AntDesign name="minus" size={24} color="black" />
           </Pressable>
-          <Text style={styles.quantityText}>{item.count}</Text>
+          <Text style={styles.quantityText}>{item.quantity}</Text>
           <Pressable
             style={styles.quantityButton}
             onPress={() => addQuantity(index)}

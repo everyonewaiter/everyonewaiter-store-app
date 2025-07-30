@@ -22,20 +22,11 @@ import MenuModal from '@/components/MenuModal'
 import OrderHistoryModal from '@/components/OrderHistoryModal'
 import StaffCallModal from '@/components/StaffCallModal'
 import SuccessModal from '@/components/SuccessModal'
-import {
-  colors,
-  defaultCategory,
-  fonts,
-  images,
-  milliTimes,
-  PaymentType,
-} from '@/constants'
+import { colors, defaultCategory, fonts, images, milliTimes } from '@/constants'
 import {
   useCreateTableOrder,
-  useGetCategories,
   useGetDevice,
   useGetMenus,
-  useGetSetting,
   useGetStore,
   useGetTableOrderHistories,
   useModal,
@@ -54,26 +45,24 @@ const CustomerTableScreen = () => {
   const [error, setError] = useState({ title: '', message: '' })
 
   // Store
-  const { data: store } = useGetStore()
-  const { data: setting } = useGetSetting()
-
-  // CategoryButton
-  const { categories } = useGetCategories()
-  const categoriesRef = useRef<FlatList | null>(null)
-  const [categoryContentWidth, setCategoryContentWidth] = useState(0)
-  const [selectedCategory, setSelectedCategory] = useState(defaultCategory)
+  const { data: store } = useGetStore(device?.storeId)
 
   // Menu
-  const { menus } = useGetMenus()
+  const { categories } = useGetMenus(device?.storeId)
   const menusRef = useRef<FlatList | null>(null)
+  const categoriesRef = useRef<FlatList | null>(null)
+  const [categoryContentWidth, setCategoryContentWidth] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null,
+  )
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
 
   // Order
-  const staffCall = useStaffCall()
-  const [selectedStaffCallOption, setSelectedStaffCallOption] = useState('')
   const { histories } = useGetTableOrderHistories(device?.tableNo)
-  const createTableOrder = useCreateTableOrder()
   const [cart, setCart] = useState<OrderCreate[]>([])
+  const [selectedStaffCallOption, setSelectedStaffCallOption] = useState('')
+  const staffCall = useStaffCall()
+  const createTableOrder = useCreateTableOrder()
   const createCardPayment = useCreateCardPayment()
 
   // Modal
@@ -118,6 +107,12 @@ const CustomerTableScreen = () => {
   }, [screenWidth])
 
   useEffect(() => {
+    if (categories && categories.length > 0) {
+      setSelectedCategory(categories[0])
+    }
+  }, [categories])
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setIdleTime(prev => prev - milliTimes.ONE_SECOND)
     }, milliTimes.ONE_SECOND)
@@ -137,16 +132,16 @@ const CustomerTableScreen = () => {
   })
 
   const handleOpenMenuModalOrAddToCart = (menu: Menu) => {
-    if (setting?.showMenuPopup || menu.optionGroups.length > 0) {
+    if (store?.setting.showMenuPopup || menu.optionGroups.length > 0) {
       setSelectedMenu(menu)
       menuModal.open()
     } else {
       const copy = [...cart]
-      const index = copy.findIndex(item => item.menuId === menu.id)
+      const index = copy.findIndex(item => item.menuId === menu.menuId)
       if (index === -1) {
-        copy.push({ menuId: menu.id, count: 1, optionGroups: [] })
+        copy.push({ menuId: menu.menuId, quantity: 1, menuOptionGroups: [] })
       } else {
-        copy[index].count += 1
+        copy[index].quantity += 1
       }
       setCart(copy)
     }
@@ -155,8 +150,8 @@ const CustomerTableScreen = () => {
   const calculateCartTotalPrice = () => {
     let totalPrice = 0
     for (const orderCreate of cart) {
-      const menu = menus?.find(
-        menu => menu.id.toString() === orderCreate.menuId.toString(),
+      const menu = categories?.[0].menus.find(
+        menu => menu.menuId === orderCreate.menuId,
       )
       if (!menu) {
         setCart([])
@@ -164,13 +159,14 @@ const CustomerTableScreen = () => {
       }
 
       let optionPrice = 0
-      const menuOptions = menu.optionGroups.flatMap(group => group.options)
-      orderCreate.optionGroups
-        .flatMap(group => group.options)
+      const menuOptions = menu.optionGroups.flatMap(group => group.menuOptions)
+      orderCreate.menuOptionGroups
+        .flatMap(group => group.orderOptions)
         .forEach(option => {
           const menuOption = menuOptions.find(
             menuOption =>
-              menuOption.id.toString() === option.optionId.toString(),
+              menuOption.name === option.name &&
+              menuOption.price === option.price,
           )
           if (!menuOption) {
             setCart([])
@@ -178,7 +174,7 @@ const CustomerTableScreen = () => {
           }
           optionPrice += menuOption.price
         })
-      totalPrice += (menu.price + optionPrice) * orderCreate.count
+      totalPrice += (menu.price + optionPrice) * orderCreate.quantity
     }
     return totalPrice
   }
@@ -187,7 +183,7 @@ const CustomerTableScreen = () => {
     if (selectedStaffCallOption) {
       staffCallModal.close()
       staffCall.mutate(
-        { callOption: selectedStaffCallOption },
+        { optionName: selectedStaffCallOption },
         {
           onSuccess: () => {
             staffCallSuccessModal.open()
@@ -208,7 +204,7 @@ const CustomerTableScreen = () => {
     if (cart.length <= 0) {
       return
     }
-    if (!setting || setting.ksnetDeviceNo.length < 8) {
+    if (!store?.setting || store.setting.ksnetDeviceNo.length < 8) {
       setError({
         title: '단말기 번호가 등록되지 않았습니다.',
         message: '설정 페이지에서 Ksnet 단말기 번호를 등록해주세요.',
@@ -216,12 +212,12 @@ const CustomerTableScreen = () => {
       errorModal.open()
       return
     }
-    if (device?.paymentType === PaymentType.PREPAID) {
+    if (device?.paymentType === 'PREPAID') {
       try {
         const amount = calculateCartTotalPrice()
         const installment = '00'
         const response = await KscatModule.approveIC(
-          setting.ksnetDeviceNo,
+          store.setting.ksnetDeviceNo,
           installment,
           amount,
         )
@@ -278,8 +274,12 @@ const CustomerTableScreen = () => {
   }
 
   const createOrder = () => {
+    if (!device) {
+      return
+    }
+
     createTableOrder.mutate(
-      { menus: cart },
+      { tableNo: device.tableNo, memo: '', orderMenus: cart },
       {
         onSuccess: () => {
           cartModal.close()
@@ -315,7 +315,7 @@ const CustomerTableScreen = () => {
                   ref={categoriesRef}
                   data={categories}
                   horizontal={true}
-                  keyExtractor={(item, index) => `${item.id}-${index}`}
+                  keyExtractor={(item, index) => `${item.categoryId}-${index}`}
                   contentContainerStyle={{ gap: 8, paddingBottom: 8 }}
                   renderItem={renderItem => (
                     <CategoryButton
@@ -341,10 +341,10 @@ const CustomerTableScreen = () => {
             </View>
           </View>
           <View style={styles.menuContainer}>
-            {menus && menus.length > 0 && (
+            {categories && categories.length > 0 && (
               <FlatList
                 ref={menusRef}
-                data={menus}
+                data={categories[0].menus}
                 numColumns={4}
                 keyExtractor={item => String(item.id)}
                 columnWrapperStyle={{ gap: 16 }}
@@ -403,7 +403,7 @@ const CustomerTableScreen = () => {
         </View>
         <CountryOfOriginModal
           isVisible={countryOfOriginModal.isOpen}
-          countryOfOrigins={store?.countryOfOrigins ?? []}
+          countryOfOrigins={store?.setting.countryOfOrigins ?? []}
           close={countryOfOriginModal.close}
         />
         <MenuModal
@@ -418,7 +418,7 @@ const CustomerTableScreen = () => {
         />
         <StaffCallModal
           isVisible={staffCallModal.isOpen}
-          options={setting?.staffCallOptions ?? []}
+          options={store?.setting.staffCallOptions ?? []}
           selectedOption={selectedStaffCallOption}
           setSelectedOption={setSelectedStaffCallOption}
           submit={callStaff}
@@ -439,17 +439,17 @@ const CustomerTableScreen = () => {
         />
         <CartModal
           visible={cartModal.isOpen}
-          menus={menus ?? []}
+          menus={categories?.[0]?.menus ?? []}
           cart={cart}
           setCart={setCart}
-          paymentType={device?.paymentType ?? PaymentType.POSTPAID}
+          paymentType={device?.paymentType ?? 'POSTPAID'}
           submit={submitCreateOrder}
           close={cartModal.close}
         />
         <OrderHistoryModal
           isVisible={orderHistoryModal.isOpen}
           histories={histories}
-          setting={setting}
+          setting={store?.setting}
           close={orderHistoryModal.close}
         />
         <SuccessModal

@@ -1,42 +1,21 @@
 import { axiosInstance } from '@/api/axios'
-import { CashReceiptType, PaymentMethod } from '@/constants'
-import { valueOf } from '@/types'
+import { CreateCardPaymentRequest } from '@/types'
 import { makeSignatureHeader } from '@/utils'
 
-type CreatePaymentRequest = {
-  tableNo: number
-  paymentMethod: valueOf<typeof PaymentMethod>
-  amount: number
-  approvalNo: string
-  installment: string
-  cardNo: string
-  issuerName: string
-  purchaseName: string
-  merchantNo: string
-  tradeTime: string
-  tradeUniqueNo: string
-  vat: number
-  supplyAmount: number
-  cashReceiptNo: string
-  cashReceiptType: valueOf<typeof CashReceiptType>
-}
-
-type CreateCardPaymentRequest = Omit<
-  CreatePaymentRequest,
-  'paymentMethod' | 'cashReceiptNo' | 'cashReceiptType'
->
-
 export const createCardPayment = async ({
+  tableNo,
   ...requestBody
 }: CreateCardPaymentRequest) => {
-  const headers = await makeSignatureHeader()
+  const requestMethod = 'POST'
+  const requestURI = `/v1/orders/payments/${tableNo}/approve`
+  const headers = await makeSignatureHeader(requestMethod, requestURI)
   return await axiosInstance.post(
-    `/orders/payments/approve`,
+    requestURI,
     {
       ...requestBody,
-      paymentMethod: PaymentMethod.CARD,
+      method: 'CARD',
       cashReceiptNo: '',
-      cashReceiptType: CashReceiptType.NONE,
+      cashReceiptType: 'NONE',
     },
     {
       headers,
