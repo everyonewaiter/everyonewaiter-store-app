@@ -55,6 +55,12 @@
     "owner": "everyonewaiter",
     "ios": {
       "bundleIdentifier": "com.everyonewaiter.storeapp"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d432ad2b-27dd-4214-acc1-556cca6a92ab"
     }
   }
 }
