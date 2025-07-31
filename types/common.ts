@@ -4,6 +4,14 @@ export type Entries<T> = {
   [K in keyof T]: [K, T[K]]
 }[keyof T][]
 
+export type ApkVersion = {
+  majorVersion: number
+  minorVersion: number
+  patchVersion: number
+  downloadUrl: string
+  createdAt: string
+}
+
 export type SseEvent = {
   storeId: string
   category: keyof SseCategory

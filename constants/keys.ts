@@ -8,6 +8,8 @@ export const storageKeys = {
 } as const
 
 export const queryKeys = {
+  HEALTH: 'health',
+  GET_APK_VERSION: 'getApkVersion',
   CATEGORY: 'category',
   DEVICE: 'device',
   GET_DEVICE: 'getDevice',

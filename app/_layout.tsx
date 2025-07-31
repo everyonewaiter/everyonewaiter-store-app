@@ -14,6 +14,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 
 import { queryClient } from '@/api'
 import { fontAssets } from '@/constants'
+import AppUpdateProvider, { useAppUpdate } from '@/contexts/AppUpdateContext'
 import AuthenticationProvider, {
   useAuthentication,
 } from '@/contexts/AuthenticationContext'
@@ -43,9 +44,11 @@ const RootLayout = () => {
     <QueryClientProvider client={queryClient}>
       <KeyboardProvider>
         <GestureHandlerRootView>
-          <AuthenticationProvider>
-            <EveryoneWaiterApplication />
-          </AuthenticationProvider>
+          <AppUpdateProvider>
+            <AuthenticationProvider>
+              <EveryoneWaiterApplication />
+            </AuthenticationProvider>
+          </AppUpdateProvider>
         </GestureHandlerRootView>
       </KeyboardProvider>
     </QueryClientProvider>
@@ -54,9 +57,10 @@ const RootLayout = () => {
 
 const EveryoneWaiterApplication = () => {
   const [loaded] = useFonts(fontAssets)
+  const { isUpdated } = useAppUpdate()
   const { isLoading } = useAuthentication()
 
-  if (!loaded || isLoading) {
+  if (!loaded || !isUpdated || isLoading) {
     return null
   }
 
