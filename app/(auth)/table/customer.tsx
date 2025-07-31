@@ -132,7 +132,7 @@ const CustomerTableScreen = () => {
   })
 
   const handleOpenMenuModalOrAddToCart = (menu: Menu) => {
-    if (store?.setting.showMenuPopup || menu.optionGroups.length > 0) {
+    if (store?.setting.showMenuPopup || menu.menuOptionGroups.length > 0) {
       setSelectedMenu(menu)
       menuModal.open()
     } else {
@@ -159,7 +159,9 @@ const CustomerTableScreen = () => {
       }
 
       let optionPrice = 0
-      const menuOptions = menu.optionGroups.flatMap(group => group.menuOptions)
+      const menuOptions = menu.menuOptionGroups.flatMap(
+        group => group.menuOptions,
+      )
       orderCreate.menuOptionGroups
         .flatMap(group => group.orderOptions)
         .forEach(option => {

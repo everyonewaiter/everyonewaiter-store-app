@@ -19,7 +19,6 @@
           "react-native-sse",
           "react-native-url-polyfill",
           "crypto-js",
-          "json-bigint",
           "@dev-plugins/react-query"
         ]
       }
@@ -49,10 +48,10 @@
     "expo-screen-orientation": "~8.0.4",
     "expo-secure-store": "~14.0.1",
     "expo-splash-screen": "~0.29.24",
+    "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.2",
     "expo-system-ui": "~4.0.9",
     "expo-web-browser": "~14.0.2",
-    "json-bigint": "^1.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.9",
@@ -65,14 +64,12 @@
     "react-native-svg": "15.8.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.5",
-    "expo-status-bar": "~2.0.1"
+    "react-native-webview": "13.12.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/crypto-js": "^4.2.2",
     "@types/jest": "^29.5.12",
-    "@types/json-bigint": "^1.0.4",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
     "eslint": "^8.57.0",

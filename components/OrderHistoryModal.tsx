@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { Modal } from '@/components/Modal'
 import { colors, fonts } from '@/constants'
 import { Order, Setting } from '@/types'
+import { calculateOrdersTotalPrice } from '@/utils'
 
 interface OrderHistoryModalProps {
   isVisible: boolean
@@ -17,19 +18,6 @@ const OrderHistoryModal = ({
   setting,
   close,
 }: OrderHistoryModalProps) => {
-  const calculateTotalPrice = () => {
-    let totalPrice = 0
-    for (const history of histories) {
-      totalPrice += history.orderMenus.reduce((acc, menu) => {
-        const optionPrice = menu.orderOptionGroups
-          .flatMap(group => group.orderOptions)
-          .reduce((acc, option) => acc + option.price, 0)
-        return acc + (menu.price + optionPrice) * menu.quantity
-      }, 0)
-    }
-    return totalPrice
-  }
-
   return (
     <Modal visible={isVisible}>
       <Modal.Container>
@@ -82,7 +70,7 @@ const OrderHistoryModal = ({
           <View style={[styles.spaceBetween, { alignItems: 'center' }]}>
             <Text style={styles.totalPriceText}>총 주문 금액</Text>
             <Text style={styles.totalPrice}>
-              {calculateTotalPrice().toPrice()}원
+              {calculateOrdersTotalPrice(histories).toPrice()}원
             </Text>
           </View>
         )}

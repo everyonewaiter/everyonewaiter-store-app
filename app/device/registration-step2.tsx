@@ -37,6 +37,8 @@ type RegistrationPageParams = {
   phoneNumber: string
 }
 
+type SelectPurpose = Pick<typeof DevicePurpose, 'TABLE' | 'WAITING'>
+
 interface RegistrationForm {
   name: RegistrationFormProps
   tableNo: RegistrationFormProps
@@ -47,7 +49,7 @@ interface RegistrationFormProps {
   error: string
 }
 
-const generateDeviceName = (selectedPurpose: keyof typeof DevicePurpose) => {
+const generateDeviceName = (selectedPurpose: keyof SelectPurpose) => {
   const timestamp = dayjs().format('YYMMDDHHmm')
   let name = timestamp
 
@@ -65,7 +67,7 @@ const generateDeviceName = (selectedPurpose: keyof typeof DevicePurpose) => {
 
 const RegistrationStep2Screen = () => {
   const [selectedPurpose, setSelectedPurpose] =
-    useState<keyof typeof DevicePurpose>('TABLE')
+    useState<keyof SelectPurpose>('TABLE')
   const [selectedPaymentType, setSelectedPaymentType] =
     useState<keyof typeof PaymentType>('POSTPAID')
   const [registrationForm, setRegistrationForm] = useState<RegistrationForm>({
@@ -183,7 +185,10 @@ const RegistrationStep2Screen = () => {
             <View style={styles.selectBoxContainer}>
               <View style={styles.devicePurposeSelectBoxContainer}>
                 {(
-                  Object.entries(DevicePurpose) as Entries<typeof DevicePurpose>
+                  Object.entries({
+                    TABLE: '손님 테이블',
+                    WAITING: '웨이팅 등록',
+                  }) as Entries<SelectPurpose>
                 ).map(([key, value], index) => (
                   <DevicePurposeSelectBox
                     key={`${key}-${index}`}

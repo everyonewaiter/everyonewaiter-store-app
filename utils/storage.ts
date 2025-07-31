@@ -1,14 +1,12 @@
 import * as SecureStore from 'expo-secure-store'
 
-import JSONBig from 'json-bigint'
-
 export const setItem = async <T>(key: string, value: T) => {
-  await SecureStore.setItemAsync(key, JSONBig.stringify(value))
+  await SecureStore.setItemAsync(key, JSON.stringify(value))
 }
 
 export const getItem = async <T>(key: string): Promise<T | null> => {
   const data = await SecureStore.getItemAsync(key)
-  return data ? JSONBig.parse(data) : null
+  return data ? JSON.parse(data) : null
 }
 
 export const getItemOrElseThrow = async <T>(key: string): Promise<T> => {

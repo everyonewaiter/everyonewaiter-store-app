@@ -4,7 +4,7 @@ import { isAxiosError } from 'axios'
 import CryptoJS from 'crypto-js'
 
 import { DevicePurpose, storageKeys } from '@/constants'
-import { getItem } from '@/utils/storage'
+import { getItemOrElseThrow } from '@/utils/storage'
 
 export const parseErrorMessage = (error: Error) => {
   if (isAxiosError(error)) {
@@ -37,6 +37,10 @@ export const getNavigatePath = (purpose: keyof typeof DevicePurpose) => {
       return '/waiting/registration'
     case 'TABLE':
       return '/table/customer'
+    case 'HALL':
+      return '/hall/management'
+    case 'POS':
+      return '/pos/tables'
     default:
       throw new Error('Unknown device purpose')
   }
@@ -47,15 +51,11 @@ export const makeSignatureHeader = async (
   requestURI: string,
 ) => {
   const [deviceId, devicePurpose, deviceName, secretKey] = await Promise.all([
-    getItem<string>(storageKeys.DEVICE_ID),
-    getItem<string>(storageKeys.DEVICE_PURPOSE),
-    getItem<string>(storageKeys.DEVICE_NAME),
-    getItem<string>(storageKeys.SECRET_KEY),
+    getItemOrElseThrow<string>(storageKeys.DEVICE_ID),
+    getItemOrElseThrow<string>(storageKeys.DEVICE_PURPOSE),
+    getItemOrElseThrow<string>(storageKeys.DEVICE_NAME),
+    getItemOrElseThrow<string>(storageKeys.SECRET_KEY),
   ])
-
-  if (!deviceId || !devicePurpose || !deviceName || !secretKey) {
-    throw new Error('Device information not found')
-  }
 
   const accessKey = deviceId
   const timestamp = Date.now().toString()
