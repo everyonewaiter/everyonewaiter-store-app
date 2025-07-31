@@ -1,6 +1,7 @@
 export * from '@/api/account'
 export * from '@/api/axios'
 export * from '@/api/device'
+export * from '@/api/health'
 export * from '@/api/menu'
 export * from '@/api/order'
 export * from '@/api/payment'
