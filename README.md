@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# 모두의 웨이터 매장 앱
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+모두의 웨이터 매장 앱은 사장님들이 운영하시는 매장에서 주문을 받고, 주문을 관리할 수 있는 앱입니다.<br/>
 
-## Get started
+## 지원하는 기능
 
-1. Install dependencies
+- 공통
+    - [x] 앱 버전 확인 후 앱 업데이트하기
+- 손님 테이블
+    - [x] 메뉴 주문하기
+    - [x] 선결제 후 메뉴 주문하기
+    - [x] 주문 내역 확인하기
+    - [x] 원산지 확인하기
+    - [x] 직원 호출하기
+- 웨이팅
+    - [x] 웨이팅 등록하기
+    - [x] 웨이팅 수 확인하기
+- 홀 관리
+    - [ ] 서빙 미완료 주문 목록 확인하기
+    - [ ] 서빙 완료 주문 목록 확인하기
+    - [ ] 서빙 완료 처리하기
+    - [ ] 직원 호출 목록 확인하기
+    - [ ] 직원 호출 처리하기
+    - [ ] 웨이팅 목록 확인하기
+    - [ ] 웨이팅 손님 호출하기
+    - [ ] 웨이팅 완료 처리하기
+    - [ ] 웨이팅 취소하기
+- POS
+    - [ ] 테이블 목록 확인하기
+    - [ ] 테이블 주문 내역 확인하기
+    - [ ] 테이블 메뉴 주문하기
+    - [ ] 테이블 메뉴 주문 취소하기
+    - [ ] 테이블 주문 할인하기
+    - [ ] 테이블 자리 이동하기
+    - [ ] 주문 결제하기
+    - [ ] 주문 결제 취소하기
+    - [ ] 매출 내역 확인하기
+
+## 시작하기
+
+1. 의존성 설치
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. env 파일 작성
 
-   ```bash
-    npx expo start
+   ```env
+   EXPO_PUBLIC_APP_VERSION=$npm_package_version
+   EXPO_PUBLIC_API_SERVER_URL=https://api.everyonewaiter.com
+   EXPO_PUBLIC_SSE_SERVER_URL=https://api.everyonewaiter.com/v1/stores/subscribe
+   EXPO_PUBLIC_CDN_URL=https://cdn.everyonewaiter.com/d
    ```
 
-In the output, you'll find options to open the app in a
+3. 안드로이드 스튜디오 에뮬레이터 설치 및 설정
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+    - [안드로이드 스튜디오 에뮬레이터 EXPO 문서](https://docs.expo.dev/workflow/android-studio-emulator/)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   > [!IMPORTANT]
+   > 에뮬레이터는 태블릿으로 설정해야 합니다.
 
-## Get a fresh project
+4. 개발 빌드 실행하기
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+   ```bash
+   npm run android
+   ```
