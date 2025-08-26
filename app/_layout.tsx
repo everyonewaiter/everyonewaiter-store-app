@@ -9,7 +9,6 @@ import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 
-import { useReactQueryDevTools } from '@dev-plugins/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
 
 import { queryClient } from '@/api'
@@ -26,7 +25,6 @@ SplashScreen.setOptions({ duration: 500, fade: true })
 UtilityModule.hideNavigationBar()
 
 const RootLayout = () => {
-  useReactQueryDevTools(queryClient)
   useKeepAwake()
 
   const { isMobile } = useDeviceType()
