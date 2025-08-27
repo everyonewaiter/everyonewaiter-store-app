@@ -6,6 +6,8 @@ import {
   useState,
 } from 'react'
 
+import * as Application from 'expo-application'
+
 import { useGetApkVersion } from '@/hooks/useGetApkVersion'
 import { updateApp } from '@/utils'
 
@@ -27,7 +29,7 @@ const AppUpdateProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     if (!isPending && isSuccess) {
-      const appVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? '1.0.0'
+      const appVersion = Application.nativeApplicationVersion ?? '1.0.0'
       const appVersionParts = appVersion.split('.').map(Number)
       const majorVersion = appVersionParts[0]
       const minorVersion = appVersionParts[1]

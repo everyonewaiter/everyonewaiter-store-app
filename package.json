@@ -1,7 +1,7 @@
 {
   "name": "everyone-waiter-store-app",
   "main": "expo-router/entry",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -66,7 +66,8 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "^0.20.0",
     "react-native-webview": "13.13.5",
-    "expo-navigation-bar": "~4.2.8"
+    "expo-navigation-bar": "~4.2.8",
+    "expo-application": "~6.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
