@@ -18,11 +18,9 @@ import AuthenticationProvider, {
   useAuthentication,
 } from '@/contexts/AuthenticationContext'
 import { useDeviceType } from '@/hooks'
-import UtilityModule from '@/modules/utility'
 
 void SplashScreen.preventAutoHideAsync()
 SplashScreen.setOptions({ duration: 500, fade: true })
-UtilityModule.hideNavigationBar()
 
 const RootLayout = () => {
   useKeepAwake()
