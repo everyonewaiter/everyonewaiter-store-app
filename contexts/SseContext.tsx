@@ -5,7 +5,7 @@ import 'react-native-url-polyfill/auto'
 
 import { queryClient } from '@/api'
 import { milliTimes, queryKeys, storageKeys } from '@/constants'
-import { useGetDevice } from '@/hooks'
+import { useAuthentication } from '@/contexts/AuthenticationContext'
 import { SseEvent } from '@/types'
 import { getItem, makeSignature } from '@/utils'
 
@@ -14,7 +14,7 @@ type SseName = 'sse'
 const SseContext = createContext(null)
 
 const SseProvider = ({ children }: PropsWithChildren) => {
-  const { device, isSuccess } = useGetDevice()
+  const { device, isAuthenticated } = useAuthentication()
   const secretKeyRef = useRef('')
   const timestampRef = useRef(Date.now().toString())
 
@@ -35,7 +35,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
     const requestMethod = 'GET'
     const requestURI = '/v1/stores/subscribe'
     const sseEndpoint = process.env.EXPO_PUBLIC_API_SERVER_URL + requestURI
-    if (!device || !isSuccess) {
+    if (!device || !isAuthenticated) {
       return
     }
 
@@ -51,8 +51,6 @@ const SseProvider = ({ children }: PropsWithChildren) => {
               requestMethod,
               requestURI,
               device.deviceId,
-              device.purpose,
-              device.name,
               secretKeyRef.current,
               timestampRef.current,
             ),
@@ -107,7 +105,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
       eventSource.removeAllEventListeners()
       eventSource.close()
     }
-  }, [device, isSuccess])
+  }, [device, isAuthenticated])
 
   return <SseContext.Provider value={null}>{children}</SseContext.Provider>
 }

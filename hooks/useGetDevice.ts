@@ -17,8 +17,6 @@ export const useGetDevice = () => {
     if (isSuccess) {
       void Promise.all([
         setItem<string>(storageKeys.DEVICE_ID, data?.deviceId),
-        setItem<string>(storageKeys.DEVICE_PURPOSE, data?.purpose),
-        setItem<string>(storageKeys.DEVICE_NAME, data?.name),
         setItem<string>(storageKeys.STORE_ID, data?.storeId),
       ])
     }
@@ -28,8 +26,6 @@ export const useGetDevice = () => {
     if (isError && isAxiosError(error) && error.response?.status === 404) {
       void Promise.all([
         removeItem(storageKeys.DEVICE_ID),
-        removeItem(storageKeys.DEVICE_PURPOSE),
-        removeItem(storageKeys.DEVICE_NAME),
         removeItem(storageKeys.SECRET_KEY),
         removeItem(storageKeys.STORE_ID),
       ])

@@ -65,7 +65,7 @@ const RegistrationStep1Screen = () => {
   const { data: stores } = useGetStores(accountId, isAuthenticate)
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null
+    let interval: number | null = null
 
     if (isSendAuthCode && authTime > 0) {
       interval = setInterval(() => {

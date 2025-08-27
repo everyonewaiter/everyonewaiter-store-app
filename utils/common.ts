@@ -25,7 +25,7 @@ export const mergeRefs = <T>(...refs: ForwardedRef<T>[]) => {
   }
 }
 
-export const clearNullableInterval = (interval: NodeJS.Timeout | null) => {
+export const clearNullableInterval = (interval: number | null) => {
   if (interval) {
     clearInterval(interval)
   }
@@ -50,10 +50,8 @@ export const makeSignatureHeader = async (
   requestMethod: string,
   requestURI: string,
 ) => {
-  const [deviceId, devicePurpose, deviceName, secretKey] = await Promise.all([
+  const [deviceId, secretKey] = await Promise.all([
     getItemOrElseThrow<string>(storageKeys.DEVICE_ID),
-    getItemOrElseThrow<string>(storageKeys.DEVICE_PURPOSE),
-    getItemOrElseThrow<string>(storageKeys.DEVICE_NAME),
     getItemOrElseThrow<string>(storageKeys.SECRET_KEY),
   ])
 
@@ -63,8 +61,6 @@ export const makeSignatureHeader = async (
     requestMethod,
     requestURI,
     deviceId,
-    devicePurpose,
-    deviceName,
     secretKey,
     timestamp,
   )
@@ -80,15 +76,13 @@ export const makeSignature = (
   requestMethod: string,
   requestURI: string,
   deviceId: string,
-  devicePurpose: string,
-  deviceName: string,
   secretKey: string,
   timestamp: string,
 ) => {
   const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey)
   hmac.update(`${requestMethod} ${requestURI}`)
   hmac.update('\n')
-  hmac.update(`${deviceId} ${devicePurpose} ${deviceName}`)
+  hmac.update(`${deviceId}`)
   hmac.update('\n')
   hmac.update(timestamp)
   const hash = hmac.finalize()
