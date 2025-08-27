@@ -2,13 +2,14 @@
   "expo": {
     "name": "모두의 웨이터 매장",
     "slug": "everyonewaiter-store-app",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "everyonewaiter-store",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "android": {
+      "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.REQUEST_INSTALL_PACKAGES"
       ],
@@ -27,6 +28,15 @@
     ],
     "plugins": [
       "expo-router",
+      [
+        "expo-navigation-bar",
+        {
+          "position": "absolute",
+          "visibility": "hidden",
+          "behavior": "overlay-swipe",
+          "backgroundColor": "#00000080"
+        }
+      ],
       [
         "expo-splash-screen",
         {
