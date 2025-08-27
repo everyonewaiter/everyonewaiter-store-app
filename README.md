@@ -47,7 +47,6 @@
 2. env 파일 작성
 
    ```env
-   EXPO_PUBLIC_APP_VERSION=$npm_package_version
    EXPO_PUBLIC_API_SERVER_URL=https://api.everyonewaiter.com
    EXPO_PUBLIC_SSE_SERVER_URL=https://api.everyonewaiter.com/v1/stores/subscribe
    EXPO_PUBLIC_CDN_URL=https://cdn.everyonewaiter.com/d
@@ -57,10 +56,15 @@
 
     - [안드로이드 스튜디오 에뮬레이터 EXPO 문서](https://docs.expo.dev/workflow/android-studio-emulator/)
 
-   > [!IMPORTANT]
    > 에뮬레이터는 태블릿으로 설정해야 합니다.
 
-4. 개발 빌드 실행하기
+4. 사전 빌드
+
+    ```bash
+    npx expo prebuild --clean
+    ```
+
+5. 실행하기
 
    ```bash
    npm run android
