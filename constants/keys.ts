@@ -1,7 +1,5 @@
 export const storageKeys = {
   DEVICE_ID: 'deviceId',
-  DEVICE_NAME: 'deviceName',
-  DEVICE_PURPOSE: 'devicePurpose',
   SECRET_KEY: 'secretKey',
   STORE_ID: 'storeId',
   ACCOUNT_ID: 'accountId',

@@ -148,11 +148,6 @@ const RegistrationStep2Screen = () => {
         onSuccess: ({ deviceId, secretKey }) => {
           Promise.all([
             setItem<string>(storageKeys.DEVICE_ID, deviceId),
-            setItem<string>(storageKeys.DEVICE_PURPOSE, selectedPurpose),
-            setItem<string>(
-              storageKeys.DEVICE_NAME,
-              registrationForm.name.value,
-            ),
             setItem<string>(storageKeys.SECRET_KEY, secretKey),
             setItem<string>(storageKeys.STORE_ID, storeId),
           ]).then(() => {

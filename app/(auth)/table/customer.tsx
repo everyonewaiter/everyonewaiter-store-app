@@ -23,9 +23,9 @@ import OrderHistoryModal from '@/components/OrderHistoryModal'
 import StaffCallModal from '@/components/StaffCallModal'
 import SuccessModal from '@/components/SuccessModal'
 import { colors, defaultCategory, fonts, images, milliTimes } from '@/constants'
+import { useAuthentication } from '@/contexts/AuthenticationContext'
 import {
   useCreateTableOrder,
-  useGetDevice,
   useGetMenus,
   useGetStore,
   useGetTableOrderHistories,
@@ -40,7 +40,7 @@ import { calculateService, calculateVat, parseErrorMessage } from '@/utils'
 const CustomerTableScreen = () => {
   // Common
   const { width: screenWidth } = useWindowDimensions()
-  const { device } = useGetDevice()
+  const { device } = useAuthentication()
   const [idleTime, setIdleTime] = useState(milliTimes.FIVE_MINUTE)
   const [error, setError] = useState({ title: '', message: '' })
 

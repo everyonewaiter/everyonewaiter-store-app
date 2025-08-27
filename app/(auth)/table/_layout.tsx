@@ -5,11 +5,12 @@ import { OrientationLock } from 'expo-screen-orientation'
 import * as SplashScreen from 'expo-splash-screen'
 
 import { colors } from '@/constants'
-import { useGetDevice, useOrientation } from '@/hooks'
+import { useAuthentication } from '@/contexts/AuthenticationContext'
+import { useOrientation } from '@/hooks'
 import { getNavigatePath } from '@/utils'
 
 const CustomerTableLayout = () => {
-  const { device } = useGetDevice()
+  const { device } = useAuthentication()
   const { lockOrientation, unlockOrientation } = useOrientation()
 
   useFocusEffect(
