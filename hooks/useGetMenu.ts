@@ -13,8 +13,12 @@ export const useGetMenus = (storeId: string | undefined, enabled = true) => {
   })
 
   useEffect(() => {
-    if (!isPending && isSuccess) {
-      if (data && !data.some(category => category.categoryId === '0')) {
+    if (!isPending && isSuccess && data) {
+      data.forEach(category => {
+        category.menus = category.menus.filter(menu => menu.state !== 'HIDE')
+      })
+
+      if (!data.some(category => category.categoryId === '0')) {
         data.unshift({
           categoryId: '0',
           name: '전체',
