@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Pressable,
-  PressableProps,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native'
+import { Pressable, PressableProps, StyleSheet, Text, useWindowDimensions, View, } from 'react-native'
 
 import { ImageBackground, useImage } from 'expo-image'
 
 import Badge from '@/components/Badge'
+import SoldOut from '@/components/SoldOut'
 import { colors, fonts } from '@/constants'
 import { Category, Menu } from '@/types'
 
@@ -43,6 +37,7 @@ const MenuCard = ({
 
   const selectedCategoryId = selectedCategory?.categoryId
   const menuCategoryId = menu.categoryId
+  const isSoldOut = menu.state === 'SOLD_OUT'
   const isVisible =
     selectedCategoryId === '0' || menuCategoryId === selectedCategoryId
 
@@ -53,23 +48,26 @@ const MenuCard = ({
         { width: contentWidth },
         !isVisible && styles.hide,
       ]}
-      disabled={!isVisible}
+      disabled={!isVisible || isSoldOut}
       {...props}
     >
       <View style={styles.imageContainer}>
         {image && (
           <ImageBackground
-            style={styles.image}
+            style={[styles.image, isSoldOut && styles.soldOutImage]}
             imageStyle={styles.imageBorder}
             source={image}
             alt={menu.name}
             contentFit="cover"
           >
-            {menu.label !== 'DEFAULT' && <Badge label={menu.label} />}
+            {menu.label !== 'DEFAULT' && !isSoldOut && (
+              <Badge label={menu.label} />
+            )}
           </ImageBackground>
         )}
+        {isSoldOut && <SoldOut />}
       </View>
-      <View style={styles.textContainer}>
+      <View style={[styles.textContainer, isSoldOut && styles.soldOutText]}>
         <View style={{ flexDirection: 'row' }}>
           <Text style={styles.menuName}>{menu.name}</Text>
           {menu.spicy > 0 && (
@@ -124,6 +122,18 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PRETENDARD_MEDIUM,
     fontSize: 20,
     fontWeight: '600',
+  },
+  soldOutImage: {
+    backgroundColor: colors.BLACK,
+    opacity: 0.4,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  soldOutText: {
+    backgroundColor: colors.BLACK,
+    opacity: 0.4,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
 })
 
