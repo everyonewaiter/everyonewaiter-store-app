@@ -3,12 +3,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
 import 'react-native-reanimated'
 
+import * as Application from 'expo-application'
 import { useFonts } from 'expo-font'
 import { useKeepAwake } from 'expo-keep-awake'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 
+import * as Sentry from '@sentry/react-native'
 import { QueryClientProvider } from '@tanstack/react-query'
 
 import { queryClient } from '@/api'
@@ -18,6 +20,11 @@ import AuthenticationProvider, {
   useAuthentication,
 } from '@/contexts/AuthenticationContext'
 import { useDeviceType } from '@/hooks'
+
+Sentry.init({
+  release: Application.nativeApplicationVersion ?? undefined,
+  sendDefaultPii: true,
+})
 
 void SplashScreen.preventAutoHideAsync()
 SplashScreen.setOptions({ duration: 500, fade: true })
@@ -72,4 +79,4 @@ const EveryoneWaiterApplication = () => {
   )
 }
 
-export default RootLayout
+export default Sentry.wrap(RootLayout)

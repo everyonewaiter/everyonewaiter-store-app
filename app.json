@@ -2,7 +2,7 @@
   "expo": {
     "name": "모두의 웨이터 매장",
     "slug": "everyonewaiter-store-app",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "everyonewaiter-store",
@@ -52,7 +52,15 @@
           "initialOrientation": "DEFAULT"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "store-app",
+          "organization": "everyonewaiter"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
