@@ -47,9 +47,15 @@
 2. env 파일 작성
 
    ```env
+   # SERVER_URL
    EXPO_PUBLIC_API_SERVER_URL=https://api.everyonewaiter.com
    EXPO_PUBLIC_SSE_SERVER_URL=https://api.everyonewaiter.com/v1/stores/subscribe
    EXPO_PUBLIC_CDN_URL=https://cdn.everyonewaiter.com/d
+   
+   # SENTRY
+   SENTRY_DSN=
+   SENTRY_AUTH_TOKEN=
+   SENTRY_ENVIRONMENT=development
    ```
 
 3. 안드로이드 스튜디오 에뮬레이터 설치 및 설정
