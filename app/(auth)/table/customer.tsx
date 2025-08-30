@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  FlatList,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native'
+import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 
@@ -71,6 +63,7 @@ const CustomerTableScreen = () => {
   const staffCallModal = useModal()
   const staffCallSuccessModal = useModal()
   const cartModal = useModal()
+  const cartResetModal = useModal()
   const orderHistoryModal = useModal()
   const orderSuccessModal = useModal()
   const errorModal = useModal()
@@ -154,8 +147,8 @@ const CustomerTableScreen = () => {
         menu => menu.menuId === orderCreate.menuId,
       )
       if (!menu) {
-        setCart([])
-        throw new Error('변경된 메뉴 항목이 있습니다. 다시 시도해 주세요.')
+        resetCart()
+        return
       }
 
       let optionPrice = 0
@@ -171,14 +164,19 @@ const CustomerTableScreen = () => {
               menuOption.price === option.price,
           )
           if (!menuOption) {
-            setCart([])
-            throw new Error('변경된 메뉴 항목이 있습니다. 다시 시도해 주세요.')
+            resetCart()
+            return
           }
           optionPrice += menuOption.price
         })
       totalPrice += (menu.price + optionPrice) * orderCreate.quantity
     }
     return totalPrice
+  }
+
+  const resetCart = () => {
+    setCart([])
+    cartResetModal.open()
   }
 
   const callStaff = () => {
@@ -206,6 +204,7 @@ const CustomerTableScreen = () => {
     if (cart.length <= 0) {
       return
     }
+
     if (!store?.setting || store.setting.ksnetDeviceNo.length < 8) {
       setError({
         title: '단말기 번호가 등록되지 않았습니다.',
@@ -214,27 +213,33 @@ const CustomerTableScreen = () => {
       errorModal.open()
       return
     }
-    if (device?.paymentType === 'PREPAID') {
-      try {
-        const amount = calculateCartTotalPrice()
-        const installment = '00'
-        const response = await KscatModule.approveIC(
-          store.setting.ksnetDeviceNo,
-          installment,
-          amount,
-        )
-        createPayment(amount, installment, response)
-      } catch (exception: any) {
-        if (exception.code === 'FAIL') {
-          setError({ title: '결제 실패', message: exception.message })
-          errorModal.open()
-        } else {
-          setError({ title: '결제 오류', message: exception.message })
-          errorModal.open()
-        }
-      }
-    } else {
+
+    if (device?.paymentType === 'POSTPAID') {
       createOrder()
+      return
+    }
+
+    const amount = calculateCartTotalPrice()
+    if (!amount) {
+      return
+    }
+
+    try {
+      const installment = '00'
+      const response = await KscatModule.approveIC(
+        store.setting.ksnetDeviceNo,
+        installment,
+        amount,
+      )
+      createPayment(amount, installment, response)
+    } catch (exception: any) {
+      if (exception.code === 'FAIL') {
+        setError({ title: '결제 실패', message: exception.message })
+        errorModal.open()
+      } else {
+        setError({ title: '결제 오류', message: exception.message })
+        errorModal.open()
+      }
     }
   }
 
@@ -447,6 +452,14 @@ const CustomerTableScreen = () => {
           paymentType={device?.paymentType ?? 'POSTPAID'}
           submit={submitCreateOrder}
           close={cartModal.close}
+        />
+        <ErrorModal
+          isVisible={cartResetModal.isOpen}
+          title={'알림'}
+          message={
+            '변경된 메뉴 항목이 있습니다.\n장바구니에 메뉴를 다시 담아주세요.'
+          }
+          close={cartResetModal.close}
         />
         <OrderHistoryModal
           isVisible={orderHistoryModal.isOpen}
