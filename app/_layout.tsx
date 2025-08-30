@@ -22,8 +22,12 @@ import AuthenticationProvider, {
 import { useDeviceType } from '@/hooks'
 
 Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
   release: Application.nativeApplicationVersion ?? undefined,
   sendDefaultPii: true,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+  integrations: [Sentry.mobileReplayIntegration()],
 })
 
 void SplashScreen.preventAutoHideAsync()

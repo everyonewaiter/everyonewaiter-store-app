@@ -53,7 +53,7 @@
    EXPO_PUBLIC_CDN_URL=https://cdn.everyonewaiter.com/d
    
    # SENTRY
-   SENTRY_DSN=
+   EXPO_PUBLIC_SENTRY_DSN=
    SENTRY_AUTH_TOKEN=
    SENTRY_ENVIRONMENT=development
    ```
