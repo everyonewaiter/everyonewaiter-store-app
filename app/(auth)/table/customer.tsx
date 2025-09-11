@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, } from 'react-native'
+import {
+  FlatList,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 
@@ -44,9 +52,7 @@ const CustomerTableScreen = () => {
   const menusRef = useRef<FlatList | null>(null)
   const categoriesRef = useRef<FlatList | null>(null)
   const [categoryContentWidth, setCategoryContentWidth] = useState(0)
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
-  )
+  const [selectedCategory, setSelectedCategory] = useState(defaultCategory)
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
 
   // Order
@@ -351,7 +357,7 @@ const CustomerTableScreen = () => {
             {categories && categories.length > 0 && (
               <FlatList
                 ref={menusRef}
-                data={categories[0].menus}
+                data={selectedCategory.menus}
                 numColumns={4}
                 keyExtractor={item => String(item.id)}
                 columnWrapperStyle={{ gap: 16 }}
@@ -363,7 +369,6 @@ const CustomerTableScreen = () => {
                 renderItem={renderItem => (
                   <MenuCard
                     menu={renderItem.item}
-                    selectedCategory={selectedCategory}
                     rootNumColumns={4}
                     rootGap={16}
                     rootPaddingHorizontal={24}

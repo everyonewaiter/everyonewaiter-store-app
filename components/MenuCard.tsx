@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import { Pressable, PressableProps, StyleSheet, Text, useWindowDimensions, View, } from 'react-native'
+import {
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native'
 
 import { ImageBackground, useImage } from 'expo-image'
 
 import Badge from '@/components/Badge'
 import SoldOut from '@/components/SoldOut'
 import { colors, fonts } from '@/constants'
-import { Category, Menu } from '@/types'
+import { Menu } from '@/types'
 
 interface MenuCardProps extends PressableProps {
   menu: Menu
-  selectedCategory: Category | null
   rootNumColumns: number
   rootGap: number
   rootPaddingHorizontal: number
@@ -18,7 +24,6 @@ interface MenuCardProps extends PressableProps {
 
 const MenuCard = ({
   menu,
-  selectedCategory,
   rootNumColumns,
   rootGap,
   rootPaddingHorizontal,
@@ -35,20 +40,12 @@ const MenuCard = ({
     setContentWidth(availableSpace / rootNumColumns)
   }, [screenWidth, rootGap, rootNumColumns, rootPaddingHorizontal])
 
-  const selectedCategoryId = selectedCategory?.categoryId
-  const menuCategoryId = menu.categoryId
   const isSoldOut = menu.state === 'SOLD_OUT'
-  const isVisible =
-    selectedCategoryId === '0' || menuCategoryId === selectedCategoryId
 
   return (
     <Pressable
-      style={[
-        styles.container,
-        { width: contentWidth },
-        !isVisible && styles.hide,
-      ]}
-      disabled={!isVisible || isSoldOut}
+      style={[styles.container, { width: contentWidth }]}
+      disabled={isSoldOut}
       {...props}
     >
       <View style={styles.imageContainer}>
@@ -87,9 +84,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: 12,
     borderColor: colors.GRAY5_E7,
-  },
-  hide: {
-    display: 'none',
   },
   imageContainer: {
     flex: 3,
