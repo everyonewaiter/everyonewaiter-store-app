@@ -1,15 +1,16 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { AntDesign } from '@expo/vector-icons'
 
 import { colors, fonts } from '@/constants'
-import { Menu, OrderCreate } from '@/types'
+import { Menu, MenuOption, OrderCreate } from '@/types'
 
 interface CartMenuProps {
   index: number
-  menu?: Menu
+  menus: Menu[]
   item: OrderCreate
+  resetCart: () => void
   addQuantity: (index: number) => void
   minusQuantity: (index: number) => void
   removeItem: (index: number) => void
@@ -17,29 +18,61 @@ interface CartMenuProps {
 
 const CartMenu = ({
   index,
-  menu,
+  menus,
   item,
+  resetCart,
   addQuantity,
   minusQuantity,
   removeItem,
 }: CartMenuProps) => {
+  const [menu, setMenu] = useState<Menu | null>(null)
+  const [options, setOptions] = useState<MenuOption[]>([])
+
+  useEffect(() => {
+    const foundMenu = menus
+      .filter(menu => menu.state === 'DEFAULT')
+      .find(menu => menu.menuId === item.menuId)
+
+    if (foundMenu) {
+      setMenu(foundMenu)
+    } else {
+      resetCart()
+    }
+  }, [menus, item.menuId, resetCart])
+
+  useEffect(() => {
+    if (menu) {
+      const menuOptions = menu.menuOptionGroups.flatMap(
+        group => group.menuOptions,
+      )
+
+      const selectedOptions = item.menuOptionGroups.flatMap(
+        group => group.orderOptions,
+      )
+
+      for (const selectedOption of selectedOptions) {
+        if (
+          !menuOptions.some(
+            menuOption =>
+              menuOption.name === selectedOption.name &&
+              menuOption.price === selectedOption.price,
+          )
+        ) {
+          resetCart()
+          return
+        }
+      }
+
+      setOptions(selectedOptions)
+    }
+  }, [menu, item.menuOptionGroups, resetCart])
+
   if (!menu) {
-    return null
+    return
   }
 
-  const selectedOptions = item.menuOptionGroups.flatMap(
-    group => group.orderOptions,
-  )
-  const findOptions = menu.menuOptionGroups
-    .flatMap(group => group.menuOptions)
-    .filter(menuOption =>
-      selectedOptions.some(
-        option =>
-          option.name === menuOption.name && option.price === menuOption.price,
-      ),
-    )
   const totalPrice =
-    (menu.price + findOptions.reduce((acc, option) => acc + option.price, 0)) *
+    (menu.price + options.reduce((acc, option) => acc + option.price, 0)) *
     item.quantity
 
   return (
@@ -48,9 +81,9 @@ const CartMenu = ({
         <Text style={styles.menuName}>{menu.name}</Text>
         <Text style={styles.menuPrice}>{menu.price.toPrice()}원</Text>
       </View>
-      {findOptions.length > 0 && (
+      {options.length > 0 && (
         <View style={{ gap: 4 }}>
-          {findOptions.map((option, index) => (
+          {options.map((option, index) => (
             <View
               key={`${option.name}-${option.price}-${index}`}
               style={styles.menuOptionContainer}

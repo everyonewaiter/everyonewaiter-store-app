@@ -181,6 +181,7 @@ const CustomerTableScreen = () => {
   }
 
   const resetCart = () => {
+    cartModal.close()
     setCart([])
     cartResetModal.open()
   }
@@ -454,6 +455,7 @@ const CustomerTableScreen = () => {
           menus={categories?.[0]?.menus ?? []}
           cart={cart}
           setCart={setCart}
+          resetCart={resetCart}
           paymentType={device?.paymentType ?? 'POSTPAID'}
           submit={submitCreateOrder}
           close={cartModal.close}
