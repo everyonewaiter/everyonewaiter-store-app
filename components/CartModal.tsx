@@ -20,6 +20,7 @@ interface CartModalProps {
   menus: Menu[]
   cart: OrderCreate[]
   setCart: React.Dispatch<React.SetStateAction<OrderCreate[]>>
+  resetCart: () => void
   paymentType: keyof typeof PaymentType
   submit: () => void
   close: () => void
@@ -30,6 +31,7 @@ const CartModal = ({
   menus,
   cart,
   setCart,
+  resetCart,
   paymentType,
   submit,
   close,
@@ -100,8 +102,9 @@ const CartModal = ({
                 renderItem={({ item, index }) => (
                   <CartMenu
                     index={index}
-                    menu={menus.find(menu => menu.menuId === item.menuId)}
+                    menus={menus}
                     item={item}
+                    resetCart={resetCart}
                     addQuantity={addQuantity}
                     minusQuantity={minusQuantity}
                     removeItem={removeItem}
