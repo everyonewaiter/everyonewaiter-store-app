@@ -2,14 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   FlatList,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-reanimated'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { scheduleOnRN } from 'react-native-worklets'
 
 import { BellIcon } from '@/assets/icons/BellIcon'
 import { ReceiptIcon } from '@/assets/icons/ReceiptIcon'
@@ -77,7 +77,9 @@ const CustomerTableScreen = () => {
   const resetAll = useCallback(() => {
     setIdleTime(milliTimes.FIVE_MINUTE)
     setError({ title: '', message: '' })
-    setSelectedCategory(defaultCategory)
+    setSelectedCategory(
+      categories && categories.length > 0 ? categories[0] : defaultCategory,
+    )
     setSelectedStaffCallOption('')
     setCart([])
     countryOfOriginModal.close()
@@ -91,6 +93,7 @@ const CustomerTableScreen = () => {
     categoriesRef.current?.scrollToIndex({ index: 0 })
     menusRef.current?.scrollToIndex({ index: 0 })
   }, [
+    categories,
     countryOfOriginModal,
     menuModal,
     staffCallModal,
@@ -126,7 +129,7 @@ const CustomerTableScreen = () => {
 
   const resetIdleTime = Gesture.Tap().onStart(() => {
     if (idleTime < milliTimes.FIVE_MINUTE) {
-      runOnJS(setIdleTime)(milliTimes.FIVE_MINUTE)
+      scheduleOnRN(setIdleTime, milliTimes.FIVE_MINUTE)
     }
   })
 

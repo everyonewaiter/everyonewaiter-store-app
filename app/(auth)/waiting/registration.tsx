@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-reanimated'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { scheduleOnRN } from 'react-native-worklets'
 
 import { AdultIcon, BabyIcon } from '@/assets/icons'
 import Button from '@/components/Button'
@@ -74,7 +75,7 @@ const WaitingRegistrationScreen = () => {
 
   const resetIdleTime = Gesture.Tap().onStart(() => {
     if (idleTime < milliTimes.ONE_MINUTE) {
-      runOnJS(setIdleTime)(milliTimes.ONE_MINUTE)
+      scheduleOnRN(setIdleTime, milliTimes.ONE_MINUTE)
     }
   })
 

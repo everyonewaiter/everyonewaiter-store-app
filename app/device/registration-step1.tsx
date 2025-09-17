@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Alert,
   Keyboard,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -10,6 +9,7 @@ import {
   View,
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
 
