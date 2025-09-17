@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Alert,
-  Keyboard,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { Alert, Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View, } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router, useLocalSearchParams } from 'expo-router'
 
@@ -20,13 +13,7 @@ import DevicePurposeSelectBox from '@/components/DevicePurposeSelectBox'
 import Input from '@/components/Input'
 import InputLabel from '@/components/InputLabel'
 import PaymentTypeSelectBox from '@/components/PaymentTypeSelectBox'
-import {
-  DevicePurpose,
-  fonts,
-  PaymentType,
-  queryKeys,
-  storageKeys,
-} from '@/constants'
+import { DevicePurpose, fonts, PaymentType, queryKeys, storageKeys, } from '@/constants'
 import { useCreateDevice } from '@/hooks/useCreateDevice'
 import { Entries } from '@/types'
 import { parseErrorMessage, setItem, validateCreateDevice } from '@/utils'
