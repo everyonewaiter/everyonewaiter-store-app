@@ -49,7 +49,7 @@ const AppUpdateProvider = ({ children }: PropsWithChildren) => {
   }, [apkVersion, isPending, isSuccess])
 
   return (
-    <AppUpdateContext.Provider value={{ isUpdated: isUpdated }}>
+    <AppUpdateContext.Provider value={{ isUpdated }}>
       {children}
     </AppUpdateContext.Provider>
   )
