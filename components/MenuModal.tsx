@@ -104,9 +104,11 @@ const MenuModal = ({
 
   const addCart = () => {
     const copy = [...cart]
-    const index = cart.findIndex(item =>
-      compareOptionGroups(item.menuOptionGroups, selectedOptions),
-    )
+    const index = copy
+      .filter(c => c.menuId === selectedMenu.menuId)
+      .findIndex(item =>
+        compareOptionGroups(item.menuOptionGroups, selectedOptions),
+      )
     if (index === -1) {
       copy.push({
         menuId: selectedMenu.menuId,
