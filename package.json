@@ -9,13 +9,7 @@
     "lint": "expo lint",
     "ios": "expo run:ios",
     "prepare": "husky",
-    "lint-staged": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
+    "lint:staged": "lint-staged"
   },
   "jest": {
     "preset": "jest-expo"
