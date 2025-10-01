@@ -20,7 +20,13 @@ const AppUpdateContext = createContext<AuthenticationContextProps>({
 })
 
 export const useAppUpdate = () => {
-  return useContext(AppUpdateContext)
+  const context = useContext(AppUpdateContext)
+
+  if (!context) {
+    throw new Error('useAppUpdate must be used within an AppUpdateProvider')
+  }
+
+  return context
 }
 
 const AppUpdateProvider = ({ children }: PropsWithChildren) => {
