@@ -2,7 +2,7 @@ import { Redirect, Stack } from "expo-router";
 
 import { colors } from "@/constants/colors";
 import { useAuthentication } from "@/contexts/AuthenticationContext";
-import { getNavigatePath } from "@/utils/support";
+import { getNavigatePath } from "@/utils/navigate";
 
 const PosLayout = () => {
   const { device } = useAuthentication();
@@ -12,7 +12,7 @@ const PosLayout = () => {
   }
 
   if (device.purpose !== "POS") {
-    return <Redirect href={`${getNavigatePath(device.purpose)}`} />;
+    return <Redirect href={`${getNavigatePath(device)}`} />;
   }
 
   return (

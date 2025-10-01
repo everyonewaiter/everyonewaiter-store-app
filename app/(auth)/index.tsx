@@ -1,16 +1,14 @@
 import { Redirect } from "expo-router";
 
 import { useAuthentication } from "@/contexts/AuthenticationContext";
-import { getNavigatePath } from "@/utils/support";
+import { getNavigatePathOrNull } from "@/utils/navigate";
 
 const AuthenticationNavigator = () => {
   const { device } = useAuthentication();
 
-  if (!device) {
-    return null;
-  }
+  const navigatePath = getNavigatePathOrNull(device);
 
-  return <Redirect href={`${getNavigatePath(device.purpose)}`} />;
+  return navigatePath ? <Redirect href={navigatePath} /> : null;
 };
 
 export default AuthenticationNavigator;

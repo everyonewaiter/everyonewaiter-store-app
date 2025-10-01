@@ -3,7 +3,6 @@ import { ForwardedRef } from "react";
 import { isAxiosError } from "axios";
 import CryptoJS from "crypto-js";
 
-import { DevicePurpose } from "@/constants/domain";
 import { storageKeys } from "@/constants/keys";
 import { getItemOrElseThrow } from "@/utils/storage";
 
@@ -29,21 +28,6 @@ export const mergeRefs = <T>(...refs: ForwardedRef<T>[]) => {
 export const clearNullableInterval = (interval: number | null) => {
   if (interval) {
     clearInterval(interval);
-  }
-};
-
-export const getNavigatePath = (purpose: keyof typeof DevicePurpose) => {
-  switch (purpose) {
-    case "WAITING":
-      return "/waiting/registration";
-    case "TABLE":
-      return "/table/customer";
-    case "HALL":
-      return "/hall/management";
-    case "POS":
-      return "/pos/tables";
-    default:
-      throw new Error("Unknown device purpose");
   }
 };
 
