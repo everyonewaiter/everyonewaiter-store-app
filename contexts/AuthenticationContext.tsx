@@ -16,7 +16,15 @@ const AuthenticationContext = createContext<AuthenticationContextProps>({
 })
 
 export const useAuthentication = () => {
-  return useContext(AuthenticationContext)
+  const context = useContext(AuthenticationContext)
+
+  if (!context) {
+    throw new Error(
+      'useAuthentication must be used within an AuthenticationProvider',
+    )
+  }
+
+  return context
 }
 
 const AuthenticationProvider = ({ children }: PropsWithChildren) => {
