@@ -70,9 +70,12 @@ const CustomerTableScreen = () => {
   const errorModal = useModal();
 
   const resetAll = useCallback(() => {
+    const existsCategory = categories && categories.length > 0;
+    const existsMenu = selectedCategory && selectedCategory.menus.length > 0;
+
     setIdleTime(milliTimes.FIVE_MINUTE);
     setError({ title: "", message: "" });
-    setSelectedCategory(categories && categories.length > 0 ? categories[0] : defaultCategory);
+    setSelectedCategory(existsCategory ? categories[0] : defaultCategory);
     setSelectedStaffCallOption("");
     setCart([]);
     countryOfOriginModal.close();
@@ -83,10 +86,17 @@ const CustomerTableScreen = () => {
     orderHistoryModal.close();
     orderSuccessModal.close();
     errorModal.close();
-    categoriesRef.current?.scrollToIndex({ index: 0 });
-    menusRef.current?.scrollToIndex({ index: 0 });
+
+    if (existsCategory) {
+      categoriesRef.current?.scrollToIndex({ index: 0 });
+    }
+
+    if (existsMenu) {
+      menusRef.current?.scrollToIndex({ index: 0 });
+    }
   }, [
     categories,
+    selectedCategory,
     countryOfOriginModal,
     menuModal,
     staffCallModal,
