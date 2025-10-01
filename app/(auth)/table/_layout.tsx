@@ -6,11 +6,10 @@ import * as SplashScreen from 'expo-splash-screen'
 
 import { colors } from '@/constants'
 import { useAuthentication } from '@/contexts/AuthenticationContext'
-import { useOrientation, useStickyImmersive } from '@/hooks'
+import { useOrientation } from '@/hooks'
 import { getNavigatePath } from '@/utils'
 
 const CustomerTableLayout = () => {
-  useStickyImmersive()
   const { lockOrientation, unlockOrientation } = useOrientation()
   const { device } = useAuthentication()
 
