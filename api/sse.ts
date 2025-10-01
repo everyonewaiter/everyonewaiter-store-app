@@ -49,7 +49,7 @@ export class SseService {
   constructor() {
     this.timestampInterval = setInterval(() => {
       this.timestamp = Date.now().toString();
-    }, milliTimes.THIRTY_SECONDS + milliTimes.FIVE_SECONDS);
+    }, milliTimes.THIRTY_SECONDS);
   }
 
   private async init(): Promise<void> {
