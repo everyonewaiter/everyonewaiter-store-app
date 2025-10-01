@@ -1,4 +1,4 @@
-import { Order } from "@/types";
+import { Order } from "@/types/order";
 
 export const calculateService = (amount: number, serviceRate: number) => {
   let result = 0;

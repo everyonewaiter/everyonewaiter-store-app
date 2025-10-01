@@ -3,7 +3,8 @@ import { Pressable, PressableProps, StyleSheet, Text, View } from "react-native"
 
 import { Image } from "expo-image";
 
-import { colors, fonts } from "@/constants";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
 
 interface MainModalProps {
   visible: boolean;

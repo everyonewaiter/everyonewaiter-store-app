@@ -1,4 +1,4 @@
-import { DevicePurpose } from "@/constants";
+import { DevicePurpose } from "@/constants/domain";
 
 const phoneNumberRegex = /^01[016789]\d{7,8}$/;
 const authenticationCodeRegex = /^\d{6}$/;

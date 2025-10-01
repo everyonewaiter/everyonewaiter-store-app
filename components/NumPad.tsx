@@ -2,7 +2,8 @@ import { Pressable, PressableProps, StyleSheet, Text } from "react-native";
 
 import { FontAwesome6 } from "@expo/vector-icons";
 
-import { colors, fonts } from "@/constants";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
 
 interface NumPadProps extends PressableProps {
   label: number | "back" | "reset";

@@ -1,4 +1,4 @@
-import { OrderCategory, OrderState, PaymentType } from "@/constants";
+import { OrderCategory, OrderState, PaymentType } from "@/constants/domain";
 
 export type CreateStaffCallRequest = {
   optionName: string;

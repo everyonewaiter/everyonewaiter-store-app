@@ -5,8 +5,11 @@ import { AntDesign } from "@expo/vector-icons";
 
 import Button from "@/components/Button";
 import CartMenu from "@/components/CartMenu";
-import { colors, fonts, PaymentType } from "@/constants";
-import { Menu, OrderCreate } from "@/types";
+import { colors } from "@/constants/colors";
+import { PaymentType } from "@/constants/domain";
+import { fonts } from "@/constants/fonts";
+import { Menu } from "@/types/menu";
+import { OrderCreate } from "@/types/order";
 
 interface CartModalProps {
   visible: boolean;

@@ -1,4 +1,4 @@
-import { KitchenPrinterLocation, StoreStatus } from "@/constants";
+import { KitchenPrinterLocation, StoreStatus } from "@/constants/domain";
 
 export type StoreName = {
   storeId: string;

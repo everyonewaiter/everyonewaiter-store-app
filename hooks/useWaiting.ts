@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createWaiting, getWaitingCount } from "@/api";
-import { queryKeys } from "@/constants";
+import { createWaiting, getWaitingCount } from "@/api/waiting";
+import { queryKeys } from "@/constants/keys";
 
 export const useGetWaitingCount = () => {
   const { data } = useQuery({

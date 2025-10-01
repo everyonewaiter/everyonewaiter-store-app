@@ -4,8 +4,9 @@ import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from "re
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import InputLabel from "@/components/InputLabel";
-import { colors, fonts } from "@/constants";
-import { mergeRefs } from "@/utils";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { mergeRefs } from "@/utils/common";
 
 interface InputProps extends TextInputProps {
   label?: string;

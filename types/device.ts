@@ -1,4 +1,4 @@
-import { DevicePurpose, DeviceState, PaymentType } from "@/constants";
+import { DevicePurpose, DeviceState, PaymentType } from "@/constants/domain";
 
 export type AuthenticationCode = {
   code: string;

@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/api/axios";
-import { CreateCardPaymentRequest } from "@/types";
-import { makeSignatureHeader } from "@/utils";
+import { CreateCardPaymentRequest } from "@/types/payment";
+import { makeSignatureHeader } from "@/utils/common";
 
 export const createCardPayment = async ({ tableNo, ...requestBody }: CreateCardPaymentRequest) => {
   const requestMethod = "POST";

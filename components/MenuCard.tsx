@@ -12,8 +12,9 @@ import { ImageBackground, useImage } from "expo-image";
 
 import Badge from "@/components/Badge";
 import SoldOut from "@/components/SoldOut";
-import { colors, fonts } from "@/constants";
-import { Menu } from "@/types";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { Menu } from "@/types/menu";
 
 interface MenuCardProps extends PressableProps {
   menu: Menu;

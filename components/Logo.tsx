@@ -2,7 +2,9 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Image } from "expo-image";
 
-import { colors, fonts, images } from "@/constants";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { images } from "@/constants/images";
 
 interface LogoProps {
   size?: "small" | "medium" | "large";

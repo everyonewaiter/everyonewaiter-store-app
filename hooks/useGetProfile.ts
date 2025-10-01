@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getProfile } from "@/api";
-import { queryKeys } from "@/constants";
+import { getProfile } from "@/api/account";
+import { queryKeys } from "@/constants/keys";
 
 export const useGetProfile = (phoneNumber: string, enabled = true) => {
   return useQuery({

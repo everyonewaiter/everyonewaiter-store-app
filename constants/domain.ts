@@ -1,4 +1,4 @@
-import { Category } from "@/types";
+import { Category } from "@/types/menu";
 
 export const CashReceiptType = {
   NONE: "미발행",

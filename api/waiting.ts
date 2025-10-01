@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/api/axios";
-import { CreateWaitingRequest, WaitingCount } from "@/types";
-import { makeSignatureHeader } from "@/utils";
+import { CreateWaitingRequest, WaitingCount } from "@/types/waiting";
+import { makeSignatureHeader } from "@/utils/common";
 
 export const getWaitingCount = async (): Promise<WaitingCount> => {
   const requestMethod = "GET";

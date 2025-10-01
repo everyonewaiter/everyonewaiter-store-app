@@ -3,8 +3,10 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { AntDesign } from "@expo/vector-icons";
 
-import { colors, fonts } from "@/constants";
-import { Menu, MenuOption, OrderCreate } from "@/types";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { Menu, MenuOption } from "@/types/menu";
+import { OrderCreate } from "@/types/order";
 
 interface CartMenuProps {
   index: number;

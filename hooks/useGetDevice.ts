@@ -3,9 +3,9 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 
-import { getDevice } from "@/api";
-import { queryKeys, storageKeys } from "@/constants";
-import { removeItem, setItem } from "@/utils";
+import { getDevice } from "@/api/device";
+import { queryKeys, storageKeys } from "@/constants/keys";
+import { removeItem, setItem } from "@/utils/storage";
 
 export const useGetDevice = () => {
   const { data, error, isSuccess, isError, isPending } = useQuery({

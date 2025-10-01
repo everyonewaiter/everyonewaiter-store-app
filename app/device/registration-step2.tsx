@@ -7,16 +7,20 @@ import { router, useLocalSearchParams } from "expo-router";
 
 import dayjs from "dayjs";
 
-import { queryClient } from "@/api";
+import { queryClient } from "@/api/queryClient";
 import Button from "@/components/Button";
 import DevicePurposeSelectBox from "@/components/DevicePurposeSelectBox";
 import Input from "@/components/Input";
 import InputLabel from "@/components/InputLabel";
 import PaymentTypeSelectBox from "@/components/PaymentTypeSelectBox";
-import { DevicePurpose, fonts, PaymentType, queryKeys, storageKeys } from "@/constants";
+import { DevicePurpose, PaymentType } from "@/constants/domain";
+import { fonts } from "@/constants/fonts";
+import { queryKeys, storageKeys } from "@/constants/keys";
 import { useCreateDevice } from "@/hooks/useCreateDevice";
-import { Entries } from "@/types";
-import { parseErrorMessage, setItem, validateCreateDevice } from "@/utils";
+import { Entries } from "@/types/common";
+import { parseErrorMessage } from "@/utils/common";
+import { setItem } from "@/utils/storage";
+import { validateCreateDevice } from "@/utils/validation";
 
 type RegistrationPageParams = {
   accountId: string;

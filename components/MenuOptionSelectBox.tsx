@@ -2,9 +2,12 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { RadioOffIcon, RadioOnIcon } from "@/assets/icons";
-import { colors, fonts, MenuOptionGroupType } from "@/constants";
-import { MenuOption, OrderCreateOptionGroup } from "@/types";
-import { formatPriceText } from "@/utils";
+import { colors } from "@/constants/colors";
+import { MenuOptionGroupType } from "@/constants/domain";
+import { fonts } from "@/constants/fonts";
+import { MenuOption } from "@/types/menu";
+import { OrderCreateOptionGroup } from "@/types/order";
+import { formatPriceText } from "@/utils/format";
 
 interface MenuOptionSelectBoxProps {
   groupId: string;

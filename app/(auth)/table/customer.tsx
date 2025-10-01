@@ -15,20 +15,23 @@ import MenuModal from "@/components/MenuModal";
 import OrderHistoryModal from "@/components/OrderHistoryModal";
 import StaffCallModal from "@/components/StaffCallModal";
 import SuccessModal from "@/components/SuccessModal";
-import { colors, defaultCategory, fonts, images, milliTimes } from "@/constants";
+import { colors } from "@/constants/colors";
+import { defaultCategory } from "@/constants/domain";
+import { fonts } from "@/constants/fonts";
+import { images } from "@/constants/images";
+import { milliTimes } from "@/constants/times";
 import { useAuthentication } from "@/contexts/AuthenticationContext";
-import {
-  useCreateTableOrder,
-  useGetMenus,
-  useGetStore,
-  useGetTableOrderHistories,
-  useModal,
-  useStaffCall,
-} from "@/hooks";
+import { useGetMenus } from "@/hooks/useGetMenu";
+import { useGetStore } from "@/hooks/useGetStores";
+import { useModal } from "@/hooks/useModal";
+import { useCreateTableOrder, useGetTableOrderHistories } from "@/hooks/useOrder";
 import { useCreateCardPayment } from "@/hooks/usePayment";
+import { useStaffCall } from "@/hooks/useStaffCall";
 import KscatModule, { KscatResponse } from "@/modules/kscat";
-import { Category, Menu, OrderCreate } from "@/types";
-import { calculateService, calculateVat, parseErrorMessage } from "@/utils";
+import { Category, Menu } from "@/types/menu";
+import { OrderCreate } from "@/types/order";
+import { calculateService, calculateVat } from "@/utils/calculate";
+import { parseErrorMessage } from "@/utils/common";
 
 const CustomerTableScreen = () => {
   // Common

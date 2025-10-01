@@ -1,4 +1,4 @@
-import { MenuLabel, MenuOptionGroupType, MenuState } from "@/constants";
+import { MenuLabel, MenuOptionGroupType, MenuState } from "@/constants/domain";
 
 export type Category = {
   categoryId: string;

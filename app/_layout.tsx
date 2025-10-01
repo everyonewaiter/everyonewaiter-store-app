@@ -13,11 +13,12 @@ import { StatusBar } from "expo-status-bar";
 import * as Sentry from "@sentry/react-native";
 import { QueryClientProvider } from "@tanstack/react-query";
 
-import { queryClient } from "@/api";
-import { fontAssets } from "@/constants";
+import { queryClient } from "@/api/queryClient";
+import { fontAssets } from "@/constants/fonts";
 import AppUpdateProvider, { useAppUpdate } from "@/contexts/AppUpdateContext";
 import AuthenticationProvider from "@/contexts/AuthenticationContext";
-import { useDeviceType, useStickyImmersive } from "@/hooks";
+import { useDeviceType } from "@/hooks/useDeviceType";
+import { useStickyImmersive } from "@/hooks/useStickyImmersive";
 import "@/sentry.config";
 
 SplashScreen.setOptions({ duration: 1000, fade: true });

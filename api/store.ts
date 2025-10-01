@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/api/axios";
-import { Store, StoreName } from "@/types";
+import { Store, StoreName } from "@/types/store";
 
 export const getStoreNames = async (accountId: string): Promise<StoreName[]> => {
   const { data } = await axiosInstance.get(`/v1/stores/accounts/${accountId}`);

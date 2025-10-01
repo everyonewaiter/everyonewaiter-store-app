@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createTableOrder, getTableOrderHistories } from "@/api";
-import { queryKeys } from "@/constants";
+import { createTableOrder, getTableOrderHistories } from "@/api/order";
+import { queryKeys } from "@/constants/keys";
 
 export const useGetTableOrderHistories = (tableNo: number | undefined) => {
   const { data } = useQuery({
