@@ -1,6 +1,6 @@
 # 모두의 웨이터 매장 앱
 
-모두의 웨이터 매장 앱은 사장님들이 운영하시는 매장에서 주문을 받고, 주문을 관리할 수 있는 앱입니다.<br/>
+모두의 웨이터 매장 앱은 사장님들이 운영하시는 매장에서 주문을 받고, 주문을 관리할 수 있는 앱입니다.
 
 ## 지원하는 기능
 
@@ -36,41 +36,42 @@
   - [ ] 주문 결제 취소하기
   - [ ] 매출 내역 확인하기
 
-## 시작하기
+## Getting Start
 
-1. 의존성 설치
+### 1. 의존성 설치
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-2. env 파일 작성
+### 2. env 파일 작성
 
-   ```env
-   # SERVER_URL
-   EXPO_PUBLIC_API_SERVER_URL=https://api.everyonewaiter.com
-   EXPO_PUBLIC_SSE_SERVER_URL=https://api.everyonewaiter.com/v1/stores/subscribe
-   EXPO_PUBLIC_CDN_URL=https://cdn.everyonewaiter.com/d
+```env
+# SERVER_URL
+EXPO_PUBLIC_API_SERVER_URL=https://devapi.everyonewaiter.com
+EXPO_PUBLIC_SSE_SERVER_URL=https://devapi.everyonewaiter.com/v1/stores/subscribe
+EXPO_PUBLIC_CDN_URL=https://cdn.everyonewaiter.com/d
 
-   # SENTRY
-   EXPO_PUBLIC_SENTRY_DSN=
-   SENTRY_AUTH_TOKEN=
-   SENTRY_ENVIRONMENT=development
-   ```
+# SENTRY
+EXPO_PUBLIC_SENTRY_DSN=
+SENTRY_AUTH_TOKEN=
+SENTRY_ENVIRONMENT=development
+```
 
-3. 안드로이드 스튜디오 에뮬레이터 설치 및 설정
-   - [안드로이드 스튜디오 에뮬레이터 EXPO 문서](https://docs.expo.dev/workflow/android-studio-emulator/)
+### 3. 안드로이드 스튜디오 에뮬레이터 설치 및 설정
 
-   > 에뮬레이터는 태블릿으로 설정해야 합니다.
+[안드로이드 스튜디오 에뮬레이터 EXPO 문서](https://docs.expo.dev/workflow/android-studio-emulator/)
 
-4. 사전 빌드
+> 에뮬레이터는 태블릿으로 설정해야 합니다.
 
-   ```bash
-   npx expo prebuild --clean
-   ```
+### 4. 사전 빌드
 
-5. 실행하기
+```bash
+npx expo prebuild --clean
+```
 
-   ```bash
-   npm run android
-   ```
+### 5. 실행하기
+
+```bash
+npm run android
+```
