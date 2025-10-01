@@ -140,10 +140,9 @@ const RegistrationStep2Screen = () => {
             setItem<string>(storageKeys.SECRET_KEY, secretKey),
             setItem<string>(storageKeys.STORE_ID, storeId),
           ]).then(() => {
-            void queryClient.invalidateQueries({
+            queryClient.invalidateQueries({
               queryKey: [queryKeys.DEVICE, queryKeys.GET_DEVICE],
             });
-            router.replace("/");
           });
         },
         onError: (error) => {
