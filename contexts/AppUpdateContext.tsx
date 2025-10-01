@@ -31,9 +31,7 @@ const AppUpdateProvider = ({ children }: PropsWithChildren) => {
     if (!isPending && isSuccess) {
       const appVersion = Application.nativeApplicationVersion ?? '1.0.0'
       const appVersionParts = appVersion.split('.').map(Number)
-      const majorVersion = appVersionParts[0]
-      const minorVersion = appVersionParts[1]
-      const patchVersion = appVersionParts[2]
+      const [majorVersion, minorVersion, patchVersion] = appVersionParts
 
       if (
         apkVersion &&
