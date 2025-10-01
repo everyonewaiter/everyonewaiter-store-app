@@ -28,6 +28,7 @@ export type Setting = {
   kitchenPrinterLocation: keyof typeof KitchenPrinterLocation
   showMenuPopup: boolean
   showOrderTotalPrice: boolean
+  showOrderMenuImage: boolean
   countryOfOrigins: CountryOfOrigin[]
   staffCallOptions: string[]
 }
