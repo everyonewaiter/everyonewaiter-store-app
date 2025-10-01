@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/api/axios";
-import { CreateStaffCallRequest, CreateTableOrderRequest, Order } from "@/types";
-import { makeSignatureHeader } from "@/utils";
+import { CreateStaffCallRequest, CreateTableOrderRequest, Order } from "@/types/order";
+import { makeSignatureHeader } from "@/utils/common";
 
 export const createStaffCall = async ({
   ...requestBody

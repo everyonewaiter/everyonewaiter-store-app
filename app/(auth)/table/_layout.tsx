@@ -3,10 +3,10 @@ import { useCallback } from "react";
 import { Redirect, Stack, useFocusEffect } from "expo-router";
 import { OrientationLock } from "expo-screen-orientation";
 
-import { colors } from "@/constants";
+import { colors } from "@/constants/colors";
 import { useAuthentication } from "@/contexts/AuthenticationContext";
-import { useOrientation } from "@/hooks";
-import { getNavigatePath } from "@/utils";
+import { useOrientation } from "@/hooks/useOrientation";
+import { getNavigatePath } from "@/utils/common";
 
 const CustomerTableLayout = () => {
   const { lockOrientation, unlockOrientation } = useOrientation();

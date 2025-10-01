@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors, fonts, MenuLabel } from "@/constants";
+import { colors } from "@/constants/colors";
+import { MenuLabel } from "@/constants/domain";
+import { fonts } from "@/constants/fonts";
 
 interface BadgeProps {
   label: keyof typeof MenuLabel;

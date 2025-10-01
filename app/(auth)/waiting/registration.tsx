@@ -12,9 +12,13 @@ import { Modal } from "@/components/Modal";
 import NumPad from "@/components/NumPad";
 import PersonCountBox from "@/components/PersonCountBox";
 import SuccessModal from "@/components/SuccessModal";
-import { colors, fonts, milliTimes } from "@/constants";
-import { useCreateWaiting, useGetWaitingCount, useModal } from "@/hooks";
-import { formatPhoneNumber, parseErrorMessage } from "@/utils";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { milliTimes } from "@/constants/times";
+import { useModal } from "@/hooks/useModal";
+import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaiting";
+import { parseErrorMessage } from "@/utils/common";
+import { formatPhoneNumber } from "@/utils/format";
 
 const PHONE_NUMBER_PREFIX = "010";
 

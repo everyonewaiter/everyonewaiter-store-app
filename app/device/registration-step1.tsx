@@ -17,15 +17,15 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import InputLabel from "@/components/InputLabel";
 import Picker from "@/components/Picker";
-import { fonts, milliTimes } from "@/constants";
-import { useGetProfile, useGetStores, useSendAuthCode, useVerifyAuthCode } from "@/hooks";
-import {
-  clearNullableInterval,
-  formatTime,
-  parseErrorMessage,
-  validateAuthCode,
-  validatePhoneNumber,
-} from "@/utils";
+import { fonts } from "@/constants/fonts";
+import { milliTimes } from "@/constants/times";
+import { useGetProfile } from "@/hooks/useGetProfile";
+import { useGetStores } from "@/hooks/useGetStores";
+import { useSendAuthCode } from "@/hooks/useSendAuthCode";
+import { useVerifyAuthCode } from "@/hooks/useVerifyAuthCode";
+import { clearNullableInterval, parseErrorMessage } from "@/utils/common";
+import { formatTime } from "@/utils/time";
+import { validateAuthCode, validatePhoneNumber } from "@/utils/validation";
 
 interface RegistrationForm {
   code: RegistrationFormProps;

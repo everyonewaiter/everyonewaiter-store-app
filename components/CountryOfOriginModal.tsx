@@ -1,8 +1,9 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
 import { Modal } from "@/components/Modal";
-import { colors, fonts } from "@/constants";
-import { CountryOfOrigin } from "@/types";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { CountryOfOrigin } from "@/types/store";
 
 interface CountryOfOriginModalProps {
   isVisible: boolean;

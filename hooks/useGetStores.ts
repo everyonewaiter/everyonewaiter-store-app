@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getStore, getStoreNames } from "@/api";
-import { queryKeys } from "@/constants";
+import { getStore, getStoreNames } from "@/api/store";
+import { queryKeys } from "@/constants/keys";
 
 export const useGetStores = (accountId: string | undefined, enabled = true) => {
   return useQuery({

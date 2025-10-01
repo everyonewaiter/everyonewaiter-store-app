@@ -1,4 +1,4 @@
-import { CashReceiptType, PaymentMethod } from "@/constants";
+import { CashReceiptType, PaymentMethod } from "@/constants/domain";
 
 export type CreatePaymentRequest = {
   tableNo: number;

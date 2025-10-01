@@ -1,9 +1,11 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
 import { Modal } from "@/components/Modal";
-import { colors, fonts } from "@/constants";
-import { Order, Setting } from "@/types";
-import { calculateOrdersTotalPrice } from "@/utils";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { Order } from "@/types/order";
+import { Setting } from "@/types/store";
+import { calculateOrdersTotalPrice } from "@/utils/calculate";
 
 interface OrderHistoryModalProps {
   isVisible: boolean;

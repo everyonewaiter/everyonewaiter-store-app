@@ -1,4 +1,4 @@
-import { AccountPermission } from "@/constants";
+import { AccountPermission } from "@/constants/domain";
 
 export type AccountProfile = {
   accountId: string;

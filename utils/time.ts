@@ -1,4 +1,4 @@
-import { milliTimes } from "@/constants";
+import { milliTimes } from "@/constants/times";
 
 export const formatTime = (milliseconds: number) => {
   const minutes = Math.floor(milliseconds / milliTimes.ONE_MINUTE);

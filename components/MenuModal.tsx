@@ -7,8 +7,12 @@ import { AntDesign } from "@expo/vector-icons";
 
 import Button from "@/components/Button";
 import MenuOptionSelectBox from "@/components/MenuOptionSelectBox";
-import { colors, fonts, images, MenuLabel } from "@/constants";
-import { Menu, OrderCreate, OrderCreateOptionGroup } from "@/types";
+import { colors } from "@/constants/colors";
+import { MenuLabel } from "@/constants/domain";
+import { fonts } from "@/constants/fonts";
+import { images } from "@/constants/images";
+import { Menu } from "@/types/menu";
+import { OrderCreate, OrderCreateOptionGroup } from "@/types/order";
 
 interface MenuModalProps {
   visible: boolean;

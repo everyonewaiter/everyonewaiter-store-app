@@ -1,9 +1,11 @@
 import EventSource from "react-native-sse";
 
 import { queryClient } from "@/api/queryClient";
-import { milliTimes, queryKeys, storageKeys } from "@/constants";
-import { SseEvent } from "@/types";
-import { getItem, makeSignature } from "@/utils";
+import { queryKeys, storageKeys } from "@/constants/keys";
+import { milliTimes } from "@/constants/times";
+import { SseEvent } from "@/types/common";
+import { makeSignature } from "@/utils/common";
+import { getItem } from "@/utils/storage";
 
 type SseName = "sse";
 

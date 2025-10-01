@@ -1,8 +1,8 @@
 import { Redirect, Stack } from "expo-router";
 
-import { colors } from "@/constants";
+import { colors } from "@/constants/colors";
 import { useAuthentication } from "@/contexts/AuthenticationContext";
-import { getNavigatePath } from "@/utils";
+import { getNavigatePath } from "@/utils/common";
 
 const PosLayout = () => {
   const { device } = useAuthentication();

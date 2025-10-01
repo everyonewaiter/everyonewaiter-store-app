@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { Modal } from "@/components/Modal";
-import { colors, fonts } from "@/constants";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
 
 interface StaffCallModalProps {
   isVisible: boolean;

@@ -3,7 +3,8 @@ import { ForwardedRef } from "react";
 import { isAxiosError } from "axios";
 import CryptoJS from "crypto-js";
 
-import { DevicePurpose, storageKeys } from "@/constants";
+import { DevicePurpose } from "@/constants/domain";
+import { storageKeys } from "@/constants/keys";
 import { getItemOrElseThrow } from "@/utils/storage";
 
 export const parseErrorMessage = (error: Error) => {

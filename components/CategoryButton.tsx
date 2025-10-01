@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { colors, fonts } from "@/constants";
-import { Category } from "@/types";
+import { colors } from "@/constants/colors";
+import { fonts } from "@/constants/fonts";
+import { Category } from "@/types/menu";
 
 interface CategoryButtonProps {
   index: number;

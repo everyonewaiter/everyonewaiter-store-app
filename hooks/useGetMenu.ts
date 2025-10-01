@@ -2,8 +2,8 @@ import { useEffect } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getMenus } from "@/api";
-import { queryKeys } from "@/constants";
+import { getMenus } from "@/api/menu";
+import { queryKeys } from "@/constants/keys";
 
 export const useGetMenus = (storeId: string | undefined, enabled = true) => {
   const { data, isPending, isSuccess } = useQuery({
