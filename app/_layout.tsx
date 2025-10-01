@@ -18,7 +18,7 @@ import AppUpdateProvider, { useAppUpdate } from '@/contexts/AppUpdateContext'
 import AuthenticationProvider, {
   useAuthentication,
 } from '@/contexts/AuthenticationContext'
-import { useDeviceType } from '@/hooks'
+import { useDeviceType, useStickyImmersive } from '@/hooks'
 import '@/sentry.config'
 
 void SplashScreen.preventAutoHideAsync()
@@ -26,6 +26,7 @@ SplashScreen.setOptions({ duration: 500, fade: true })
 
 const RootLayout = () => {
   useKeepAwake()
+  useStickyImmersive()
 
   const { isMobile } = useDeviceType()
 
