@@ -46,6 +46,7 @@ export type OrderMenu = {
   name: string
   price: number
   quantity: number
+  image: string
   served: boolean
   servedTime: string
   printEnabled: boolean
