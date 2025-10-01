@@ -6,7 +6,7 @@ import { OrientationLock } from "expo-screen-orientation";
 import { colors } from "@/constants/colors";
 import { useAuthentication } from "@/contexts/AuthenticationContext";
 import { useOrientation } from "@/hooks/useOrientation";
-import { getNavigatePath } from "@/utils/common";
+import { getNavigatePath } from "@/utils/support";
 
 const WaitingLayout = () => {
   const { lockOrientation, unlockOrientation } = useOrientation();

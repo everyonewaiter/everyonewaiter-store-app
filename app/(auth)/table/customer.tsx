@@ -21,17 +21,16 @@ import { fonts } from "@/constants/fonts";
 import { images } from "@/constants/images";
 import { milliTimes } from "@/constants/times";
 import { useAuthentication } from "@/contexts/AuthenticationContext";
-import { useGetMenus } from "@/hooks/useGetMenu";
-import { useGetStore } from "@/hooks/useGetStores";
+import { useGetMenus } from "@/hooks/useMenuApi";
 import { useModal } from "@/hooks/useModal";
-import { useCreateTableOrder, useGetTableOrderHistories } from "@/hooks/useOrder";
-import { useCreateCardPayment } from "@/hooks/usePayment";
-import { useStaffCall } from "@/hooks/useStaffCall";
+import { useCreateTableOrder, useGetTableOrderHistories, useStaffCall } from "@/hooks/useOrderApi";
+import { useCreateCardPayment } from "@/hooks/usePaymentApi";
+import { useGetStore } from "@/hooks/useStoreApi";
 import KscatModule, { KscatResponse } from "@/modules/kscat";
 import { Category, Menu } from "@/types/menu";
 import { OrderCreate } from "@/types/order";
 import { calculateService, calculateVat } from "@/utils/calculate";
-import { parseErrorMessage } from "@/utils/common";
+import { parseErrorMessage } from "@/utils/support";
 
 const CustomerTableScreen = () => {
   // Common

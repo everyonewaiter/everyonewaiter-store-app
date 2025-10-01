@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createTableOrder, getTableOrderHistories } from "@/api/order";
+import { createStaffCall, createTableOrder, getTableOrderHistories } from "@/api/order";
 import { queryKeys } from "@/constants/keys";
 
 export const useGetTableOrderHistories = (tableNo: number | undefined) => {
@@ -14,4 +14,8 @@ export const useGetTableOrderHistories = (tableNo: number | undefined) => {
 
 export const useCreateTableOrder = () => {
   return useMutation({ mutationFn: createTableOrder });
+};
+
+export const useStaffCall = () => {
+  return useMutation({ mutationFn: createStaffCall });
 };

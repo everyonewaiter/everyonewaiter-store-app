@@ -3,11 +3,37 @@ import EventSource from "react-native-sse";
 import { queryClient } from "@/api/queryClient";
 import { queryKeys, storageKeys } from "@/constants/keys";
 import { milliTimes } from "@/constants/times";
-import { SseEvent } from "@/types/common";
-import { makeSignature } from "@/utils/common";
-import { getItem } from "@/utils/storage";
+import { getItemOrElseThrow } from "@/utils/storage";
+import { makeSignature } from "@/utils/support";
 
 type SseName = "sse";
+
+type SseEvent = {
+  storeId: string;
+  category: keyof SseCategory;
+  action: keyof ServerAction;
+  hasData: boolean;
+  data: string;
+};
+
+type SseCategory = {
+  DEVICE: "기기";
+  STORE: "매장";
+  CATEGORY: "카테고리";
+  MENU: "메뉴";
+  WAITING: "웨이팅";
+  ORDER: "주문";
+  STAFF_CALL: "직원 호출";
+  RECEIPT: "레시피";
+  POS: "POS";
+};
+
+type ServerAction = {
+  GET: "조회";
+  CREATE: "생성";
+  UPDATE: "수정";
+  DELETE: "삭제";
+};
 
 export class SseService {
   private static REQUEST_METHOD = "GET";
@@ -31,23 +57,11 @@ export class SseService {
   }
 
   private async setDeviceId(): Promise<void> {
-    const deviceId = await getItem<string>(storageKeys.DEVICE_ID);
-
-    if (!deviceId) {
-      throw new Error("Failed to initialize device ID");
-    }
-
-    this.deviceId = deviceId;
+    this.deviceId = await getItemOrElseThrow<string>(storageKeys.DEVICE_ID);
   }
 
   private async setSecretKey(): Promise<void> {
-    const secretKey = await getItem<string>(storageKeys.SECRET_KEY);
-
-    if (!secretKey) {
-      throw new Error("Failed to initialize secret key");
-    }
-
-    this.secretKey = secretKey;
+    this.secretKey = await getItemOrElseThrow<string>(storageKeys.SECRET_KEY);
   }
 
   async connect(): Promise<void> {

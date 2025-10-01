@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useContext } from "react";
 
-import { useGetDevice } from "@/hooks/useGetDevice";
+import { useGetDevice } from "@/hooks/useDeviceApi";
 import { Device } from "@/types/device";
 
 interface AuthenticationContextProps {

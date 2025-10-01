@@ -6,7 +6,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import InputLabel from "@/components/InputLabel";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
-import { mergeRefs } from "@/utils/common";
+import { mergeRefs } from "@/utils/support";
 
 interface InputProps extends TextInputProps {
   label?: string;
