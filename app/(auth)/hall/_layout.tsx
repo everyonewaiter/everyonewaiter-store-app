@@ -4,7 +4,7 @@ import { colors } from "@/constants/colors";
 import { useAuthentication } from "@/contexts/AuthenticationContext";
 import { getNavigatePath } from "@/utils/support";
 
-const PosLayout = () => {
+const HallLayout = () => {
   const { device } = useAuthentication();
 
   if (!device) {
@@ -22,4 +22,4 @@ const PosLayout = () => {
   );
 };
 
-export default PosLayout;
+export default HallLayout;
