@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from "@tanstack/react-query";
 
-import { verifyAuthenticationCode } from '@/api'
+import { verifyAuthenticationCode } from "@/api";
 
 export const useVerifyAuthCode = () => {
-  return useMutation({ mutationFn: verifyAuthenticationCode })
-}
+  return useMutation({ mutationFn: verifyAuthenticationCode });
+};

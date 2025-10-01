@@ -1,23 +1,18 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from "react-native";
 
-import { Modal } from '@/components/Modal'
-import { colors, fonts } from '@/constants'
-import { Order, Setting } from '@/types'
-import { calculateOrdersTotalPrice } from '@/utils'
+import { Modal } from "@/components/Modal";
+import { colors, fonts } from "@/constants";
+import { Order, Setting } from "@/types";
+import { calculateOrdersTotalPrice } from "@/utils";
 
 interface OrderHistoryModalProps {
-  isVisible: boolean
-  histories: Order[]
-  setting?: Setting
-  close: () => void
+  isVisible: boolean;
+  histories: Order[];
+  setting?: Setting;
+  close: () => void;
 }
 
-const OrderHistoryModal = ({
-  isVisible,
-  histories,
-  setting,
-  close,
-}: OrderHistoryModalProps) => {
+const OrderHistoryModal = ({ isVisible, histories, setting, close }: OrderHistoryModalProps) => {
   return (
     <Modal visible={isVisible}>
       <Modal.Container>
@@ -28,29 +23,26 @@ const OrderHistoryModal = ({
           <FlatList
             style={{ height: 300 }}
             data={histories}
-            keyExtractor={item => item.orderId}
+            keyExtractor={(item) => item.orderId}
             contentContainerStyle={{ gap: 14 }}
             renderItem={({ item, index }) => (
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  flexDirection: "row",
+                  alignItems: "center",
                   gap: 8,
                 }}
               >
                 <Text style={styles.indexNumber}>{index + 1}</Text>
                 <View style={styles.orderContainer}>
                   {item.orderMenus.map((menu, index) => (
-                    <View
-                      key={`${item.orderId}-${menu.orderMenuId}-${index}`}
-                      style={{ flex: 1 }}
-                    >
+                    <View key={`${item.orderId}-${menu.orderMenuId}-${index}`} style={{ flex: 1 }}>
                       <View style={[styles.spaceBetween]}>
                         <Text style={styles.menuName}>{menu.name}</Text>
                         <Text style={styles.menuName}>{menu.quantity}개</Text>
                       </View>
                       {menu.orderOptionGroups
-                        .flatMap(group => group.orderOptions)
+                        .flatMap((group) => group.orderOptions)
                         .map((option, index) => (
                           <Text
                             key={`${option.name}-${option.price}-${index}`}
@@ -67,7 +59,7 @@ const OrderHistoryModal = ({
           />
         </View>
         {setting?.showOrderTotalPrice && (
-          <View style={[styles.spaceBetween, { alignItems: 'center' }]}>
+          <View style={[styles.spaceBetween, { alignItems: "center" }]}>
             <Text style={styles.totalPriceText}>총 주문 금액</Text>
             <Text style={styles.totalPrice}>
               {calculateOrdersTotalPrice(histories).toPrice()}원
@@ -79,8 +71,8 @@ const OrderHistoryModal = ({
         </Modal.ButtonContainer>
       </Modal.Container>
     </Modal>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   orderContainer: {
@@ -91,8 +83,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   spaceBetween: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   menuOption: {
     color: colors.BLUE,
@@ -106,7 +98,7 @@ const styles = StyleSheet.create({
   indexNumber: {
     fontFamily: fonts.PRETENDARD_MEDIUM,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     backgroundColor: colors.PRIMARY_RED,
     borderRadius: 6,
     color: colors.WHITE,
@@ -122,6 +114,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: colors.PRIMARY_RED,
   },
-})
+});
 
-export default OrderHistoryModal
+export default OrderHistoryModal;

@@ -1,10 +1,10 @@
-import { Modal } from '@/components/Modal'
+import { Modal } from "@/components/Modal";
 
 interface ErrorModalProps {
-  isVisible: boolean
-  title: string
-  message: string
-  close: () => void
+  isVisible: boolean;
+  title: string;
+  message: string;
+  close: () => void;
 }
 
 const ErrorModal = ({ isVisible, title, message, close }: ErrorModalProps) => {
@@ -18,7 +18,7 @@ const ErrorModal = ({ isVisible, title, message, close }: ErrorModalProps) => {
         </Modal.ButtonContainer>
       </Modal.Container>
     </Modal>
-  )
-}
+  );
+};
 
-export default ErrorModal
+export default ErrorModal;

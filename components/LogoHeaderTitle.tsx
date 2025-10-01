@@ -1,9 +1,9 @@
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from "react-native";
 
-import Logo from '@/components/Logo'
+import Logo from "@/components/Logo";
 
 interface LogoHeaderTitleProps {
-  paddingLeft?: number
+  paddingLeft?: number;
 }
 
 const LogoHeaderTitle = ({ paddingLeft = 0 }: LogoHeaderTitleProps) => {
@@ -11,13 +11,13 @@ const LogoHeaderTitle = ({ paddingLeft = 0 }: LogoHeaderTitleProps) => {
     <View style={[styles.container, { paddingLeft }]}>
       <Logo size="medium" direction="row" />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
-})
+});
 
-export default LogoHeaderTitle
+export default LogoHeaderTitle;

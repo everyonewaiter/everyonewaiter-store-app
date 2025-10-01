@@ -1,18 +1,15 @@
-import React, { PropsWithChildren } from 'react'
-import { Pressable, PressableProps, StyleSheet, Text, View } from 'react-native'
+import React, { PropsWithChildren } from "react";
+import { Pressable, PressableProps, StyleSheet, Text, View } from "react-native";
 
-import { Image } from 'expo-image'
+import { Image } from "expo-image";
 
-import { colors, fonts } from '@/constants'
+import { colors, fonts } from "@/constants";
 
 interface MainModalProps {
-  visible: boolean
+  visible: boolean;
 }
 
-const MainModal = ({
-  visible,
-  children,
-}: PropsWithChildren<MainModalProps>) => {
+const MainModal = ({ visible, children }: PropsWithChildren<MainModalProps>) => {
   return (
     <>
       {visible && (
@@ -22,36 +19,34 @@ const MainModal = ({
         </View>
       )}
     </>
-  )
-}
+  );
+};
 
 const Container = ({ children }: PropsWithChildren) => {
-  return <View style={styles.modalContainer}>{children}</View>
-}
+  return <View style={styles.modalContainer}>{children}</View>;
+};
 
 interface TitleProps {
-  color?: 'black' | 'red'
-  position?: 'left' | 'center'
-  size?: 'medium' | 'large'
+  color?: "black" | "red";
+  position?: "left" | "center";
+  size?: "medium" | "large";
 }
 
 const Title = ({
-  color = 'black',
-  position = 'center',
-  size = 'large',
+  color = "black",
+  position = "center",
+  size = "large",
   children,
 }: PropsWithChildren<TitleProps>) => {
   return (
-    <View style={position === 'center' && styles.titleCenter}>
-      <Text style={[styles[`titleText-${size}`], styles[`title-${color}`]]}>
-        {children}
-      </Text>
+    <View style={position === "center" && styles.titleCenter}>
+      <Text style={[styles[`titleText-${size}`], styles[`title-${color}`]]}>{children}</Text>
     </View>
-  )
-}
+  );
+};
 
 interface ContentProps {
-  image?: string
+  image?: string;
 }
 
 const Content = ({ image, children }: PropsWithChildren<ContentProps>) => {
@@ -60,25 +55,20 @@ const Content = ({ image, children }: PropsWithChildren<ContentProps>) => {
       {image && <Image source={image} style={styles.image} />}
       <Text style={styles.contentText}>{children}</Text>
     </View>
-  )
-}
+  );
+};
 
 const ButtonContainer = ({ children }: PropsWithChildren) => {
-  return <View style={styles.buttonContainer}>{children}</View>
-}
+  return <View style={styles.buttonContainer}>{children}</View>;
+};
 
 interface ButtonProps extends PressableProps {
-  label: string
-  color?: 'red' | 'gray' | 'black'
-  disabled?: boolean
+  label: string;
+  color?: "red" | "gray" | "black";
+  disabled?: boolean;
 }
 
-const Button = ({
-  label,
-  color = 'red',
-  disabled = false,
-  ...props
-}: ButtonProps) => {
+const Button = ({ label, color = "red", disabled = false, ...props }: ButtonProps) => {
   return (
     <Pressable
       disabled={disabled}
@@ -91,53 +81,51 @@ const Button = ({
       {...props}
     >
       <View style={styles.labelContainer}>
-        <Text style={[styles.largeLabel, styles[`${color}LabelText`]]}>
-          {label}
-        </Text>
+        <Text style={[styles.largeLabel, styles[`${color}LabelText`]]}>{label}</Text>
       </View>
     </Pressable>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
     backgroundColor: colors.WHITE,
     borderRadius: 30,
     padding: 32,
-    width: '50%',
+    width: "50%",
     gap: 24,
   },
   titleCenter: {
-    alignItems: 'center',
+    alignItems: "center",
   },
-  'titleText-medium': {
+  "titleText-medium": {
     fontFamily: fonts.PRETENDARD_BOLD,
     fontSize: 18,
   },
-  'titleText-large': {
+  "titleText-large": {
     fontFamily: fonts.PRETENDARD_BOLD,
     fontSize: 32,
   },
-  'title-black': {
+  "title-black": {
     color: colors.BLACK,
   },
-  'title-red': {
+  "title-red": {
     color: colors.PRIMARY_RED,
   },
   contentCenter: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   contentText: {
     fontFamily: fonts.PRETENDARD_REGULAR,
@@ -148,7 +136,7 @@ const styles = StyleSheet.create({
     height: 100,
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   largeButton: {
@@ -173,8 +161,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   labelContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   largeLabel: {
     fontFamily: fonts.PRETENDARD_BOLD,
@@ -189,7 +177,7 @@ const styles = StyleSheet.create({
   blackLabelText: {
     color: colors.WHITE,
   },
-})
+});
 
 export const Modal = Object.assign(MainModal, {
   Container,
@@ -197,4 +185,4 @@ export const Modal = Object.assign(MainModal, {
   Content,
   ButtonContainer,
   Button,
-})
+});

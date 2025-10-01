@@ -1,25 +1,19 @@
-import { ReactNode } from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { ReactNode } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign } from "@expo/vector-icons";
 
-import { colors, fonts } from '@/constants'
+import { colors, fonts } from "@/constants";
 
 interface PersonCountBoxProps {
-  icon: ReactNode
-  label: string
-  count: number
-  minusHandler: () => void
-  plusHandler: () => void
+  icon: ReactNode;
+  label: string;
+  count: number;
+  minusHandler: () => void;
+  plusHandler: () => void;
 }
 
-const PersonCountBox = ({
-  icon,
-  label,
-  minusHandler,
-  plusHandler,
-  count,
-}: PersonCountBoxProps) => {
+const PersonCountBox = ({ icon, label, minusHandler, plusHandler, count }: PersonCountBoxProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.contentContainer}>
@@ -38,8 +32,8 @@ const PersonCountBox = ({
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -48,27 +42,27 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   contentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   leftContent: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconContainer: {
     marginRight: 12,
   },
   rightContent: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
   contentText: {
     fontFamily: fonts.PRETENDARD_MEDIUM,
     fontSize: 32,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   countText: {
     paddingHorizontal: 24,
@@ -78,9 +72,9 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 8,
     backgroundColor: colors.GRAY7_F1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
-})
+});
 
-export default PersonCountBox
+export default PersonCountBox;

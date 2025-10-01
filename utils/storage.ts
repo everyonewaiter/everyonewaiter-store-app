@@ -1,25 +1,25 @@
-import * as SecureStore from 'expo-secure-store'
+import * as SecureStore from "expo-secure-store";
 
 export const setItem = async <T>(key: string, value: T) => {
-  await SecureStore.setItemAsync(key, JSON.stringify(value))
-}
+  await SecureStore.setItemAsync(key, JSON.stringify(value));
+};
 
 export const getItem = async <T>(key: string): Promise<T | null> => {
-  const data = await SecureStore.getItemAsync(key)
-  return data ? JSON.parse(data) : null
-}
+  const data = await SecureStore.getItemAsync(key);
+  return data ? JSON.parse(data) : null;
+};
 
 export const getItemOrElseThrow = async <T>(key: string): Promise<T> => {
-  const data = await getItem<T>(key)
+  const data = await getItem<T>(key);
   if (!data) {
-    throw new Error(`Item not found: ${key}`)
+    throw new Error(`Item not found: ${key}`);
   }
-  return data
-}
+  return data;
+};
 
 export const removeItem = async (key: string) => {
-  const data = await getItem(key)
+  const data = await getItem(key);
   if (data) {
-    await SecureStore.deleteItemAsync(key)
+    await SecureStore.deleteItemAsync(key);
   }
-}
+};

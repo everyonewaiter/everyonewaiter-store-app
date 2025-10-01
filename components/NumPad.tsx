@@ -1,13 +1,13 @@
-import { Pressable, PressableProps, StyleSheet, Text } from 'react-native'
+import { Pressable, PressableProps, StyleSheet, Text } from "react-native";
 
-import { FontAwesome6 } from '@expo/vector-icons'
+import { FontAwesome6 } from "@expo/vector-icons";
 
-import { colors, fonts } from '@/constants'
+import { colors, fonts } from "@/constants";
 
 interface NumPadProps extends PressableProps {
-  label: number | 'back' | 'reset'
-  positionX: 'left' | 'center' | 'right'
-  positionY: 'top' | 'center' | 'bottom'
+  label: number | "back" | "reset";
+  positionX: "left" | "center" | "right";
+  positionY: "top" | "center" | "bottom";
 }
 
 const NumPad = ({ label, positionX, positionY, ...props }: NumPadProps) => {
@@ -20,64 +20,60 @@ const NumPad = ({ label, positionX, positionY, ...props }: NumPadProps) => {
       ]}
       {...props}
     >
-      {typeof label === 'number' && <Text style={styles.label}>{label}</Text>}
-      {label === 'reset' && (
-        <FontAwesome6 name="arrows-rotate" size={32} color={colors.GRAY3_99} />
-      )}
-      {label === 'back' && (
-        <FontAwesome6 name="arrow-left" size={32} color={colors.GRAY3_99} />
-      )}
+      {typeof label === "number" && <Text style={styles.label}>{label}</Text>}
+      {label === "reset" && <FontAwesome6 name="arrows-rotate" size={32} color={colors.GRAY3_99} />}
+      {label === "back" && <FontAwesome6 name="arrow-left" size={32} color={colors.GRAY3_99} />}
     </Pressable>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: '100%',
+    height: "100%",
     borderColor: colors.GRAY5_E7,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
-  'border-left-top': {
+  "border-left-top": {
     borderTopLeftRadius: 16,
     borderTopWidth: 2,
     borderLeftWidth: 2,
     borderBottomWidth: 2,
   },
-  'border-center-top': {
+  "border-center-top": {
     borderWidth: 2,
   },
-  'border-right-top': {
+  "border-right-top": {
     borderTopRightRadius: 16,
     borderTopWidth: 2,
     borderRightWidth: 2,
     borderBottomWidth: 2,
   },
-  'border-left-center': {
+  "border-left-center": {
     borderLeftWidth: 2,
     borderBottomWidth: 2,
   },
-  'border-center-center': {
+  "border-center-center": {
     borderLeftWidth: 2,
     borderRightWidth: 2,
     borderBottomWidth: 2,
   },
-  'border-right-center': {
+  "border-right-center": {
     borderRightWidth: 2,
     borderBottomWidth: 2,
   },
-  'border-left-bottom': {
+  "border-left-bottom": {
     borderBottomLeftRadius: 16,
     borderLeftWidth: 2,
     borderBottomWidth: 2,
   },
-  'border-center-bottom': {
+  "border-center-bottom": {
     borderLeftWidth: 2,
     borderRightWidth: 2,
     borderBottomWidth: 2,
   },
-  'border-right-bottom': {
+  "border-right-bottom": {
     borderBottomRightRadius: 16,
     borderRightWidth: 2,
     borderBottomWidth: 2,
@@ -89,6 +85,6 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.7,
   },
-})
+});
 
-export default NumPad
+export default NumPad;

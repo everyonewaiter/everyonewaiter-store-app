@@ -1,43 +1,37 @@
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 
-import * as Application from 'expo-application'
+import * as Application from "expo-application";
 
-import { useGetApkVersion } from '@/hooks/useGetApkVersion'
-import { updateApp } from '@/utils'
+import { useGetApkVersion } from "@/hooks/useGetApkVersion";
+import { updateApp } from "@/utils";
 
 interface AuthenticationContextProps {
-  isUpdated: boolean
+  isUpdated: boolean;
 }
 
 const AppUpdateContext = createContext<AuthenticationContextProps>({
   isUpdated: false,
-})
+});
 
 export const useAppUpdate = () => {
-  const context = useContext(AppUpdateContext)
+  const context = useContext(AppUpdateContext);
 
   if (!context) {
-    throw new Error('useAppUpdate must be used within an AppUpdateProvider')
+    throw new Error("useAppUpdate must be used within an AppUpdateProvider");
   }
 
-  return context
-}
+  return context;
+};
 
 const AppUpdateProvider = ({ children }: PropsWithChildren) => {
-  const [isUpdated, setIsUpdated] = useState(false)
-  const { apkVersion, isSuccess, isPending } = useGetApkVersion()
+  const [isUpdated, setIsUpdated] = useState(false);
+  const { apkVersion, isSuccess, isPending } = useGetApkVersion();
 
   useEffect(() => {
     if (!isPending && isSuccess) {
-      const appVersion = Application.nativeApplicationVersion ?? '1.0.0'
-      const appVersionParts = appVersion.split('.').map(Number)
-      const [majorVersion, minorVersion, patchVersion] = appVersionParts
+      const appVersion = Application.nativeApplicationVersion ?? "1.0.0";
+      const appVersionParts = appVersion.split(".").map(Number);
+      const [majorVersion, minorVersion, patchVersion] = appVersionParts;
 
       if (
         apkVersion &&
@@ -45,18 +39,14 @@ const AppUpdateProvider = ({ children }: PropsWithChildren) => {
           minorVersion < apkVersion.minorVersion ||
           patchVersion < apkVersion.patchVersion)
       ) {
-        updateApp(apkVersion.downloadUrl).finally(() => setIsUpdated(true))
+        updateApp(apkVersion.downloadUrl).finally(() => setIsUpdated(true));
       } else {
-        setIsUpdated(true)
+        setIsUpdated(true);
       }
     }
-  }, [apkVersion, isPending, isSuccess])
+  }, [apkVersion, isPending, isSuccess]);
 
-  return (
-    <AppUpdateContext.Provider value={{ isUpdated }}>
-      {children}
-    </AppUpdateContext.Provider>
-  )
-}
+  return <AppUpdateContext.Provider value={{ isUpdated }}>{children}</AppUpdateContext.Provider>;
+};
 
-export default AppUpdateProvider
+export default AppUpdateProvider;

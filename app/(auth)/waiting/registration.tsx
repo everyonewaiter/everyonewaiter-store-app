@@ -1,108 +1,104 @@
-import { useCallback, useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { scheduleOnRN } from 'react-native-worklets'
+import { useCallback, useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { scheduleOnRN } from "react-native-worklets";
 
-import { AdultIcon, BabyIcon } from '@/assets/icons'
-import Button from '@/components/Button'
-import ErrorModal from '@/components/ErrorModal'
-import LogoHeaderTitle from '@/components/LogoHeaderTitle'
-import { Modal } from '@/components/Modal'
-import NumPad from '@/components/NumPad'
-import PersonCountBox from '@/components/PersonCountBox'
-import SuccessModal from '@/components/SuccessModal'
-import { colors, fonts, milliTimes } from '@/constants'
-import { useCreateWaiting, useGetWaitingCount, useModal } from '@/hooks'
-import { formatPhoneNumber, parseErrorMessage } from '@/utils'
+import { AdultIcon, BabyIcon } from "@/assets/icons";
+import Button from "@/components/Button";
+import ErrorModal from "@/components/ErrorModal";
+import LogoHeaderTitle from "@/components/LogoHeaderTitle";
+import { Modal } from "@/components/Modal";
+import NumPad from "@/components/NumPad";
+import PersonCountBox from "@/components/PersonCountBox";
+import SuccessModal from "@/components/SuccessModal";
+import { colors, fonts, milliTimes } from "@/constants";
+import { useCreateWaiting, useGetWaitingCount, useModal } from "@/hooks";
+import { formatPhoneNumber, parseErrorMessage } from "@/utils";
 
-const PHONE_NUMBER_PREFIX = '010'
+const PHONE_NUMBER_PREFIX = "010";
 
 const WaitingRegistrationScreen = () => {
-  const [idleTime, setIdleTime] = useState(milliTimes.ONE_MINUTE)
+  const [idleTime, setIdleTime] = useState(milliTimes.ONE_MINUTE);
   const [personCount, setPersonCount] = useState({
     adult: 0,
     infant: 0,
-  })
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [isValidForm, setIsValidForm] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
+  });
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [isValidForm, setIsValidForm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const { waitingCount } = useGetWaitingCount()
-  const createWaiting = useCreateWaiting()
+  const { waitingCount } = useGetWaitingCount();
+  const createWaiting = useCreateWaiting();
 
-  const submitModal = useModal()
-  const successModal = useModal()
-  const errorModal = useModal()
+  const submitModal = useModal();
+  const successModal = useModal();
+  const errorModal = useModal();
 
   const resetAll = useCallback(() => {
-    setIdleTime(milliTimes.ONE_MINUTE)
-    setPersonCount({ adult: 0, infant: 0 })
-    setPhoneNumber('')
-    setIsValidForm(false)
-    submitModal.close()
-    successModal.close()
-    errorModal.close()
-    setErrorMessage('')
-  }, [errorModal, submitModal, successModal])
+    setIdleTime(milliTimes.ONE_MINUTE);
+    setPersonCount({ adult: 0, infant: 0 });
+    setPhoneNumber("");
+    setIsValidForm(false);
+    submitModal.close();
+    successModal.close();
+    errorModal.close();
+    setErrorMessage("");
+  }, [errorModal, submitModal, successModal]);
 
   useEffect(() => {
     if (personCount.adult > 0 && phoneNumber.length === 8) {
-      setIsValidForm(true)
+      setIsValidForm(true);
     } else {
-      setIsValidForm(false)
+      setIsValidForm(false);
     }
-  }, [personCount.adult, phoneNumber])
+  }, [personCount.adult, phoneNumber]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (
-        personCount.adult !== 0 ||
-        personCount.infant !== 0 ||
-        phoneNumber !== ''
-      ) {
-        setIdleTime(prev => prev - milliTimes.ONE_SECOND)
+      if (personCount.adult !== 0 || personCount.infant !== 0 || phoneNumber !== "") {
+        setIdleTime((prev) => prev - milliTimes.ONE_SECOND);
       }
-    }, milliTimes.ONE_SECOND)
-    return () => clearInterval(interval)
-  }, [personCount, phoneNumber])
+    }, milliTimes.ONE_SECOND);
+    return () => clearInterval(interval);
+  }, [personCount, phoneNumber]);
 
   useEffect(() => {
     if (idleTime <= milliTimes.ZERO) {
-      resetAll()
+      resetAll();
     }
-  }, [idleTime, resetAll])
+  }, [idleTime, resetAll]);
 
   const resetIdleTime = Gesture.Tap().onStart(() => {
     if (idleTime < milliTimes.ONE_MINUTE) {
-      scheduleOnRN(setIdleTime, milliTimes.ONE_MINUTE)
+      scheduleOnRN(setIdleTime, milliTimes.ONE_MINUTE);
     }
-  })
+  });
 
-  const minusPersonCount = (key: 'adult' | 'infant') => {
+  const minusPersonCount = (key: "adult" | "infant") => {
     if (personCount[key] > 0) {
-      setPersonCount(prev => ({ ...prev, [key]: prev[key] - 1 }))
+      setPersonCount((prev) => ({ ...prev, [key]: prev[key] - 1 }));
     }
-  }
+  };
 
-  const plusPersonCount = (key: 'adult' | 'infant') => {
+  const plusPersonCount = (key: "adult" | "infant") => {
     if (personCount[key] <= 30) {
-      setPersonCount(prev => ({ ...prev, [key]: prev[key] + 1 }))
+      setPersonCount((prev) => ({ ...prev, [key]: prev[key] + 1 }));
     }
-  }
+  };
 
   const addPhoneNumber = (num: number) => {
     if (phoneNumber.length < 8) {
-      setPhoneNumber(prev => prev + num)
+      setPhoneNumber((prev) => prev + num);
     }
-  }
+  };
 
   const removeLastPhoneNumber = () => {
-    setPhoneNumber(prev => prev.slice(0, -1))
-  }
+    setPhoneNumber((prev) => prev.slice(0, -1));
+  };
 
   const submitCreateWaiting = () => {
-    submitModal.close()
+    submitModal.close();
     createWaiting.mutate(
       {
         phoneNumber: `${PHONE_NUMBER_PREFIX}${phoneNumber}`,
@@ -111,15 +107,15 @@ const WaitingRegistrationScreen = () => {
       },
       {
         onSuccess: () => {
-          successModal.open()
+          successModal.open();
         },
-        onError: error => {
-          setErrorMessage(parseErrorMessage(error))
-          errorModal.open()
+        onError: (error) => {
+          setErrorMessage(parseErrorMessage(error));
+          errorModal.open();
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
   return (
     <GestureDetector gesture={resetIdleTime}>
@@ -130,22 +126,20 @@ const WaitingRegistrationScreen = () => {
               <LogoHeaderTitle />
               <View>
                 <Text style={styles.mainText}>현재 대기 중인 팀은</Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <Text style={[styles.mainText, styles.highlightMainText]}>
-                    {waitingCount}팀
-                  </Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={[styles.mainText, styles.highlightMainText]}>{waitingCount}팀</Text>
                   <Text style={styles.mainText}> 입니다.</Text>
                 </View>
               </View>
               <View>
                 {waitingCount > 0 ? (
                   <Text style={styles.subText}>
-                    자리가 준비되면 연락드릴게요!{'\n'}
+                    자리가 준비되면 연락드릴게요!{"\n"}
                     인원과 전화번호를 입력해 주세요.
                   </Text>
                 ) : (
                   <Text style={styles.subText}>
-                    현재 대기 중인 팀이 없습니다.{'\n'}
+                    현재 대기 중인 팀이 없습니다.{"\n"}
                     지금 바로 매장에 입장해 주세요!
                   </Text>
                 )}
@@ -157,15 +151,15 @@ const WaitingRegistrationScreen = () => {
                   icon={<AdultIcon />}
                   label="성인"
                   count={personCount.adult}
-                  minusHandler={() => minusPersonCount('adult')}
-                  plusHandler={() => plusPersonCount('adult')}
+                  minusHandler={() => minusPersonCount("adult")}
+                  plusHandler={() => plusPersonCount("adult")}
                 />
                 <PersonCountBox
                   icon={<BabyIcon />}
                   label="유아"
                   count={personCount.infant}
-                  minusHandler={() => minusPersonCount('infant')}
-                  plusHandler={() => plusPersonCount('infant')}
+                  minusHandler={() => minusPersonCount("infant")}
+                  plusHandler={() => plusPersonCount("infant")}
                 />
               </View>
             </View>
@@ -243,12 +237,7 @@ const WaitingRegistrationScreen = () => {
                 />
               </View>
               <View style={styles.numPad}>
-                <NumPad
-                  label="reset"
-                  positionX="left"
-                  positionY="bottom"
-                  onPress={resetAll}
-                />
+                <NumPad label="reset" positionX="left" positionY="bottom" onPress={resetAll} />
                 <NumPad
                   label={0}
                   positionX="center"
@@ -263,7 +252,7 @@ const WaitingRegistrationScreen = () => {
                 />
               </View>
             </View>
-            <View style={{ flex: 0.5, justifyContent: 'flex-end' }}>
+            <View style={{ flex: 0.5, justifyContent: "flex-end" }}>
               <Button
                 label="등록하기"
                 color="black"
@@ -279,11 +268,7 @@ const WaitingRegistrationScreen = () => {
             <Modal.Content>위 번호로 웨이팅 등록을 하시겠습니까?</Modal.Content>
             <Modal.ButtonContainer>
               <Modal.Button label="닫기" color="gray" onPress={resetAll} />
-              <Modal.Button
-                label="등록하기"
-                color="black"
-                onPress={submitCreateWaiting}
-              />
+              <Modal.Button label="등록하기" color="black" onPress={submitCreateWaiting} />
             </Modal.ButtonContainer>
           </Modal.Container>
         </Modal>
@@ -301,13 +286,13 @@ const WaitingRegistrationScreen = () => {
         />
       </SafeAreaView>
     </GestureDetector>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 32,
     paddingVertical: 18,
     paddingHorizontal: 24,
@@ -340,7 +325,7 @@ const styles = StyleSheet.create({
   },
   personContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   personCountContainer: {
     backgroundColor: colors.WHITE,
@@ -348,7 +333,7 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   numPadContent: {
-    height: '100%',
+    height: "100%",
     borderRadius: 20,
     backgroundColor: colors.WHITE,
     paddingTop: 24,
@@ -357,7 +342,7 @@ const styles = StyleSheet.create({
   },
   phoneNumberContainer: {
     flex: 0.5,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 8,
     marginBottom: 32,
   },
@@ -371,9 +356,9 @@ const styles = StyleSheet.create({
     color: colors.GRAY3_99,
   },
   numPad: {
-    height: '25%',
-    flexDirection: 'row',
+    height: "25%",
+    flexDirection: "row",
   },
-})
+});
 
-export default WaitingRegistrationScreen
+export default WaitingRegistrationScreen;

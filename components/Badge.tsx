@@ -1,26 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from "react-native";
 
-import { colors, fonts, MenuLabel } from '@/constants'
+import { colors, fonts, MenuLabel } from "@/constants";
 
 interface BadgeProps {
-  label: keyof typeof MenuLabel
+  label: keyof typeof MenuLabel;
 }
 
 const Badge = ({ label }: BadgeProps) => {
-  const color = label === 'BEST' ? colors.ORANGE : colors.PRIMARY_RED
+  const color = label === "BEST" ? colors.ORANGE : colors.PRIMARY_RED;
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.badge, { backgroundColor: color }]}>
-        {MenuLabel[label]}
-      </Text>
+      <Text style={[styles.badge, { backgroundColor: color }]}>{MenuLabel[label]}</Text>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     paddingTop: 6,
     paddingRight: 4,
   },
@@ -32,6 +30,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 4,
   },
-})
+});
 
-export default Badge
+export default Badge;

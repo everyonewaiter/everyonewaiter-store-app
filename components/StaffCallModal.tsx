@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native'
+import React, { useEffect, useState } from "react";
+import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
-import { Modal } from '@/components/Modal'
-import { colors, fonts } from '@/constants'
+import { Modal } from "@/components/Modal";
+import { colors, fonts } from "@/constants";
 
 interface StaffCallModalProps {
-  isVisible: boolean
-  options: string[]
-  selectedOption: string
-  setSelectedOption: React.Dispatch<React.SetStateAction<string>>
-  submit: () => void
-  close: () => void
+  isVisible: boolean;
+  options: string[];
+  selectedOption: string;
+  setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
+  submit: () => void;
+  close: () => void;
 }
 
-const numColumns = 4
-const gap = 12
+const numColumns = 4;
+const gap = 12;
 
 const StaffCallModal = ({
   isVisible,
@@ -31,16 +24,16 @@ const StaffCallModal = ({
   submit,
   close,
 }: StaffCallModalProps) => {
-  const { width: screenWidth } = useWindowDimensions()
-  const [contentWidth, setContentWidth] = useState(0)
+  const { width: screenWidth } = useWindowDimensions();
+  const [contentWidth, setContentWidth] = useState(0);
 
   useEffect(() => {
-    const modalWidth = screenWidth * 0.5
-    const paddingHorizontalSpace = 32 * 2
-    const columnGapSpace = gap * (numColumns - 1)
-    const availableSpace = modalWidth - paddingHorizontalSpace - columnGapSpace
-    setContentWidth(availableSpace / numColumns)
-  }, [screenWidth])
+    const modalWidth = screenWidth * 0.5;
+    const paddingHorizontalSpace = 32 * 2;
+    const columnGapSpace = gap * (numColumns - 1);
+    const availableSpace = modalWidth - paddingHorizontalSpace - columnGapSpace;
+    setContentWidth(availableSpace / numColumns);
+  }, [screenWidth]);
 
   return (
     <Modal visible={isVisible}>
@@ -54,7 +47,7 @@ const StaffCallModal = ({
           keyExtractor={(item, index) => `${item}-${index}`}
           columnWrapperStyle={{ gap }}
           contentContainerStyle={{ gap }}
-          renderItem={renderItem => (
+          renderItem={(renderItem) => (
             <Pressable
               style={[
                 styles.staffCallOption,
@@ -64,9 +57,7 @@ const StaffCallModal = ({
               onPress={() => setSelectedOption(renderItem.item)}
             >
               <View style={styles.center}>
-                <Text style={styles.staffCallOptionText}>
-                  {renderItem.item}
-                </Text>
+                <Text style={styles.staffCallOptionText}>{renderItem.item}</Text>
               </View>
             </Pressable>
           )}
@@ -82,21 +73,21 @@ const StaffCallModal = ({
         </Modal.ButtonContainer>
       </Modal.Container>
     </Modal>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   subjectContainer: {
     height: 48,
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: colors.GRAY7_F1,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
   center: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   subjectText: {
     fontFamily: fonts.PRETENDARD_MEDIUM,
@@ -104,7 +95,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     height: 48,
-    flexDirection: 'row',
+    flexDirection: "row",
     borderBottomWidth: 1,
     borderColor: colors.GRAY5_E7,
   },
@@ -125,6 +116,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PRETENDARD_REGULAR,
     fontSize: 15,
   },
-})
+});
 
-export default StaffCallModal
+export default StaffCallModal;

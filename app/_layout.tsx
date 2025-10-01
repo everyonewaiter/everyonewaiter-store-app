@@ -1,42 +1,38 @@
-import { Alert } from 'react-native'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { KeyboardProvider } from 'react-native-keyboard-controller'
-import 'react-native-reanimated'
+import { Alert } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+import "react-native-reanimated";
 
-import { useFonts } from 'expo-font'
-import { useKeepAwake } from 'expo-keep-awake'
-import { Stack } from 'expo-router'
-import * as SplashScreen from 'expo-splash-screen'
-import { StatusBar } from 'expo-status-bar'
+import { useFonts } from "expo-font";
+import { useKeepAwake } from "expo-keep-awake";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 
-import * as Sentry from '@sentry/react-native'
-import { QueryClientProvider } from '@tanstack/react-query'
+import * as Sentry from "@sentry/react-native";
+import { QueryClientProvider } from "@tanstack/react-query";
 
-import { queryClient } from '@/api'
-import { fontAssets } from '@/constants'
-import AppUpdateProvider, { useAppUpdate } from '@/contexts/AppUpdateContext'
-import AuthenticationProvider, {
-  useAuthentication,
-} from '@/contexts/AuthenticationContext'
-import { useDeviceType, useStickyImmersive } from '@/hooks'
-import '@/sentry.config'
+import { queryClient } from "@/api";
+import { fontAssets } from "@/constants";
+import AppUpdateProvider, { useAppUpdate } from "@/contexts/AppUpdateContext";
+import AuthenticationProvider, { useAuthentication } from "@/contexts/AuthenticationContext";
+import { useDeviceType, useStickyImmersive } from "@/hooks";
+import "@/sentry.config";
 
-void SplashScreen.preventAutoHideAsync()
-SplashScreen.setOptions({ duration: 500, fade: true })
+void SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({ duration: 500, fade: true });
 
 const RootLayout = () => {
-  useKeepAwake()
-  useStickyImmersive()
+  useKeepAwake();
+  useStickyImmersive();
 
-  const { isMobile } = useDeviceType()
+  const { isMobile } = useDeviceType();
 
   if (isMobile) {
-    Alert.alert(
-      '알림',
-      '모바일 환경은 지원하지 않습니다.\n태블릿을 이용해 주세요.',
-      [{ text: '확인' }],
-    )
-    return null
+    Alert.alert("알림", "모바일 환경은 지원하지 않습니다.\n태블릿을 이용해 주세요.", [
+      { text: "확인" },
+    ]);
+    return null;
   }
 
   return (
@@ -51,16 +47,16 @@ const RootLayout = () => {
         </GestureHandlerRootView>
       </KeyboardProvider>
     </QueryClientProvider>
-  )
-}
+  );
+};
 
 const EveryoneWaiterApplication = () => {
-  const [loaded] = useFonts(fontAssets)
-  const { isUpdated } = useAppUpdate()
-  const { isLoading } = useAuthentication()
+  const [loaded] = useFonts(fontAssets);
+  const { isUpdated } = useAppUpdate();
+  const { isLoading } = useAuthentication();
 
   if (!loaded || !isUpdated || isLoading) {
-    return null
+    return null;
   }
 
   return (
@@ -72,7 +68,7 @@ const EveryoneWaiterApplication = () => {
       </Stack>
       <StatusBar hidden={true} />
     </>
-  )
-}
+  );
+};
 
-export default Sentry.wrap(RootLayout)
+export default Sentry.wrap(RootLayout);

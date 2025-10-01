@@ -1,4 +1,4 @@
-import Svg, { G, Path, SvgProps } from 'react-native-svg'
+import Svg, { G, Path, SvgProps } from "react-native-svg";
 
 export const AdultIcon = (props: SvgProps) => (
   <Svg width={48} height={48} fill="none" {...props}>
@@ -11,4 +11,4 @@ export const AdultIcon = (props: SvgProps) => (
       <Path d="M17.846 30.154h12.308a1.23 1.23 0 1 0 0-2.462H17.846a1.23 1.23 0 1 0 0 2.462ZM20.308 20.923a1.846 1.846 0 1 1-3.693 0 1.846 1.846 0 0 1 3.693 0ZM31.385 20.923a1.846 1.846 0 1 1-3.693 0 1.846 1.846 0 0 1 3.693 0Z" />
     </G>
   </Svg>
-)
+);

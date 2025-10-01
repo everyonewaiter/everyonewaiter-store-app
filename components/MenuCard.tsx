@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import {
   Pressable,
   PressableProps,
@@ -6,20 +6,20 @@ import {
   Text,
   useWindowDimensions,
   View,
-} from 'react-native'
+} from "react-native";
 
-import { ImageBackground, useImage } from 'expo-image'
+import { ImageBackground, useImage } from "expo-image";
 
-import Badge from '@/components/Badge'
-import SoldOut from '@/components/SoldOut'
-import { colors, fonts } from '@/constants'
-import { Menu } from '@/types'
+import Badge from "@/components/Badge";
+import SoldOut from "@/components/SoldOut";
+import { colors, fonts } from "@/constants";
+import { Menu } from "@/types";
 
 interface MenuCardProps extends PressableProps {
-  menu: Menu
-  rootNumColumns: number
-  rootGap: number
-  rootPaddingHorizontal: number
+  menu: Menu;
+  rootNumColumns: number;
+  rootGap: number;
+  rootPaddingHorizontal: number;
 }
 
 const MenuCard = ({
@@ -29,25 +29,21 @@ const MenuCard = ({
   rootPaddingHorizontal,
   ...props
 }: MenuCardProps) => {
-  const { width: screenWidth } = useWindowDimensions()
-  const [contentWidth, setContentWidth] = useState(0)
-  const image = useImage(process.env.EXPO_PUBLIC_CDN_URL + `/${menu.image}`)
+  const { width: screenWidth } = useWindowDimensions();
+  const [contentWidth, setContentWidth] = useState(0);
+  const image = useImage(process.env.EXPO_PUBLIC_CDN_URL + `/${menu.image}`);
 
   useEffect(() => {
-    const paddingHorizontalSpace = rootPaddingHorizontal * 2
-    const columnGapSpace = rootGap * (rootNumColumns - 1)
-    const availableSpace = screenWidth - paddingHorizontalSpace - columnGapSpace
-    setContentWidth(availableSpace / rootNumColumns)
-  }, [screenWidth, rootGap, rootNumColumns, rootPaddingHorizontal])
+    const paddingHorizontalSpace = rootPaddingHorizontal * 2;
+    const columnGapSpace = rootGap * (rootNumColumns - 1);
+    const availableSpace = screenWidth - paddingHorizontalSpace - columnGapSpace;
+    setContentWidth(availableSpace / rootNumColumns);
+  }, [screenWidth, rootGap, rootNumColumns, rootPaddingHorizontal]);
 
-  const isSoldOut = menu.state === 'SOLD_OUT'
+  const isSoldOut = menu.state === "SOLD_OUT";
 
   return (
-    <Pressable
-      style={[styles.container, { width: contentWidth }]}
-      disabled={isSoldOut}
-      {...props}
-    >
+    <Pressable style={[styles.container, { width: contentWidth }]} disabled={isSoldOut} {...props}>
       <View style={styles.imageContainer}>
         {image && (
           <ImageBackground
@@ -57,25 +53,21 @@ const MenuCard = ({
             alt={menu.name}
             contentFit="cover"
           >
-            {menu.label !== 'DEFAULT' && !isSoldOut && (
-              <Badge label={menu.label} />
-            )}
+            {menu.label !== "DEFAULT" && !isSoldOut && <Badge label={menu.label} />}
           </ImageBackground>
         )}
         {isSoldOut && <SoldOut />}
       </View>
       <View style={[styles.textContainer, isSoldOut && styles.soldOutText]}>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: "row" }}>
           <Text style={styles.menuName}>{menu.name}</Text>
-          {menu.spicy > 0 && (
-            <Text style={styles.menuSpicy}> {'🌶'.repeat(menu.spicy)}</Text>
-          )}
+          {menu.spicy > 0 && <Text style={styles.menuSpicy}> {"🌶".repeat(menu.spicy)}</Text>}
         </View>
         <Text style={styles.menuPrice}>{menu.price.toPrice()}원</Text>
       </View>
     </Pressable>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -92,13 +84,13 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     gap: 4,
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   imageBorder: {
     borderTopLeftRadius: 12,
@@ -115,7 +107,7 @@ const styles = StyleSheet.create({
   menuPrice: {
     fontFamily: fonts.PRETENDARD_MEDIUM,
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   soldOutImage: {
     backgroundColor: colors.BLACK,
@@ -129,6 +121,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
-})
+});
 
-export default MenuCard
+export default MenuCard;

@@ -1,13 +1,13 @@
-import { Redirect, Stack } from 'expo-router'
+import { Redirect, Stack } from "expo-router";
 
-import { useAuthentication } from '@/contexts/AuthenticationContext'
-import SseProvider from '@/contexts/SseContext'
+import { useAuthentication } from "@/contexts/AuthenticationContext";
+import SseProvider from "@/contexts/SseContext";
 
 const AuthenticationLayout = () => {
-  const { isAuthenticated } = useAuthentication()
+  const { isAuthenticated } = useAuthentication();
 
   if (!isAuthenticated) {
-    return <Redirect href="/device/registration-step1" />
+    return <Redirect href="/device/registration-step1" />;
   }
 
   return (
@@ -19,7 +19,7 @@ const AuthenticationLayout = () => {
         <Stack.Screen name="pos" options={{ headerShown: false }} />
       </Stack>
     </SseProvider>
-  )
-}
+  );
+};
 
-export default AuthenticationLayout
+export default AuthenticationLayout;
