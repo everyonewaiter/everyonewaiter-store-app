@@ -16,10 +16,10 @@ import PaymentTypeSelectBox from "@/components/PaymentTypeSelectBox";
 import { DevicePurpose, PaymentType } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
 import { queryKeys, storageKeys } from "@/constants/keys";
-import { useCreateDevice } from "@/hooks/useCreateDevice";
-import { Entries } from "@/types/common";
-import { parseErrorMessage } from "@/utils/common";
+import { useCreateDevice } from "@/hooks/useDeviceApi";
+import { Entries } from "@/types/utility";
 import { setItem } from "@/utils/storage";
+import { parseErrorMessage } from "@/utils/support";
 import { validateCreateDevice } from "@/utils/validation";
 
 type RegistrationPageParams = {

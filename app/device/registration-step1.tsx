@@ -19,12 +19,11 @@ import InputLabel from "@/components/InputLabel";
 import Picker from "@/components/Picker";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
-import { useGetProfile } from "@/hooks/useGetProfile";
-import { useGetStores } from "@/hooks/useGetStores";
-import { useSendAuthCode } from "@/hooks/useSendAuthCode";
-import { useVerifyAuthCode } from "@/hooks/useVerifyAuthCode";
-import { clearNullableInterval, parseErrorMessage } from "@/utils/common";
-import { formatTime } from "@/utils/time";
+import { useGetProfile } from "@/hooks/useAccountApi";
+import { useSendAuthCode, useVerifyAuthCode } from "@/hooks/useDeviceApi";
+import { useGetStores } from "@/hooks/useStoreApi";
+import { formatTime } from "@/utils/format";
+import { clearNullableInterval, parseErrorMessage } from "@/utils/support";
 import { validateAuthCode, validatePhoneNumber } from "@/utils/validation";
 
 interface RegistrationForm {

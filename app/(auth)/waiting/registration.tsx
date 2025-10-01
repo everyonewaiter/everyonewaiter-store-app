@@ -16,9 +16,9 @@ import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
 import { useModal } from "@/hooks/useModal";
-import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaiting";
-import { parseErrorMessage } from "@/utils/common";
+import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaitingApi";
 import { formatPhoneNumber } from "@/utils/format";
+import { parseErrorMessage } from "@/utils/support";
 
 const PHONE_NUMBER_PREFIX = "010";
 

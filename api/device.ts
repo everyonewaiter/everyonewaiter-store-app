@@ -6,7 +6,7 @@ import {
   Device,
   SendAuthenticationCode,
 } from "@/types/device";
-import { makeSignatureHeader } from "@/utils/common";
+import { makeSignatureHeader } from "@/utils/support";
 
 export const getDevice = async (): Promise<Device> => {
   const requestMethod = "GET";

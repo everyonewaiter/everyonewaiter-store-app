@@ -1,7 +1,7 @@
 import { Redirect } from "expo-router";
 
 import { useAuthentication } from "@/contexts/AuthenticationContext";
-import { getNavigatePath } from "@/utils/common";
+import { getNavigatePath } from "@/utils/support";
 
 const AuthenticationNavigator = () => {
   const { device } = useAuthentication();

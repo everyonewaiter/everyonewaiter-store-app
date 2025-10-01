@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 
 import * as Application from "expo-application";
 
-import { useGetApkVersion } from "@/hooks/useGetApkVersion";
+import { useGetApkVersion } from "@/hooks/useHealthApi";
 import { updateApp } from "@/utils/update";
 
 interface AuthenticationContextProps {

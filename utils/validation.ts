@@ -37,8 +37,8 @@ const validateDeviceName = (name: string) => {
   if (name.length === 0) {
     return "기기 이름을 입력해주세요.";
   }
-  if (name.length > 30) {
-    return "기기 이름은 30자 이하로 입력해주세요.";
+  if (name.length > 20) {
+    return "기기 이름은 20자 이하로 입력해주세요.";
   }
   return "";
 };
