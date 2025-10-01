@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Alert } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -15,12 +16,12 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/api";
 import { fontAssets } from "@/constants";
 import AppUpdateProvider, { useAppUpdate } from "@/contexts/AppUpdateContext";
-import AuthenticationProvider, { useAuthentication } from "@/contexts/AuthenticationContext";
+import AuthenticationProvider from "@/contexts/AuthenticationContext";
 import { useDeviceType, useStickyImmersive } from "@/hooks";
 import "@/sentry.config";
 
-void SplashScreen.preventAutoHideAsync();
-SplashScreen.setOptions({ duration: 500, fade: true });
+SplashScreen.setOptions({ duration: 1000, fade: true });
+SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
   useKeepAwake();
@@ -53,9 +54,14 @@ const RootLayout = () => {
 const EveryoneWaiterApplication = () => {
   const [loaded] = useFonts(fontAssets);
   const { isUpdated } = useAppUpdate();
-  const { isLoading } = useAuthentication();
 
-  if (!loaded || !isUpdated || isLoading) {
+  useEffect(() => {
+    if (loaded && isUpdated) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, isUpdated]);
+
+  if (!loaded || !isUpdated) {
     return null;
   }
 
