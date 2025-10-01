@@ -31,11 +31,11 @@ export const useGetDevice = () => {
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (data && isSuccess) {
       (async () => {
         await Promise.all([
-          setItem<string>(storageKeys.DEVICE_ID, data?.deviceId),
-          setItem<string>(storageKeys.STORE_ID, data?.storeId),
+          setItem<string>(storageKeys.DEVICE_ID, data.deviceId),
+          setItem<string>(storageKeys.STORE_ID, data.storeId),
         ]);
       })();
     }
