@@ -16,7 +16,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/api/queryClient";
 import { fontAssets } from "@/constants/fonts";
 import AppUpdateProvider, { useAppUpdate } from "@/contexts/AppUpdateContext";
-import AuthenticationProvider from "@/contexts/AuthenticationContext";
+import AuthenticationProvider, { useAuthentication } from "@/contexts/AuthenticationContext";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import { useStickyImmersive } from "@/hooks/useStickyImmersive";
 import "@/sentry.config";
@@ -55,14 +55,15 @@ const RootLayout = () => {
 const EveryoneWaiterApplication = () => {
   const [loaded] = useFonts(fontAssets);
   const { isUpdated } = useAppUpdate();
+  const { isLoading } = useAuthentication();
 
   useEffect(() => {
-    if (loaded && isUpdated) {
+    if (loaded && isUpdated && !isLoading) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, isUpdated]);
+  }, [loaded, isUpdated, isLoading]);
 
-  if (!loaded || !isUpdated) {
+  if (!loaded || !isUpdated || isLoading) {
     return null;
   }
 
