@@ -1,27 +1,25 @@
-import { Redirect, Stack } from 'expo-router'
+import { Redirect, Stack } from "expo-router";
 
-import { colors } from '@/constants'
-import { useAuthentication } from '@/contexts/AuthenticationContext'
-import { getNavigatePath } from '@/utils'
+import { colors } from "@/constants";
+import { useAuthentication } from "@/contexts/AuthenticationContext";
+import { getNavigatePath } from "@/utils";
 
 const PosLayout = () => {
-  const { device } = useAuthentication()
+  const { device } = useAuthentication();
 
   if (!device) {
-    return null
+    return null;
   }
 
-  if (device.purpose !== 'HALL') {
-    return <Redirect href={`${getNavigatePath(device.purpose)}`} />
+  if (device.purpose !== "HALL") {
+    return <Redirect href={`${getNavigatePath(device.purpose)}`} />;
   }
 
   return (
-    <Stack
-      screenOptions={{ contentStyle: { backgroundColor: colors.GRAY7_F1 } }}
-    >
+    <Stack screenOptions={{ contentStyle: { backgroundColor: colors.GRAY7_F1 } }}>
       <Stack.Screen name="management" options={{ headerShown: false }} />
     </Stack>
-  )
-}
+  );
+};
 
-export default PosLayout
+export default PosLayout;

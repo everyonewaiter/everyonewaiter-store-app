@@ -1,13 +1,13 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from "react-native";
 
-import { Modal } from '@/components/Modal'
-import { colors, fonts } from '@/constants'
-import { CountryOfOrigin } from '@/types'
+import { Modal } from "@/components/Modal";
+import { colors, fonts } from "@/constants";
+import { CountryOfOrigin } from "@/types";
 
 interface CountryOfOriginModalProps {
-  isVisible: boolean
-  countryOfOrigins: CountryOfOrigin[]
-  close: () => void
+  isVisible: boolean;
+  countryOfOrigins: CountryOfOrigin[];
+  close: () => void;
 }
 
 const CountryOfOriginModal = ({
@@ -33,18 +33,14 @@ const CountryOfOriginModal = ({
           <FlatList
             style={{ height: 300 }}
             data={countryOfOrigins}
-            keyExtractor={(item, index) =>
-              `${item.item}-${item.origin}-${index}`
-            }
-            renderItem={renderItem => (
+            keyExtractor={(item, index) => `${item.item}-${item.origin}-${index}`}
+            renderItem={(renderItem) => (
               <View style={styles.contentContainer}>
                 <View style={styles.center}>
                   <Text style={styles.contentText}>{renderItem.item.item}</Text>
                 </View>
                 <View style={styles.center}>
-                  <Text style={styles.contentText}>
-                    {renderItem.item.origin}
-                  </Text>
+                  <Text style={styles.contentText}>{renderItem.item.origin}</Text>
                 </View>
               </View>
             )}
@@ -55,21 +51,21 @@ const CountryOfOriginModal = ({
         </Modal.ButtonContainer>
       </Modal.Container>
     </Modal>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   subjectContainer: {
     height: 48,
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: colors.GRAY7_F1,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
   center: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   subjectText: {
     fontFamily: fonts.PRETENDARD_MEDIUM,
@@ -77,7 +73,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     height: 48,
-    flexDirection: 'row',
+    flexDirection: "row",
     borderBottomWidth: 1,
     borderColor: colors.GRAY5_E7,
   },
@@ -85,6 +81,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PRETENDARD_REGULAR,
     fontSize: 14,
   },
-})
+});
 
-export default CountryOfOriginModal
+export default CountryOfOriginModal;

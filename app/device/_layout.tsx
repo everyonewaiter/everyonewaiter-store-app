@@ -1,25 +1,25 @@
-import { useCallback } from 'react'
+import { useCallback } from "react";
 
-import { Redirect, Stack, useFocusEffect } from 'expo-router'
-import * as SplashScreen from 'expo-splash-screen'
+import { Redirect, Stack, useFocusEffect } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 
-import LogoHeaderTitle from '@/components/LogoHeaderTitle'
-import { colors } from '@/constants'
-import { useAuthentication } from '@/contexts/AuthenticationContext'
+import LogoHeaderTitle from "@/components/LogoHeaderTitle";
+import { colors } from "@/constants";
+import { useAuthentication } from "@/contexts/AuthenticationContext";
 
 const UnAuthenticationLayout = () => {
-  const { isAuthenticated } = useAuthentication()
+  const { isAuthenticated } = useAuthentication();
 
   useFocusEffect(
     useCallback(() => {
       if (!isAuthenticated) {
-        void SplashScreen.hideAsync()
+        void SplashScreen.hideAsync();
       }
-    }, [isAuthenticated]),
-  )
+    }, [isAuthenticated])
+  );
 
   if (isAuthenticated) {
-    return <Redirect href="/" />
+    return <Redirect href="/" />;
   }
 
   return (
@@ -32,19 +32,19 @@ const UnAuthenticationLayout = () => {
       <Stack.Screen
         name="registration-step1"
         options={{
-          title: '',
+          title: "",
           headerTitle: () => <LogoHeaderTitle paddingLeft={24} />,
         }}
       />
       <Stack.Screen
         name="registration-step2"
         options={{
-          title: '',
+          title: "",
           headerTitle: () => <LogoHeaderTitle paddingLeft={12} />,
         }}
       />
     </Stack>
-  )
-}
+  );
+};
 
-export default UnAuthenticationLayout
+export default UnAuthenticationLayout;

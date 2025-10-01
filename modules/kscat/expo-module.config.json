@@ -1,10 +1,6 @@
 {
-  "platforms": [
-    "android"
-  ],
+  "platforms": ["android"],
   "android": {
-    "modules": [
-      "expo.modules.kscat.KscatModule"
-    ]
+    "modules": ["expo.modules.kscat.KscatModule"]
   }
 }

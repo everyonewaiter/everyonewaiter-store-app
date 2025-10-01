@@ -1,7 +1,7 @@
 declare global {
   interface Number {
-    toPrice: () => string
+    toPrice: () => string;
   }
 }
 
-export {}
+export {};

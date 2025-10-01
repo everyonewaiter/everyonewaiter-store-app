@@ -1,4 +1,4 @@
-import Svg, { Path, SvgProps } from 'react-native-svg'
+import Svg, { Path, SvgProps } from "react-native-svg";
 
 export const ReceiptIcon = (props: SvgProps) => (
   <Svg width={24} height={24} fill="none" {...props}>
@@ -9,4 +9,4 @@ export const ReceiptIcon = (props: SvgProps) => (
       clipRule="evenodd"
     />
   </Svg>
-)
+);

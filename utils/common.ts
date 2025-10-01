@@ -1,90 +1,81 @@
-import { ForwardedRef } from 'react'
+import { ForwardedRef } from "react";
 
-import { isAxiosError } from 'axios'
-import CryptoJS from 'crypto-js'
+import { isAxiosError } from "axios";
+import CryptoJS from "crypto-js";
 
-import { DevicePurpose, storageKeys } from '@/constants'
-import { getItemOrElseThrow } from '@/utils/storage'
+import { DevicePurpose, storageKeys } from "@/constants";
+import { getItemOrElseThrow } from "@/utils/storage";
 
 export const parseErrorMessage = (error: Error) => {
   if (isAxiosError(error)) {
-    return error.response?.data.message ?? error.message
+    return error.response?.data.message ?? error.message;
   }
-  return error.message
-}
+  return error.message;
+};
 
 export const mergeRefs = <T>(...refs: ForwardedRef<T>[]) => {
   return (node: T) => {
-    refs.forEach(ref => {
-      if (typeof ref === 'function') {
-        ref(node)
+    refs.forEach((ref) => {
+      if (typeof ref === "function") {
+        ref(node);
       } else if (ref) {
-        ref.current = node
+        ref.current = node;
       }
-    })
-  }
-}
+    });
+  };
+};
 
 export const clearNullableInterval = (interval: number | null) => {
   if (interval) {
-    clearInterval(interval)
+    clearInterval(interval);
   }
-}
+};
 
 export const getNavigatePath = (purpose: keyof typeof DevicePurpose) => {
   switch (purpose) {
-    case 'WAITING':
-      return '/waiting/registration'
-    case 'TABLE':
-      return '/table/customer'
-    case 'HALL':
-      return '/hall/management'
-    case 'POS':
-      return '/pos/tables'
+    case "WAITING":
+      return "/waiting/registration";
+    case "TABLE":
+      return "/table/customer";
+    case "HALL":
+      return "/hall/management";
+    case "POS":
+      return "/pos/tables";
     default:
-      throw new Error('Unknown device purpose')
+      throw new Error("Unknown device purpose");
   }
-}
+};
 
-export const makeSignatureHeader = async (
-  requestMethod: string,
-  requestURI: string,
-) => {
+export const makeSignatureHeader = async (requestMethod: string, requestURI: string) => {
   const [deviceId, secretKey] = await Promise.all([
     getItemOrElseThrow<string>(storageKeys.DEVICE_ID),
     getItemOrElseThrow<string>(storageKeys.SECRET_KEY),
-  ])
+  ]);
 
-  const accessKey = deviceId
-  const timestamp = Date.now().toString()
-  const signature = makeSignature(
-    requestMethod,
-    requestURI,
-    deviceId,
-    secretKey,
-    timestamp,
-  )
+  const accessKey = deviceId;
+  const timestamp = Date.now().toString();
+  const signature = makeSignature(requestMethod, requestURI, deviceId, secretKey, timestamp);
 
   return {
-    'x-ew-access-key': accessKey,
-    'x-ew-signature': signature,
-    'x-ew-timestamp': timestamp,
-  }
-}
+    "x-ew-access-key": accessKey,
+    "x-ew-signature": signature,
+    "x-ew-timestamp": timestamp,
+  };
+};
 
 export const makeSignature = (
   requestMethod: string,
   requestURI: string,
   deviceId: string,
   secretKey: string,
-  timestamp: string,
+  timestamp: string
 ) => {
-  const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey)
-  hmac.update(`${requestMethod} ${requestURI}`)
-  hmac.update('\n')
-  hmac.update(`${deviceId}`)
-  hmac.update('\n')
-  hmac.update(timestamp)
-  const hash = hmac.finalize()
-  return hash.toString(CryptoJS.enc.Base64)
-}
+  const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey);
+  hmac.update(`${requestMethod} ${requestURI}`);
+  hmac.update("\n");
+  hmac.update(`${deviceId}`);
+  hmac.update("\n");
+  hmac.update(timestamp);
+  const hash = hmac.finalize();
+  return hash.toString(CryptoJS.enc.Base64);
+};

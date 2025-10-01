@@ -1,32 +1,25 @@
-import { ForwardedRef, forwardRef, useRef } from 'react'
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-} from 'react-native'
+import { ForwardedRef, forwardRef, useRef } from "react";
+import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-import InputLabel from '@/components/InputLabel'
-import { colors, fonts } from '@/constants'
-import { mergeRefs } from '@/utils'
+import InputLabel from "@/components/InputLabel";
+import { colors, fonts } from "@/constants";
+import { mergeRefs } from "@/utils";
 
 interface InputProps extends TextInputProps {
-  label?: string
-  right?: string
-  error?: string
-  disabled?: boolean
+  label?: string;
+  right?: string;
+  error?: string;
+  disabled?: boolean;
 }
 
 const Input = (
   { label, right, error, disabled = false, ...props }: InputProps,
-  ref?: ForwardedRef<TextInput>,
+  ref?: ForwardedRef<TextInput>
 ) => {
-  const innerRef = useRef<TextInput | null>(null)
-  const hasError = Boolean(error)
+  const innerRef = useRef<TextInput | null>(null);
+  const hasError = Boolean(error);
 
   return (
     <Pressable onPress={() => innerRef.current?.focus()}>
@@ -41,11 +34,7 @@ const Input = (
         >
           <TextInput
             ref={ref ? mergeRefs(innerRef, ref) : innerRef}
-            style={[
-              styles.input,
-              hasError && styles.inputError,
-              disabled && styles.inputDisabled,
-            ]}
+            style={[styles.input, hasError && styles.inputError, disabled && styles.inputDisabled]}
             placeholderTextColor={colors.GRAY3_99}
             editable={!disabled}
             autoCapitalize="none"
@@ -58,17 +47,13 @@ const Input = (
       </View>
       {hasError && (
         <View style={styles.errorTextContainer}>
-          <MaterialCommunityIcons
-            name="information-outline"
-            size={20}
-            color={colors.PRIMARY_RED}
-          />
+          <MaterialCommunityIcons name="information-outline" size={20} color={colors.PRIMARY_RED} />
           <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
     </Pressable>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   inputContainer: {
@@ -100,12 +85,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.PRETENDARD_REGULAR,
     fontSize: 14,
     color: colors.GRAY2_55,
-    position: 'absolute',
+    position: "absolute",
     right: 12,
-    top: '50%',
+    top: "50%",
   },
   errorTextContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 4,
   },
   errorText: {
@@ -114,6 +99,6 @@ const styles = StyleSheet.create({
     color: colors.STATUS_ERROR,
     marginLeft: 4,
   },
-})
+});
 
-export default forwardRef(Input)
+export default forwardRef(Input);

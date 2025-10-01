@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from "@tanstack/react-query";
 
-import { sendAuthenticationCode } from '@/api'
+import { sendAuthenticationCode } from "@/api";
 
 export const useSendAuthCode = () => {
-  return useMutation({ mutationFn: sendAuthenticationCode })
-}
+  return useMutation({ mutationFn: sendAuthenticationCode });
+};

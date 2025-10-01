@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from "@tanstack/react-query";
 
-import { createCardPayment } from '@/api'
+import { createCardPayment } from "@/api";
 
 export const useCreateCardPayment = () => {
-  return useMutation({ mutationFn: createCardPayment })
-}
+  return useMutation({ mutationFn: createCardPayment });
+};

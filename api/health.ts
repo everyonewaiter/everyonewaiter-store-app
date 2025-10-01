@@ -1,7 +1,7 @@
-import { axiosInstance } from '@/api/axios'
-import { ApkVersion } from '@/types'
+import { axiosInstance } from "@/api/axios";
+import { ApkVersion } from "@/types";
 
 export const getApkVersion = async (): Promise<ApkVersion> => {
-  const { data } = await axiosInstance.get(`/v1/health/apk-versions`)
-  return data
-}
+  const { data } = await axiosInstance.get(`/v1/health/apk-versions`);
+  return data;
+};

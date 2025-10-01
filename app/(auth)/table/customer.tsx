@@ -1,29 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { scheduleOnRN } from 'react-native-worklets'
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { scheduleOnRN } from "react-native-worklets";
 
-import { BellIcon } from '@/assets/icons/BellIcon'
-import { ReceiptIcon } from '@/assets/icons/ReceiptIcon'
-import CartModal from '@/components/CartModal'
-import CategoryButton from '@/components/CategoryButton'
-import CountryOfOriginModal from '@/components/CountryOfOriginModal'
-import ErrorModal from '@/components/ErrorModal'
-import MenuCard from '@/components/MenuCard'
-import MenuModal from '@/components/MenuModal'
-import OrderHistoryModal from '@/components/OrderHistoryModal'
-import StaffCallModal from '@/components/StaffCallModal'
-import SuccessModal from '@/components/SuccessModal'
-import { colors, defaultCategory, fonts, images, milliTimes } from '@/constants'
-import { useAuthentication } from '@/contexts/AuthenticationContext'
+import { BellIcon } from "@/assets/icons/BellIcon";
+import { ReceiptIcon } from "@/assets/icons/ReceiptIcon";
+import CartModal from "@/components/CartModal";
+import CategoryButton from "@/components/CategoryButton";
+import CountryOfOriginModal from "@/components/CountryOfOriginModal";
+import ErrorModal from "@/components/ErrorModal";
+import MenuCard from "@/components/MenuCard";
+import MenuModal from "@/components/MenuModal";
+import OrderHistoryModal from "@/components/OrderHistoryModal";
+import StaffCallModal from "@/components/StaffCallModal";
+import SuccessModal from "@/components/SuccessModal";
+import { colors, defaultCategory, fonts, images, milliTimes } from "@/constants";
+import { useAuthentication } from "@/contexts/AuthenticationContext";
 import {
   useCreateTableOrder,
   useGetMenus,
@@ -31,67 +24,65 @@ import {
   useGetTableOrderHistories,
   useModal,
   useStaffCall,
-} from '@/hooks'
-import { useCreateCardPayment } from '@/hooks/usePayment'
-import KscatModule, { KscatResponse } from '@/modules/kscat'
-import { Category, Menu, OrderCreate } from '@/types'
-import { calculateService, calculateVat, parseErrorMessage } from '@/utils'
+} from "@/hooks";
+import { useCreateCardPayment } from "@/hooks/usePayment";
+import KscatModule, { KscatResponse } from "@/modules/kscat";
+import { Category, Menu, OrderCreate } from "@/types";
+import { calculateService, calculateVat, parseErrorMessage } from "@/utils";
 
 const CustomerTableScreen = () => {
   // Common
-  const { width: screenWidth } = useWindowDimensions()
-  const { device } = useAuthentication()
-  const [idleTime, setIdleTime] = useState(milliTimes.FIVE_MINUTE)
-  const [error, setError] = useState({ title: '', message: '' })
+  const { width: screenWidth } = useWindowDimensions();
+  const { device } = useAuthentication();
+  const [idleTime, setIdleTime] = useState(milliTimes.FIVE_MINUTE);
+  const [error, setError] = useState({ title: "", message: "" });
 
   // Store
-  const { data: store } = useGetStore(device?.storeId)
+  const { data: store } = useGetStore(device?.storeId);
 
   // Menu
-  const { categories } = useGetMenus(device?.storeId)
-  const menusRef = useRef<FlatList | null>(null)
-  const categoriesRef = useRef<FlatList | null>(null)
-  const [categoryContentWidth, setCategoryContentWidth] = useState(0)
-  const [selectedCategory, setSelectedCategory] = useState(defaultCategory)
-  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null)
+  const { categories } = useGetMenus(device?.storeId);
+  const menusRef = useRef<FlatList | null>(null);
+  const categoriesRef = useRef<FlatList | null>(null);
+  const [categoryContentWidth, setCategoryContentWidth] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
+  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
 
   // Order
-  const { histories } = useGetTableOrderHistories(device?.tableNo)
-  const [cart, setCart] = useState<OrderCreate[]>([])
-  const [selectedStaffCallOption, setSelectedStaffCallOption] = useState('')
-  const staffCall = useStaffCall()
-  const createTableOrder = useCreateTableOrder()
-  const createCardPayment = useCreateCardPayment()
+  const { histories } = useGetTableOrderHistories(device?.tableNo);
+  const [cart, setCart] = useState<OrderCreate[]>([]);
+  const [selectedStaffCallOption, setSelectedStaffCallOption] = useState("");
+  const staffCall = useStaffCall();
+  const createTableOrder = useCreateTableOrder();
+  const createCardPayment = useCreateCardPayment();
 
   // Modal
-  const countryOfOriginModal = useModal()
-  const menuModal = useModal()
-  const staffCallModal = useModal()
-  const staffCallSuccessModal = useModal()
-  const cartModal = useModal()
-  const cartResetModal = useModal()
-  const orderHistoryModal = useModal()
-  const orderSuccessModal = useModal()
-  const errorModal = useModal()
+  const countryOfOriginModal = useModal();
+  const menuModal = useModal();
+  const staffCallModal = useModal();
+  const staffCallSuccessModal = useModal();
+  const cartModal = useModal();
+  const cartResetModal = useModal();
+  const orderHistoryModal = useModal();
+  const orderSuccessModal = useModal();
+  const errorModal = useModal();
 
   const resetAll = useCallback(() => {
-    setIdleTime(milliTimes.FIVE_MINUTE)
-    setError({ title: '', message: '' })
-    setSelectedCategory(
-      categories && categories.length > 0 ? categories[0] : defaultCategory,
-    )
-    setSelectedStaffCallOption('')
-    setCart([])
-    countryOfOriginModal.close()
-    menuModal.close()
-    staffCallModal.close()
-    staffCallSuccessModal.close()
-    cartModal.close()
-    orderHistoryModal.close()
-    orderSuccessModal.close()
-    errorModal.close()
-    categoriesRef.current?.scrollToIndex({ index: 0 })
-    menusRef.current?.scrollToIndex({ index: 0 })
+    setIdleTime(milliTimes.FIVE_MINUTE);
+    setError({ title: "", message: "" });
+    setSelectedCategory(categories && categories.length > 0 ? categories[0] : defaultCategory);
+    setSelectedStaffCallOption("");
+    setCart([]);
+    countryOfOriginModal.close();
+    menuModal.close();
+    staffCallModal.close();
+    staffCallSuccessModal.close();
+    cartModal.close();
+    orderHistoryModal.close();
+    orderSuccessModal.close();
+    errorModal.close();
+    categoriesRef.current?.scrollToIndex({ index: 0 });
+    menusRef.current?.scrollToIndex({ index: 0 });
   }, [
     categories,
     countryOfOriginModal,
@@ -102,164 +93,154 @@ const CustomerTableScreen = () => {
     orderHistoryModal,
     orderSuccessModal,
     errorModal,
-  ])
+  ]);
 
   useEffect(() => {
-    setCategoryContentWidth(screenWidth - 210)
-  }, [screenWidth])
+    setCategoryContentWidth(screenWidth - 210);
+  }, [screenWidth]);
 
   useEffect(() => {
     if (categories && categories.length > 0) {
-      setSelectedCategory(categories[0])
+      setSelectedCategory(categories[0]);
     }
-  }, [categories])
+  }, [categories]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIdleTime(prev => prev - milliTimes.ONE_SECOND)
-    }, milliTimes.ONE_SECOND)
-    return () => clearInterval(interval)
-  }, [])
+      setIdleTime((prev) => prev - milliTimes.ONE_SECOND);
+    }, milliTimes.ONE_SECOND);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (idleTime <= milliTimes.ZERO) {
-      resetAll()
+      resetAll();
     }
-  }, [idleTime, resetAll])
+  }, [idleTime, resetAll]);
 
   const resetIdleTime = Gesture.Tap().onStart(() => {
     if (idleTime < milliTimes.FIVE_MINUTE) {
-      scheduleOnRN(setIdleTime, milliTimes.FIVE_MINUTE)
+      scheduleOnRN(setIdleTime, milliTimes.FIVE_MINUTE);
     }
-  })
+  });
 
   const handleOpenMenuModalOrAddToCart = (menu: Menu) => {
     if (store?.setting.showMenuPopup || menu.menuOptionGroups.length > 0) {
-      setSelectedMenu(menu)
-      menuModal.open()
+      setSelectedMenu(menu);
+      menuModal.open();
     } else {
-      const copy = [...cart]
-      const index = copy.findIndex(item => item.menuId === menu.menuId)
+      const copy = [...cart];
+      const index = copy.findIndex((item) => item.menuId === menu.menuId);
       if (index === -1) {
-        copy.push({ menuId: menu.menuId, quantity: 1, menuOptionGroups: [] })
+        copy.push({ menuId: menu.menuId, quantity: 1, menuOptionGroups: [] });
       } else {
-        copy[index].quantity += 1
+        copy[index].quantity += 1;
       }
-      setCart(copy)
+      setCart(copy);
     }
-  }
+  };
 
   const calculateCartTotalPrice = () => {
-    let totalPrice = 0
+    let totalPrice = 0;
     for (const orderCreate of cart) {
-      const menu = categories?.[0].menus.find(
-        menu => menu.menuId === orderCreate.menuId,
-      )
+      const menu = categories?.[0].menus.find((menu) => menu.menuId === orderCreate.menuId);
       if (!menu) {
-        resetCart()
-        return
+        resetCart();
+        return;
       }
 
-      let optionPrice = 0
-      const menuOptions = menu.menuOptionGroups.flatMap(
-        group => group.menuOptions,
-      )
+      let optionPrice = 0;
+      const menuOptions = menu.menuOptionGroups.flatMap((group) => group.menuOptions);
       orderCreate.menuOptionGroups
-        .flatMap(group => group.orderOptions)
-        .forEach(option => {
+        .flatMap((group) => group.orderOptions)
+        .forEach((option) => {
           const menuOption = menuOptions.find(
-            menuOption =>
-              menuOption.name === option.name &&
-              menuOption.price === option.price,
-          )
+            (menuOption) => menuOption.name === option.name && menuOption.price === option.price
+          );
           if (!menuOption) {
-            resetCart()
-            return
+            resetCart();
+            return;
           }
-          optionPrice += menuOption.price
-        })
-      totalPrice += (menu.price + optionPrice) * orderCreate.quantity
+          optionPrice += menuOption.price;
+        });
+      totalPrice += (menu.price + optionPrice) * orderCreate.quantity;
     }
-    return totalPrice
-  }
+    return totalPrice;
+  };
 
   const resetCart = () => {
-    cartModal.close()
-    setCart([])
-    cartResetModal.open()
-  }
+    cartModal.close();
+    setCart([]);
+    cartResetModal.open();
+  };
 
   const callStaff = () => {
     if (selectedStaffCallOption) {
-      staffCallModal.close()
+      staffCallModal.close();
       staffCall.mutate(
         { optionName: selectedStaffCallOption },
         {
           onSuccess: () => {
-            staffCallSuccessModal.open()
+            staffCallSuccessModal.open();
           },
-          onError: error => {
+          onError: (error) => {
             setError({
-              title: '직원 호출 실패',
+              title: "직원 호출 실패",
               message: parseErrorMessage(error),
-            })
-            errorModal.open()
+            });
+            errorModal.open();
           },
-        },
-      )
+        }
+      );
     }
-  }
+  };
 
   const submitCreateOrder = async () => {
     if (cart.length <= 0) {
-      return
+      return;
     }
 
     if (!store?.setting || store.setting.ksnetDeviceNo.length < 8) {
       setError({
-        title: '단말기 번호가 등록되지 않았습니다.',
-        message: '설정 페이지에서 Ksnet 단말기 번호를 등록해주세요.',
-      })
-      errorModal.open()
-      return
+        title: "단말기 번호가 등록되지 않았습니다.",
+        message: "설정 페이지에서 Ksnet 단말기 번호를 등록해주세요.",
+      });
+      errorModal.open();
+      return;
     }
 
-    if (device?.paymentType === 'POSTPAID') {
-      createOrder()
-      return
+    if (device?.paymentType === "POSTPAID") {
+      createOrder();
+      return;
     }
 
-    const amount = calculateCartTotalPrice()
+    const amount = calculateCartTotalPrice();
     if (!amount) {
-      return
+      return;
     }
 
     try {
-      const installment = '00'
+      const installment = "00";
       const response = await KscatModule.approveIC(
         store.setting.ksnetDeviceNo,
         installment,
-        amount,
-      )
-      createPayment(amount, installment, response)
+        amount
+      );
+      createPayment(amount, installment, response);
     } catch (exception: any) {
-      if (exception.code === 'FAIL') {
-        setError({ title: '결제 실패', message: exception.message })
-        errorModal.open()
+      if (exception.code === "FAIL") {
+        setError({ title: "결제 실패", message: exception.message });
+        errorModal.open();
       } else {
-        setError({ title: '결제 오류', message: exception.message })
-        errorModal.open()
+        setError({ title: "결제 오류", message: exception.message });
+        errorModal.open();
       }
     }
-  }
+  };
 
-  const createPayment = (
-    amount: number,
-    installment: string,
-    response: KscatResponse,
-  ) => {
-    const service = calculateService(amount, 0)
-    const vat = calculateVat(amount, service, 10)
+  const createPayment = (amount: number, installment: string, response: KscatResponse) => {
+    const service = calculateService(amount, 0);
+    const vat = calculateVat(amount, service, 10);
     createCardPayment.mutate(
       {
         tableNo: device?.tableNo ?? 0,
@@ -277,51 +258,51 @@ const CustomerTableScreen = () => {
       },
       {
         onSuccess: () => {
-          createOrder()
+          createOrder();
         },
-        onError: error => {
+        onError: (error) => {
           setError({
-            title: '오류: 직원을 호출하여 결제를 취소하세요.',
+            title: "오류: 직원을 호출하여 결제를 취소하세요.",
             message: parseErrorMessage(error),
-          })
-          errorModal.open()
+          });
+          errorModal.open();
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
   const createOrder = () => {
     if (!device) {
-      return
+      return;
     }
 
     createTableOrder.mutate(
-      { tableNo: device.tableNo, memo: '', orderMenus: cart },
+      { tableNo: device.tableNo, memo: "", orderMenus: cart },
       {
         onSuccess: () => {
-          cartModal.close()
-          orderSuccessModal.open()
+          cartModal.close();
+          orderSuccessModal.open();
         },
-        onError: error => {
+        onError: (error) => {
           setError({
-            title: '주문 실패',
+            title: "주문 실패",
             message: parseErrorMessage(error),
-          })
-          errorModal.open()
+          });
+          errorModal.open();
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
   return (
     <GestureDetector gesture={resetIdleTime}>
       <SafeAreaView style={styles.container}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
-            <View style={[styles.header, styles['header-red']]}>
+            <View style={[styles.header, styles["header-red"]]}>
               <Text style={styles.headerText}>{store?.name}</Text>
             </View>
-            <View style={[styles.header, styles['header-black']]}>
+            <View style={[styles.header, styles["header-black"]]}>
               <Text style={styles.headerText}>{device?.tableNo}번 테이블</Text>
             </View>
           </View>
@@ -334,14 +315,14 @@ const CustomerTableScreen = () => {
                   horizontal={true}
                   keyExtractor={(item, index) => `${item.categoryId}-${index}`}
                   contentContainerStyle={{ gap: 8, paddingBottom: 8 }}
-                  renderItem={renderItem => (
+                  renderItem={(renderItem) => (
                     <CategoryButton
                       category={renderItem.item}
                       index={renderItem.index}
                       selectedCategory={selectedCategory}
                       handleSelectCategory={(category: Category, index) => {
-                        setSelectedCategory(category)
-                        categoriesRef.current?.scrollToIndex({ index })
+                        setSelectedCategory(category);
+                        categoriesRef.current?.scrollToIndex({ index });
                       }}
                     />
                   )}
@@ -349,10 +330,7 @@ const CustomerTableScreen = () => {
               )}
             </View>
             <View>
-              <Pressable
-                style={styles.countryOfOrigin}
-                onPress={countryOfOriginModal.open}
-              >
+              <Pressable style={styles.countryOfOrigin} onPress={countryOfOriginModal.open}>
                 <Text style={styles.countryOfOriginText}>원산지 정보</Text>
               </Pressable>
             </View>
@@ -370,15 +348,13 @@ const CustomerTableScreen = () => {
                   paddingHorizontal: 24,
                   paddingBottom: 130,
                 }}
-                renderItem={renderItem => (
+                renderItem={(renderItem) => (
                   <MenuCard
                     menu={renderItem.item}
                     rootNumColumns={4}
                     rootGap={16}
                     rootPaddingHorizontal={24}
-                    onPress={() =>
-                      handleOpenMenuModalOrAddToCart(renderItem.item)
-                    }
+                    onPress={() => handleOpenMenuModalOrAddToCart(renderItem.item)}
                   />
                 )}
               />
@@ -391,7 +367,7 @@ const CustomerTableScreen = () => {
               style={styles.receipt}
               onPress={() => {
                 if (histories.length > 0) {
-                  orderHistoryModal.open()
+                  orderHistoryModal.open();
                 }
               }}
             >
@@ -408,7 +384,7 @@ const CustomerTableScreen = () => {
               style={styles.cart}
               onPress={() => {
                 if (cart.length > 0) {
-                  cartModal.open()
+                  cartModal.open();
                 }
               }}
             >
@@ -428,8 +404,8 @@ const CustomerTableScreen = () => {
           cart={cart}
           setCart={setCart}
           close={() => {
-            setSelectedMenu(null)
-            menuModal.close()
+            setSelectedMenu(null);
+            menuModal.close();
           }}
         />
         <StaffCallModal
@@ -439,8 +415,8 @@ const CustomerTableScreen = () => {
           setSelectedOption={setSelectedStaffCallOption}
           submit={callStaff}
           close={() => {
-            setSelectedStaffCallOption('')
-            staffCallModal.close()
+            setSelectedStaffCallOption("");
+            staffCallModal.close();
           }}
         />
         <SuccessModal
@@ -449,8 +425,8 @@ const CustomerTableScreen = () => {
           image={images.BELL_ANIMATION}
           message="직원을 호출했습니다. 잠시만 기다려주세요!"
           close={() => {
-            setSelectedStaffCallOption('')
-            staffCallSuccessModal.close()
+            setSelectedStaffCallOption("");
+            staffCallSuccessModal.close();
           }}
         />
         <CartModal
@@ -459,16 +435,14 @@ const CustomerTableScreen = () => {
           cart={cart}
           setCart={setCart}
           resetCart={resetCart}
-          paymentType={device?.paymentType ?? 'POSTPAID'}
+          paymentType={device?.paymentType ?? "POSTPAID"}
           submit={submitCreateOrder}
           close={cartModal.close}
         />
         <ErrorModal
           isVisible={cartResetModal.isOpen}
-          title={'알림'}
-          message={
-            '변경된 메뉴 항목이 있습니다.\n장바구니에 메뉴를 다시 담아주세요.'
-          }
+          title={"알림"}
+          message={"변경된 메뉴 항목이 있습니다.\n장바구니에 메뉴를 다시 담아주세요."}
           close={cartResetModal.close}
         />
         <OrderHistoryModal
@@ -489,14 +463,14 @@ const CustomerTableScreen = () => {
           title={error.title}
           message={error.message}
           close={() => {
-            setError({ title: '', message: '' })
-            errorModal.close()
+            setError({ title: "", message: "" });
+            errorModal.close();
           }}
         />
       </SafeAreaView>
     </GestureDetector>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -504,7 +478,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     backgroundColor: colors.WHITE,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     paddingHorizontal: 24,
     paddingBottom: 12,
@@ -516,10 +490,10 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingHorizontal: 16,
   },
-  'header-red': {
+  "header-red": {
     backgroundColor: colors.PRIMARY_RED,
   },
-  'header-black': {
+  "header-black": {
     backgroundColor: colors.BLACK,
   },
   headerText: {
@@ -529,10 +503,10 @@ const styles = StyleSheet.create({
   },
   categoryContainer: {
     backgroundColor: colors.WHITE,
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingTop: 16,
     paddingHorizontal: 24,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   countryOfOrigin: {
     width: 100,
@@ -541,8 +515,8 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     borderColor: colors.PRIMARY_RED,
     paddingHorizontal: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   countryOfOriginText: {
     fontFamily: fonts.PRETENDARD_REGULAR,
@@ -555,24 +529,24 @@ const styles = StyleSheet.create({
   footerContainer: {
     height: 72,
     backgroundColor: colors.WHITE,
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    boxShadow: '0 -1 12 0 rgba(0, 0, 0, 0.12)',
+    boxShadow: "0 -1 12 0 rgba(0, 0, 0, 0.12)",
   },
   footerLeft: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   footerRight: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   receipt: {
     height: 48,
-    flexDirection: 'row',
+    flexDirection: "row",
     borderWidth: 1,
     borderRadius: 12,
     borderColor: colors.GRAY5_E7,
@@ -587,7 +561,7 @@ const styles = StyleSheet.create({
   },
   staffCall: {
     height: 48,
-    flexDirection: 'row',
+    flexDirection: "row",
     borderWidth: 1,
     borderRadius: 12,
     borderColor: colors.PRIMARY_RED,
@@ -602,7 +576,7 @@ const styles = StyleSheet.create({
   },
   cart: {
     height: 48,
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: colors.PRIMARY_RED,
     borderRadius: 12,
     paddingVertical: 12,
@@ -622,6 +596,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 8,
   },
-})
+});
 
-export default CustomerTableScreen
+export default CustomerTableScreen;

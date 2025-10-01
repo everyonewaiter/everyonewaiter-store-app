@@ -1,20 +1,14 @@
-import { Modal } from '@/components/Modal'
+import { Modal } from "@/components/Modal";
 
 interface SuccessModalProps {
-  isVisible: boolean
-  title: string
-  image?: string
-  message: string
-  close: () => void
+  isVisible: boolean;
+  title: string;
+  image?: string;
+  message: string;
+  close: () => void;
 }
 
-const SuccessModal = ({
-  isVisible,
-  title,
-  image,
-  message,
-  close,
-}: SuccessModalProps) => {
+const SuccessModal = ({ isVisible, title, image, message, close }: SuccessModalProps) => {
   return (
     <Modal visible={isVisible}>
       <Modal.Container>
@@ -25,7 +19,7 @@ const SuccessModal = ({
         </Modal.ButtonContainer>
       </Modal.Container>
     </Modal>
-  )
-}
+  );
+};
 
-export default SuccessModal
+export default SuccessModal;

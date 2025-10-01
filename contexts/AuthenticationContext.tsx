@@ -1,34 +1,32 @@
-import { createContext, PropsWithChildren, useContext } from 'react'
+import { createContext, PropsWithChildren, useContext } from "react";
 
-import { useGetDevice } from '@/hooks'
-import { Device } from '@/types'
+import { useGetDevice } from "@/hooks";
+import { Device } from "@/types";
 
 interface AuthenticationContextProps {
-  device: Device | null
-  isAuthenticated: boolean
-  isLoading: boolean
+  device: Device | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AuthenticationContext = createContext<AuthenticationContextProps>({
   device: null,
   isAuthenticated: false,
   isLoading: false,
-})
+});
 
 export const useAuthentication = () => {
-  const context = useContext(AuthenticationContext)
+  const context = useContext(AuthenticationContext);
 
   if (!context) {
-    throw new Error(
-      'useAuthentication must be used within an AuthenticationProvider',
-    )
+    throw new Error("useAuthentication must be used within an AuthenticationProvider");
   }
 
-  return context
-}
+  return context;
+};
 
 const AuthenticationProvider = ({ children }: PropsWithChildren) => {
-  const { device, isSuccess, isPending } = useGetDevice()
+  const { device, isSuccess, isPending } = useGetDevice();
 
   return (
     <AuthenticationContext.Provider
@@ -40,7 +38,7 @@ const AuthenticationProvider = ({ children }: PropsWithChildren) => {
     >
       {children}
     </AuthenticationContext.Provider>
-  )
-}
+  );
+};
 
-export default AuthenticationProvider
+export default AuthenticationProvider;

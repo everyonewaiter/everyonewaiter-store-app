@@ -1,4 +1,4 @@
-import Svg, { G, Path, SvgProps } from 'react-native-svg'
+import Svg, { G, Path, SvgProps } from "react-native-svg";
 
 export const BellIcon = (props: SvgProps) => (
   <Svg width={24} height={24} fill="none" {...props}>
@@ -7,4 +7,4 @@ export const BellIcon = (props: SvgProps) => (
       <Path d="M12.004 3.1c-.713 0-1.279.569-1.279 1.255 0 .686.566 1.254 1.279 1.254s1.278-.568 1.278-1.254S12.717 3.1 12.004 3.1ZM9.625 4.355C9.625 3.047 10.697 2 12.004 2c1.306 0 2.378 1.047 2.378 2.355 0 1.307-1.072 2.354-2.378 2.354-1.307 0-2.379-1.047-2.379-2.354Z" />
     </G>
   </Svg>
-)
+);
