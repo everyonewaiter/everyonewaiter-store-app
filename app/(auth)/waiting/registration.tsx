@@ -17,7 +17,7 @@ import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
 import { useModal } from "@/hooks/useModal";
 import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaitingApi";
-import { formatPhoneNumber } from "@/utils/format";
+import { formatPhoneNumberWithoutPrefix } from "@/utils/format";
 import { parseErrorMessage } from "@/utils/support";
 
 const PHONE_NUMBER_PREFIX = "010";
@@ -173,7 +173,7 @@ const WaitingRegistrationScreen = () => {
           <View style={styles.numPadContent}>
             <View style={styles.phoneNumberContainer}>
               <Text style={styles.phoneNumberText}>
-                {`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumber(phoneNumber)}`}
+                {`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumberWithoutPrefix(phoneNumber)}`}
               </Text>
               <Text style={styles.phoneNumberSubText}>
                 실시간 웨이팅 안내를 받을 수 있는 번호를 입력해 주세요.
@@ -268,7 +268,7 @@ const WaitingRegistrationScreen = () => {
         </View>
         <Modal visible={submitModal.isOpen}>
           <Modal.Container>
-            <Modal.Title color="red">{`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumber(phoneNumber)}`}</Modal.Title>
+            <Modal.Title color="red">{`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumberWithoutPrefix(phoneNumber)}`}</Modal.Title>
             <Modal.Content>위 번호로 웨이팅 등록을 하시겠습니까?</Modal.Content>
             <Modal.ButtonContainer>
               <Modal.Button label="닫기" color="gray" onPress={resetAll} />
