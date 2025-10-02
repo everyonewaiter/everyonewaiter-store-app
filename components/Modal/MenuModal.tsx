@@ -7,6 +7,7 @@ import { AntDesign } from "@expo/vector-icons";
 
 import Button from "@/components/Button";
 import MenuOptionSelectBox from "@/components/MenuOptionSelectBox";
+import Modal from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { MenuLabel } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
@@ -150,125 +151,94 @@ const MenuModal = ({ visible, selectedMenu, cart, setCart, close }: MenuModalPro
   };
 
   return (
-    <>
-      {visible && (
-        <View style={styles.container}>
-          <View style={[styles.container, styles.overlay]}></View>
-          <View style={styles.modalContainer}>
-            <View style={styles.imageContainer}>
-              {image && (
-                <ImageBackground
-                  style={styles.image}
-                  imageStyle={styles.imageBorder}
-                  source={image}
-                  alt={selectedMenu.name}
-                  contentFit="cover"
-                />
+    <Modal visible={visible} size="large">
+      <View style={styles.imageContainer}>
+        {image && (
+          <ImageBackground
+            style={styles.image}
+            imageStyle={styles.imageBorder}
+            source={image}
+            alt={selectedMenu.name}
+            contentFit="cover"
+          />
+        )}
+      </View>
+      <View style={styles.contentContainer}>
+        <View style={{ flex: 1 }}>
+          <View style={styles.info}>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.infoLabel}>{MenuLabel[selectedMenu.label]}</Text>
+              <Pressable style={styles.closeButton} onPress={handleClose}>
+                <AntDesign name="close" size={28} color="black" />
+              </Pressable>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={styles.infoTitleText}>{selectedMenu.name}</Text>
+              {selectedMenu.spicy > 0 && (
+                <Text style={styles.infoDescriptionText}> {"🌶".repeat(selectedMenu.spicy)}</Text>
               )}
             </View>
-            <View style={styles.contentContainer}>
-              <View style={{ flex: 1 }}>
-                <View style={styles.info}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text style={styles.infoLabel}>{MenuLabel[selectedMenu.label]}</Text>
-                    <Pressable style={styles.closeButton} onPress={handleClose}>
-                      <AntDesign name="close" size={28} color="black" />
-                    </Pressable>
-                  </View>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={styles.infoTitleText}>{selectedMenu.name}</Text>
-                    {selectedMenu.spicy > 0 && (
-                      <Text style={styles.infoDescriptionText}>
-                        {" "}
-                        {"🌶".repeat(selectedMenu.spicy)}
-                      </Text>
-                    )}
-                  </View>
-                  {selectedMenu.description && (
-                    <Text style={styles.infoDescriptionText}>{selectedMenu.description}</Text>
-                  )}
-                  <View style={{ flexDirection: "row", marginTop: 8 }}>
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <Pressable style={styles.quantityButton} onPress={minusQuantity}>
-                        <AntDesign name="minus" size={32} color="black" />
-                      </Pressable>
-                      <Text style={styles.quantityText}>{quantity}</Text>
-                      <Pressable style={styles.quantityButton} onPress={addQuantity}>
-                        <AntDesign name="plus" size={32} color="black" />
-                      </Pressable>
-                    </View>
-                    <View style={styles.menuPrice}>
-                      <Text style={styles.menuPriceText}>{selectedMenu.price.toPrice()}원</Text>
-                    </View>
-                  </View>
-                  <View style={styles.divider} />
-                  <SectionList
-                    style={{ height: selectedMenu.description ? 320 : 360 }}
-                    sections={optionGroups}
-                    keyExtractor={(item) => item.menuOptionGroupId}
-                    renderItem={({ item }) => (
-                      <View style={styles.optionGroupContainer}>
-                        <View style={styles.optionGroup}>
-                          <Text style={styles.optionGroupTitle}>{item.name}</Text>
-                          <MenuOptionSelectBox
-                            groupId={item.menuOptionGroupId}
-                            type={item.type}
-                            options={item.menuOptions}
-                            selectedOptions={selectedOptions}
-                            setSelectedOptions={setSelectedOptions}
-                          />
-                        </View>
-                      </View>
-                    )}
-                    renderSectionHeader={({ section: { title, data } }) =>
-                      data.length > 0 ? (
-                        title === "필수 옵션" ? (
-                          <View style={styles.rowCenter}>
-                            <Text style={styles.optionTypeText}>필수 옵션</Text>
-                            <Text style={[styles.optionTypeText, styles.redText]}> *</Text>
-                          </View>
-                        ) : (
-                          <Text style={styles.optionTypeText}>선택 옵션</Text>
-                        )
-                      ) : null
-                    }
-                    renderSectionFooter={({ section: { data } }) =>
-                      data.length > 0 ? <View style={styles.thinDivider} /> : null
-                    }
-                  />
-                </View>
+            {selectedMenu.description && (
+              <Text style={styles.infoDescriptionText}>{selectedMenu.description}</Text>
+            )}
+            <View style={{ flexDirection: "row", marginTop: 8 }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Pressable style={styles.quantityButton} onPress={minusQuantity}>
+                  <AntDesign name="minus" size={32} color="black" />
+                </Pressable>
+                <Text style={styles.quantityText}>{quantity}</Text>
+                <Pressable style={styles.quantityButton} onPress={addQuantity}>
+                  <AntDesign name="plus" size={32} color="black" />
+                </Pressable>
               </View>
-              <Button label={`총 ${calculateTotalPrice()}원 | 메뉴 담기`} onPress={addCart} />
+              <View style={styles.menuPrice}>
+                <Text style={styles.menuPriceText}>{selectedMenu.price.toPrice()}원</Text>
+              </View>
             </View>
+            <View style={styles.divider} />
+            <SectionList
+              style={{ height: selectedMenu.description ? 320 : 360 }}
+              sections={optionGroups}
+              keyExtractor={(item) => item.menuOptionGroupId}
+              renderItem={({ item }) => (
+                <View style={styles.optionGroupContainer}>
+                  <View style={styles.optionGroup}>
+                    <Text style={styles.optionGroupTitle}>{item.name}</Text>
+                    <MenuOptionSelectBox
+                      groupId={item.menuOptionGroupId}
+                      type={item.type}
+                      options={item.menuOptions}
+                      selectedOptions={selectedOptions}
+                      setSelectedOptions={setSelectedOptions}
+                    />
+                  </View>
+                </View>
+              )}
+              renderSectionHeader={({ section: { title, data } }) =>
+                data.length > 0 ? (
+                  title === "필수 옵션" ? (
+                    <View style={styles.rowCenter}>
+                      <Text style={styles.optionTypeText}>필수 옵션</Text>
+                      <Text style={[styles.optionTypeText, styles.redText]}> *</Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.optionTypeText}>선택 옵션</Text>
+                  )
+                ) : null
+              }
+              renderSectionFooter={({ section: { data } }) =>
+                data.length > 0 ? <View style={styles.thinDivider} /> : null
+              }
+            />
           </View>
         </View>
-      )}
-    </>
+        <Button label={`총 ${calculateTotalPrice()}원 | 메뉴 담기`} onPress={addCart} />
+      </View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContainer: {
-    backgroundColor: colors.WHITE,
-    borderRadius: 20,
-    flexDirection: "row",
-    padding: 16,
-    width: "80%",
-    height: "80%",
-    gap: 24,
-  },
   imageContainer: {
     flex: 1,
   },

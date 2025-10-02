@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
-import { Modal } from "@/components/Modal";
+import Modal from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 
@@ -38,41 +38,34 @@ const StaffCallModal = ({
 
   return (
     <Modal visible={isVisible}>
-      <Modal.Container>
-        <Modal.Title color="black" size="medium" position="left">
-          직원 호출
-        </Modal.Title>
-        <FlatList
-          data={options}
-          numColumns={numColumns}
-          keyExtractor={(item, index) => `${item}-${index}`}
-          columnWrapperStyle={{ gap }}
-          contentContainerStyle={{ gap }}
-          renderItem={(renderItem) => (
-            <Pressable
-              style={[
-                styles.staffCallOption,
-                { width: contentWidth },
-                selectedOption === renderItem.item && styles.selectedOption,
-              ]}
-              onPress={() => setSelectedOption(renderItem.item)}
-            >
-              <View style={styles.center}>
-                <Text style={styles.staffCallOptionText}>{renderItem.item}</Text>
-              </View>
-            </Pressable>
-          )}
-        />
-        <Modal.ButtonContainer>
-          <Modal.Button label="닫기" color="gray" onPress={close} />
-          <Modal.Button
-            label="호출하기"
-            color="black"
-            disabled={!selectedOption}
-            onPress={submit}
-          />
-        </Modal.ButtonContainer>
-      </Modal.Container>
+      <Modal.Title color="black" size="medium" position="left">
+        직원 호출
+      </Modal.Title>
+      <FlatList
+        data={options}
+        numColumns={numColumns}
+        keyExtractor={(item, index) => `${item}-${index}`}
+        columnWrapperStyle={{ gap }}
+        contentContainerStyle={{ gap }}
+        renderItem={(renderItem) => (
+          <Pressable
+            style={[
+              styles.staffCallOption,
+              { width: contentWidth },
+              selectedOption === renderItem.item && styles.selectedOption,
+            ]}
+            onPress={() => setSelectedOption(renderItem.item)}
+          >
+            <View style={styles.center}>
+              <Text style={styles.staffCallOptionText}>{renderItem.item}</Text>
+            </View>
+          </Pressable>
+        )}
+      />
+      <Modal.ButtonContainer>
+        <Modal.Button label="닫기" color="gray" onPress={close} />
+        <Modal.Button label="호출하기" color="black" disabled={!selectedOption} onPress={submit} />
+      </Modal.ButtonContainer>
     </Modal>
   );
 };

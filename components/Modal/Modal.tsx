@@ -6,70 +6,82 @@ import { Image } from "expo-image";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 
-interface MainModalProps {
+interface ModalContainerProps {
   visible: boolean;
+  size?: "default" | "large";
+  position?: "center" | "right";
 }
 
-const MainModal = ({ visible, children }: PropsWithChildren<MainModalProps>) => {
+function ModalContainer({
+  visible,
+  size = "default",
+  position = "center",
+  children,
+}: PropsWithChildren<ModalContainerProps>) {
+  const isRightPosition = position === "right";
+
+  const alignItems = isRightPosition ? "flex-end" : "center";
+  const containerStyle = isRightPosition
+    ? styles.rightModalContainer
+    : size === "large"
+      ? styles.largeModalContainer
+      : styles.defaultModalContainer;
+
   return (
     <>
       {visible && (
-        <View style={styles.container}>
-          <View style={[styles.container, styles.overlay]}></View>
-          {children}
+        <View style={[styles.container, { alignItems }]}>
+          <View style={[styles.container, { alignItems }, styles.overlay]}></View>
+          <View style={containerStyle}>{children}</View>
         </View>
       )}
     </>
   );
-};
+}
 
-const Container = ({ children }: PropsWithChildren) => {
-  return <View style={styles.modalContainer}>{children}</View>;
-};
-
-interface TitleProps {
+interface ModalTitleProps {
   color?: "black" | "red";
   position?: "left" | "center";
   size?: "medium" | "large";
 }
 
-const Title = ({
+function ModalTitle({
   color = "black",
   position = "center",
   size = "large",
   children,
-}: PropsWithChildren<TitleProps>) => {
+}: PropsWithChildren<ModalTitleProps>) {
   return (
     <View style={position === "center" && styles.titleCenter}>
       <Text style={[styles[`titleText-${size}`], styles[`title-${color}`]]}>{children}</Text>
     </View>
   );
-};
+}
 
-interface ContentProps {
+interface ModalContentProps {
   image?: string;
 }
 
-const Content = ({ image, children }: PropsWithChildren<ContentProps>) => {
+function ModalContent({ image, children }: PropsWithChildren<ModalContentProps>) {
   return (
     <View style={styles.contentCenter}>
       {image && <Image source={image} style={styles.image} />}
       <Text style={styles.contentText}>{children}</Text>
     </View>
   );
-};
+}
 
-const ButtonContainer = ({ children }: PropsWithChildren) => {
+function ButtonContainer({ children }: PropsWithChildren) {
   return <View style={styles.buttonContainer}>{children}</View>;
-};
+}
 
-interface ButtonProps extends PressableProps {
+interface ModalButtonProps extends PressableProps {
   label: string;
   color?: "red" | "gray" | "black";
   disabled?: boolean;
 }
 
-const Button = ({ label, color = "red", disabled = false, ...props }: ButtonProps) => {
+function ModalButton({ label, color = "red", disabled = false, ...props }: ModalButtonProps) {
   return (
     <Pressable
       disabled={disabled}
@@ -86,7 +98,14 @@ const Button = ({ label, color = "red", disabled = false, ...props }: ButtonProp
       </View>
     </Pressable>
   );
-};
+}
+
+const Modal = Object.assign(ModalContainer, {
+  Title: ModalTitle,
+  Content: ModalContent,
+  ButtonContainer,
+  Button: ModalButton,
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -96,17 +115,34 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     justifyContent: "center",
-    alignItems: "center",
   },
   overlay: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  modalContainer: {
+  defaultModalContainer: {
     backgroundColor: colors.WHITE,
     borderRadius: 30,
     padding: 32,
     width: "50%",
     gap: 24,
+  },
+  largeModalContainer: {
+    backgroundColor: colors.WHITE,
+    borderRadius: 20,
+    flexDirection: "row",
+    padding: 16,
+    width: "80%",
+    height: "80%",
+    gap: 24,
+  },
+  rightModalContainer: {
+    backgroundColor: colors.WHITE,
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+    padding: 24,
+    width: "40%",
+    height: "100%",
+    gap: 12,
   },
   titleCenter: {
     alignItems: "center",
@@ -180,10 +216,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export const Modal = Object.assign(MainModal, {
-  Container,
-  Title,
-  Content,
-  ButtonContainer,
-  Button,
-});
+export default Modal;
