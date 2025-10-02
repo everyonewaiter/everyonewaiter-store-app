@@ -59,6 +59,11 @@ const useDeviceStep1Form = () => {
     updateErrorMessage(DeviceStep1FormName.AUTH_CODE, message);
   };
 
+  const isValid = {
+    [DeviceStep1FormName.PHONE_NUMBER]: isValidForm(DeviceStep1FormName.PHONE_NUMBER),
+    [DeviceStep1FormName.AUTH_CODE]: isValidForm(DeviceStep1FormName.AUTH_CODE),
+  };
+
   return {
     form,
     errorMessage,
@@ -70,10 +75,8 @@ const useDeviceStep1Form = () => {
       [DeviceStep1FormName.PHONE_NUMBER]: handleOnErrorPhone,
       [DeviceStep1FormName.AUTH_CODE]: handleOnErrorAuthCode,
     },
-    isValid: {
-      [DeviceStep1FormName.PHONE_NUMBER]: isValidForm(DeviceStep1FormName.PHONE_NUMBER),
-      [DeviceStep1FormName.AUTH_CODE]: isValidForm(DeviceStep1FormName.AUTH_CODE),
-    },
+    isValid,
+    isValidForm: Object.values(isValid).every(Boolean),
   };
 };
 

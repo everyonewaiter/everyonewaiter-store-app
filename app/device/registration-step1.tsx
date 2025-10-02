@@ -20,43 +20,34 @@ import Picker from "@/components/Picker";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
 import { useGetProfile } from "@/hooks/useAccountApi";
-import { useSendAuthCode, useVerifyAuthCode } from "@/hooks/useDeviceApi";
+import useAuthCode from "@/hooks/useAuthCode";
 import useDeviceStep1Form, { DeviceStep1FormName } from "@/hooks/useDeviceStep1Form";
 import { useGetStores } from "@/hooks/useStoreApi";
 import { formatPhoneNumberOnlyNumber, formatTime } from "@/utils/format";
-import { clearNullableInterval, parseErrorMessage } from "@/utils/support";
+import { parseErrorMessage } from "@/utils/support";
 
 const RegistrationStep1Screen = () => {
   const phoneNumberRef = useRef<TextInput | null>(null);
   const authenticationCodeRef = useRef<TextInput | null>(null);
 
-  const { form, errorMessage, handleOnChange, handleOnError, isValid } = useDeviceStep1Form();
+  const { form, errorMessage, handleOnChange, handleOnError, isValid, isValidForm } =
+    useDeviceStep1Form();
   const unformattedPhone = formatPhoneNumberOnlyNumber(form[DeviceStep1FormName.PHONE_NUMBER]);
 
-  const [isAuthenticate, setIsAuthenticate] = useState(false);
-  const [isSendAuthCode, setIsSendAuthCode] = useState(false);
-  const [authTime, setAuthTime] = useState(milliTimes.FIVE_MINUTE);
+  const {
+    authTime,
+    isSendAuthCode,
+    isVerifyAuthCode,
+    sendAuthenticationCode,
+    verifyAuthenticationCode,
+  } = useAuthCode();
+  const minimumIdleTime = milliTimes.FIVE_MINUTE - milliTimes.THIRTY_SECONDS;
+
   const [selectedStoreId, setSelectedStoreId] = useState<string>("");
 
-  const sendAuthCode = useSendAuthCode();
-  const verifyAuthCode = useVerifyAuthCode();
-  const { data: profile } = useGetProfile(unformattedPhone, isAuthenticate);
+  const { data: profile } = useGetProfile(unformattedPhone, isVerifyAuthCode);
   const { accountId } = profile || {};
-  const { data: stores } = useGetStores(accountId, isAuthenticate);
-
-  useEffect(() => {
-    let interval: number | null = null;
-
-    if (isSendAuthCode && authTime > 0) {
-      interval = setInterval(() => {
-        setAuthTime((prev) => prev - milliTimes.ONE_SECOND);
-      }, milliTimes.ONE_SECOND);
-    } else if (authTime <= 0) {
-      clearNullableInterval(interval);
-    }
-
-    return () => clearNullableInterval(interval);
-  }, [isSendAuthCode, authTime]);
+  const { data: stores } = useGetStores(accountId, isVerifyAuthCode);
 
   useEffect(() => {
     if (!stores) return;
@@ -73,42 +64,29 @@ const RegistrationStep1Screen = () => {
     }
   }, [stores]);
 
-  const sendAuthenticationCode = () => {
-    sendAuthCode.mutate(
-      {
-        phoneNumber: unformattedPhone,
+  const handleOnSubmitSendAuthCode = () => {
+    sendAuthenticationCode({
+      phoneNumber: unformattedPhone,
+      successCallback: () => {
+        handleOnChange[DeviceStep1FormName.AUTH_CODE]("");
+        authenticationCodeRef.current?.focus();
       },
-      {
-        onSuccess: () => {
-          setAuthTime(milliTimes.FIVE_MINUTE);
-          setIsSendAuthCode(true);
-          authenticationCodeRef.current?.focus();
-        },
-        onError: (error) => {
-          handleOnError[DeviceStep1FormName.PHONE_NUMBER](parseErrorMessage(error));
-          phoneNumberRef.current?.focus();
-        },
-      }
-    );
+      errorCallback: (error) => {
+        handleOnError[DeviceStep1FormName.PHONE_NUMBER](parseErrorMessage(error));
+        phoneNumberRef.current?.focus();
+      },
+    });
   };
 
-  const verifyAuthenticationCode = () => {
-    verifyAuthCode.mutate(
-      {
-        code: form[DeviceStep1FormName.AUTH_CODE],
-        phoneNumber: unformattedPhone,
+  const handleOnSubmitVerifyAuthCode = () => {
+    verifyAuthenticationCode({
+      code: form[DeviceStep1FormName.AUTH_CODE],
+      phoneNumber: unformattedPhone,
+      errorCallback: (error) => {
+        handleOnError[DeviceStep1FormName.AUTH_CODE](parseErrorMessage(error));
+        authenticationCodeRef.current?.focus();
       },
-      {
-        onSuccess: () => {
-          setAuthTime(milliTimes.ZERO);
-          setIsAuthenticate(true);
-        },
-        onError: (error) => {
-          handleOnError[DeviceStep1FormName.AUTH_CODE](parseErrorMessage(error));
-          authenticationCodeRef.current?.focus();
-        },
-      }
-    );
+    });
   };
 
   return (
@@ -132,15 +110,19 @@ const RegistrationStep1Screen = () => {
                       error={errorMessage[DeviceStep1FormName.PHONE_NUMBER]}
                       onChangeText={handleOnChange[DeviceStep1FormName.PHONE_NUMBER]}
                       returnKeyType="done"
-                      disabled={isAuthenticate}
+                      disabled={isVerifyAuthCode}
                     />
                   </View>
                   <View style={styles.buttonContainer}>
                     <Button
                       label={isSendAuthCode ? "재요청" : "인증요청"}
                       size="medium"
-                      onPress={sendAuthenticationCode}
-                      disabled={!isValid[DeviceStep1FormName.PHONE_NUMBER] || isAuthenticate}
+                      onPress={handleOnSubmitSendAuthCode}
+                      disabled={
+                        !isValid[DeviceStep1FormName.PHONE_NUMBER] ||
+                        (isSendAuthCode && authTime >= minimumIdleTime) ||
+                        isVerifyAuthCode
+                      }
                     />
                   </View>
                 </View>
@@ -156,7 +138,7 @@ const RegistrationStep1Screen = () => {
                       value={form[DeviceStep1FormName.AUTH_CODE]}
                       error={errorMessage[DeviceStep1FormName.AUTH_CODE]}
                       onChangeText={handleOnChange[DeviceStep1FormName.AUTH_CODE]}
-                      disabled={isAuthenticate}
+                      disabled={isVerifyAuthCode}
                       returnKeyType="done"
                       autoComplete="one-time-code"
                     />
@@ -165,10 +147,8 @@ const RegistrationStep1Screen = () => {
                     <Button
                       label="확인"
                       size="medium"
-                      onPress={verifyAuthenticationCode}
-                      disabled={
-                        !isSendAuthCode || !isValid[DeviceStep1FormName.AUTH_CODE] || isAuthenticate
-                      }
+                      onPress={handleOnSubmitVerifyAuthCode}
+                      disabled={!isSendAuthCode || !isValidForm || isVerifyAuthCode}
                     />
                   </View>
                 </View>
@@ -195,11 +175,16 @@ const RegistrationStep1Screen = () => {
                   params: {
                     accountId: profile?.accountId,
                     storeId: selectedStoreId,
-                    phoneNumber: form[DeviceStep1FormName.PHONE_NUMBER],
+                    phoneNumber: unformattedPhone,
                   },
                 })
               }
-              disabled={!isAuthenticate || !stores}
+              disabled={
+                !isValidForm ||
+                !isVerifyAuthCode ||
+                !Boolean(profile?.accountId) ||
+                !Boolean(selectedStoreId)
+              }
             />
           </KeyboardAwareScrollView>
         </View>
