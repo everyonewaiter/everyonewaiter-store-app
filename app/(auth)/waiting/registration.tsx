@@ -6,12 +6,12 @@ import { scheduleOnRN } from "react-native-worklets";
 
 import { AdultIcon, BabyIcon } from "@/assets/icons";
 import Button from "@/components/Button";
-import ErrorModal from "@/components/ErrorModal";
 import LogoHeaderTitle from "@/components/LogoHeaderTitle";
-import { Modal } from "@/components/Modal";
+import ErrorModal from "@/components/Modal/ErrorModal";
+import Modal from "@/components/Modal/Modal";
+import SuccessModal from "@/components/Modal/SuccessModal";
 import NumPad from "@/components/NumPad";
 import PersonCountBox from "@/components/PersonCountBox";
-import SuccessModal from "@/components/SuccessModal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
@@ -267,14 +267,12 @@ const WaitingRegistrationScreen = () => {
           </View>
         </View>
         <Modal visible={submitModal.isOpen}>
-          <Modal.Container>
-            <Modal.Title color="red">{`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumberWithoutPrefix(phoneNumber)}`}</Modal.Title>
-            <Modal.Content>위 번호로 웨이팅 등록을 하시겠습니까?</Modal.Content>
-            <Modal.ButtonContainer>
-              <Modal.Button label="닫기" color="gray" onPress={resetAll} />
-              <Modal.Button label="등록하기" color="black" onPress={submitCreateWaiting} />
-            </Modal.ButtonContainer>
-          </Modal.Container>
+          <Modal.Title color="red">{`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumberWithoutPrefix(phoneNumber)}`}</Modal.Title>
+          <Modal.Content>위 번호로 웨이팅 등록을 하시겠습니까?</Modal.Content>
+          <Modal.ButtonContainer>
+            <Modal.Button label="닫기" color="gray" onPress={resetAll} />
+            <Modal.Button label="등록하기" color="black" onPress={submitCreateWaiting} />
+          </Modal.ButtonContainer>
         </Modal>
         <SuccessModal
           isVisible={successModal.isOpen}
