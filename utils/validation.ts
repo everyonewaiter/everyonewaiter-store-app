@@ -1,6 +1,6 @@
 import { DevicePurpose } from "@/constants/domain";
 
-const phoneNumberRegex = /^01[016789]\d{7,8}$/;
+const phoneNumberRegex = /^01([0|1|6|7|8|9])-?([0-9]{4})-?([0-9]{4})$/;
 const authenticationCodeRegex = /^\d{6}$/;
 
 export const validatePhoneNumber = (phoneNumber: string) => {
