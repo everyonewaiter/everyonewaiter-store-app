@@ -1,22 +1,20 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
-import Modal from "@/components/Modal/Modal";
+import Modal, { BaseModalProps } from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { Order } from "@/types/order";
 import { Setting } from "@/types/store";
 import { calculateOrdersTotalPrice } from "@/utils/calculate";
 
-interface OrderHistoryModalProps {
-  isVisible: boolean;
+export interface OrderHistoryModalProps extends BaseModalProps {
   histories: Order[];
   setting?: Setting;
-  close: () => void;
 }
 
-const OrderHistoryModal = ({ isVisible, histories, setting, close }: OrderHistoryModalProps) => {
+const OrderHistoryModal = ({ histories, setting, onClose }: OrderHistoryModalProps) => {
   return (
-    <Modal visible={isVisible}>
+    <Modal>
       <Modal.Title color="black" size="medium" position="left">
         주문 내역
       </Modal.Title>
@@ -66,7 +64,7 @@ const OrderHistoryModal = ({ isVisible, histories, setting, close }: OrderHistor
         </View>
       )}
       <Modal.ButtonContainer>
-        <Modal.Button label="확인" onPress={close} />
+        <Modal.Button label="확인" onPress={onClose} />
       </Modal.ButtonContainer>
     </Modal>
   );

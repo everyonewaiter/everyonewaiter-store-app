@@ -1,6 +1,6 @@
 import { Redirect } from "expo-router";
 
-import { useAuthentication } from "@/contexts/AuthenticationContext";
+import { useAuthentication } from "@/providers/AuthenticationProvider";
 import { getNavigatePathOrNull } from "@/utils/navigate";
 
 const AuthenticationNavigator = () => {

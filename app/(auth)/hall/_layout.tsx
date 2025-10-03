@@ -1,7 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 
 import { colors } from "@/constants/colors";
-import { useAuthentication } from "@/contexts/AuthenticationContext";
+import { useAuthentication } from "@/providers/AuthenticationProvider";
 import { getNavigatePath } from "@/utils/navigate";
 
 const HallLayout = () => {

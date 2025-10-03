@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Keyboard,
   StyleSheet,
   Text,
@@ -16,13 +15,16 @@ import { router } from "expo-router";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import InputLabel from "@/components/InputLabel";
+import ErrorModal from "@/components/Modal/ErrorModal";
 import Picker from "@/components/Picker";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
 import { useGetProfile } from "@/hooks/useAccountApi";
 import useAuthCode from "@/hooks/useAuthCode";
 import useDeviceStep1Form, { DeviceStep1FormName } from "@/hooks/useDeviceStep1Form";
+import useModals from "@/hooks/useModal";
 import { useGetStores } from "@/hooks/useStoreApi";
+import { ModalName } from "@/stores/modal";
 import { formatPhoneNumberOnlyNumber, formatTime } from "@/utils/format";
 import { parseErrorMessage } from "@/utils/support";
 
@@ -30,8 +32,15 @@ const RegistrationStep1Screen = () => {
   const phoneNumberRef = useRef<TextInput | null>(null);
   const authenticationCodeRef = useRef<TextInput | null>(null);
 
-  const { form, errorMessage, handleOnChange, handleOnError, isValid, isValidForm } =
-    useDeviceStep1Form();
+  const {
+    form,
+    errorMessage,
+    handleOnChange,
+    handleOnError,
+    isValid,
+    isValidForm,
+    resetAllState: resetForm,
+  } = useDeviceStep1Form();
   const unformattedPhone = formatPhoneNumberOnlyNumber(form[DeviceStep1FormName.PHONE_NUMBER]);
 
   const {
@@ -40,6 +49,7 @@ const RegistrationStep1Screen = () => {
     isVerifyAuthCode,
     sendAuthenticationCode,
     verifyAuthenticationCode,
+    resetAllState: resetAuth,
   } = useAuthCode();
   const minimumIdleTime = milliTimes.FIVE_MINUTE - milliTimes.THIRTY_SECONDS;
 
@@ -49,20 +59,25 @@ const RegistrationStep1Screen = () => {
   const { accountId } = profile || {};
   const { data: stores } = useGetStores(accountId, isVerifyAuthCode);
 
-  useEffect(() => {
-    if (!stores) return;
+  const { openModal, closeModal } = useModals();
 
-    if (stores.length > 0) {
+  useEffect(() => {
+    if (stores && stores.length > 0) {
       setSelectedStoreId(stores[0].storeId);
-    } else {
-      Alert.alert("알림", "매장을 먼저 등록해주세요.", [
-        {
-          text: "확인",
-          onPress: () => router.replace("/device/registration-step1"),
-        },
-      ]);
     }
-  }, [stores]);
+    if (stores && stores.length === 0) {
+      openModal(ModalName.STORE_IS_EMPTY, ErrorModal, {
+        title: "알림",
+        message: "매장을 먼저 등록해주세요.",
+        onClose: () => {
+          resetForm();
+          resetAuth();
+          setSelectedStoreId("");
+          closeModal();
+        },
+      });
+    }
+  }, [stores, openModal, closeModal, resetForm, resetAuth]);
 
   const handleOnSubmitSendAuthCode = () => {
     sendAuthenticationCode({
@@ -153,7 +168,7 @@ const RegistrationStep1Screen = () => {
                   </View>
                 </View>
               </View>
-              {stores && stores.length > 0 && (
+              {isVerifyAuthCode && stores && stores.length > 0 && (
                 <View>
                   <InputLabel label="매장 선택" />
                   <Picker

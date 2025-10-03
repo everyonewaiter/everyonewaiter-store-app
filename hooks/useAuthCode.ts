@@ -87,12 +87,19 @@ const useAuthCode = () => {
     );
   };
 
+  const resetAllState = () => {
+    setIsSendAuthCode(false);
+    setIsVerifyAuthCode(false);
+    setAuthTime(milliTimes.FIVE_MINUTE);
+  };
+
   return {
     authTime,
     isSendAuthCode,
     isVerifyAuthCode,
     sendAuthenticationCode,
     verifyAuthenticationCode,
+    resetAllState,
   };
 };
 

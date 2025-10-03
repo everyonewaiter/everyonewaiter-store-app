@@ -5,33 +5,29 @@ import { AntDesign } from "@expo/vector-icons";
 
 import Button from "@/components/Button";
 import CartMenu from "@/components/CartMenu";
-import Modal from "@/components/Modal/Modal";
+import Modal, { SubmitModalProps } from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { PaymentType } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
 import { Menu } from "@/types/menu";
 import { OrderCreate } from "@/types/order";
 
-interface CartModalProps {
-  visible: boolean;
+export interface CartModalProps extends SubmitModalProps {
   menus: Menu[];
   cart: OrderCreate[];
   setCart: React.Dispatch<React.SetStateAction<OrderCreate[]>>;
   resetCart: () => void;
   paymentType: keyof typeof PaymentType;
-  submit: () => void;
-  close: () => void;
 }
 
 const CartModal = ({
-  visible,
   menus,
   cart,
   setCart,
   resetCart,
   paymentType,
-  submit,
-  close,
+  onSubmit,
+  onClose,
 }: CartModalProps) => {
   const { height: screenHeight } = useWindowDimensions();
   const [contentHeight, setContentHeight] = useState(0);
@@ -59,12 +55,12 @@ const CartModal = ({
     copy.splice(index, 1);
     setCart(copy);
     if (copy.length === 0) {
-      close();
+      onClose();
     }
   };
 
   return (
-    <Modal visible={visible} position="right">
+    <Modal position="right">
       <View style={{ flexDirection: "row" }}>
         <View
           style={{
@@ -77,7 +73,7 @@ const CartModal = ({
           <Text style={styles.cartTitleText}>장바구니</Text>
           <Text style={styles.cartCountText}>{cart.length}</Text>
         </View>
-        <Pressable style={styles.closeButton} onPress={close}>
+        <Pressable style={styles.closeButton} onPress={onClose}>
           <AntDesign name="close" size={28} color="black" />
         </Pressable>
       </View>
@@ -112,14 +108,14 @@ const CartModal = ({
             variant="outline"
             onPress={() => {
               setCart([]);
-              close();
+              onClose();
             }}
           />
         </View>
         <View style={{ flex: 2 }}>
           <Button
             label={paymentType === "PREPAID" ? "결제하고 주문하기" : "주문하기"}
-            onPress={submit}
+            onPress={onSubmit}
           />
         </View>
       </View>

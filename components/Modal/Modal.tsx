@@ -6,14 +6,20 @@ import { Image } from "expo-image";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 
+export interface BaseModalProps {
+  onClose: () => void;
+}
+
+export interface SubmitModalProps extends BaseModalProps {
+  onSubmit: () => void;
+}
+
 interface ModalContainerProps {
-  visible: boolean;
   size?: "default" | "large";
   position?: "center" | "right";
 }
 
 function ModalContainer({
-  visible,
   size = "default",
   position = "center",
   children,
@@ -28,14 +34,10 @@ function ModalContainer({
       : styles.defaultModalContainer;
 
   return (
-    <>
-      {visible && (
-        <View style={[styles.container, { alignItems }]}>
-          <View style={[styles.container, { alignItems }, styles.overlay]}></View>
-          <View style={containerStyle}>{children}</View>
-        </View>
-      )}
-    </>
+    <View style={[styles.container, { alignItems }]}>
+      <View style={[styles.container, { alignItems }, styles.overlay]}></View>
+      <View style={containerStyle}>{children}</View>
+    </View>
   );
 }
 
