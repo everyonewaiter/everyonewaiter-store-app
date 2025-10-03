@@ -1,5 +1,3 @@
-import { DevicePurpose } from "@/constants/domain";
-
 const phoneNumberRegex = /^01([0|1|6|7|8|9])-?([0-9]{4})-?([0-9]{4})$/;
 const authenticationCodeRegex = /^\d{6}$/;
 
@@ -17,7 +15,7 @@ export const validateAuthCode = (authCode: string) => {
   return "인증번호는 6자리의 숫자입니다.";
 };
 
-const validateTableNo = (tableNo: string) => {
+export const validateTableNo = (tableNo: string) => {
   const parsedTableNo = parseInt(tableNo, 10);
 
   if (isNaN(parsedTableNo)) {
@@ -29,11 +27,14 @@ const validateTableNo = (tableNo: string) => {
   if (Number(tableNo) < 1) {
     return "테이블 번호는 1 이상이어야 합니다.";
   }
+  if (Number(tableNo) > 100) {
+    return "테이블 번호는 100 이하이어야 합니다.";
+  }
 
   return "";
 };
 
-const validateDeviceName = (name: string) => {
+export const validateDeviceName = (name: string) => {
   if (name.length === 0) {
     return "기기 이름을 입력해주세요.";
   }
@@ -41,20 +42,4 @@ const validateDeviceName = (name: string) => {
     return "기기 이름은 20자 이하로 입력해주세요.";
   }
   return "";
-};
-
-export const validateCreateDevice = (
-  purpose: keyof typeof DevicePurpose,
-  name: string,
-  tableNo: string
-) => {
-  const error = { name: "", tableNo: "" };
-
-  error.name = validateDeviceName(name);
-  if (purpose === "TABLE") {
-    error.tableNo = validateTableNo(tableNo);
-  }
-
-  const hasError = Object.values(error).some((value) => value.length > 0);
-  return { hasError, error };
 };

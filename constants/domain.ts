@@ -6,6 +6,11 @@ export const CashReceiptType = {
   PROOF: "지출증빙",
 } as const;
 
+export const SupportPurpose = {
+  TABLE: "손님 테이블",
+  WAITING: "웨이팅 등록",
+} as const;
+
 export const DevicePurpose = {
   TABLE: "손님 테이블",
   WAITING: "웨이팅 등록",

@@ -22,8 +22,8 @@ const useAuthCode = () => {
   const [isSendAuthCode, setIsSendAuthCode] = useState(false);
   const [isVerifyAuthCode, setIsVerifyAuthCode] = useState(false);
 
-  const sendAuthCode = useSendAuthCode();
-  const verifyAuthCode = useVerifyAuthCode();
+  const { mutate: mutateSendAuthCode, isPending: isPendingSendAuthCode } = useSendAuthCode();
+  const { mutate: mutateVerifyAuthCode, isPending: isPendingVerifyAuthCode } = useVerifyAuthCode();
 
   useInterval(() => {
     if (isSendAuthCode && !isVerifyAuthCode && authTime > 0) {
@@ -41,7 +41,7 @@ const useAuthCode = () => {
     successCallback = () => {},
     errorCallback = () => {},
   }: SendAuthCodeProps) => {
-    sendAuthCode.mutate(
+    mutateSendAuthCode(
       {
         phoneNumber,
       },
@@ -68,7 +68,7 @@ const useAuthCode = () => {
     successCallback = () => {},
     errorCallback = () => {},
   }: VerifyAuthCodeProps) => {
-    verifyAuthCode.mutate(
+    mutateVerifyAuthCode(
       {
         code,
         phoneNumber,
@@ -99,6 +99,8 @@ const useAuthCode = () => {
     isVerifyAuthCode,
     sendAuthenticationCode,
     verifyAuthenticationCode,
+    isPendingSendAuthCode,
+    isPendingVerifyAuthCode,
     resetAllState,
   };
 };

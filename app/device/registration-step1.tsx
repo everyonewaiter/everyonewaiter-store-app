@@ -49,6 +49,8 @@ const RegistrationStep1Screen = () => {
     isVerifyAuthCode,
     sendAuthenticationCode,
     verifyAuthenticationCode,
+    isPendingSendAuthCode,
+    isPendingVerifyAuthCode,
     resetAllState: resetAuth,
   } = useAuthCode();
   const minimumIdleTime = milliTimes.FIVE_MINUTE - milliTimes.THIRTY_SECONDS;
@@ -136,6 +138,7 @@ const RegistrationStep1Screen = () => {
                       disabled={
                         !isValid[DeviceStep1FormName.PHONE_NUMBER] ||
                         (isSendAuthCode && authTime >= minimumIdleTime) ||
+                        isPendingSendAuthCode ||
                         isVerifyAuthCode
                       }
                     />
@@ -163,7 +166,12 @@ const RegistrationStep1Screen = () => {
                       label="확인"
                       size="medium"
                       onPress={handleOnSubmitVerifyAuthCode}
-                      disabled={!isSendAuthCode || !isValidForm || isVerifyAuthCode}
+                      disabled={
+                        !isSendAuthCode ||
+                        !isValidForm ||
+                        isPendingVerifyAuthCode ||
+                        isVerifyAuthCode
+                      }
                     />
                   </View>
                 </View>
