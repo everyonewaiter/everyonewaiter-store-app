@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Alert } from "react-native";
+import { Alert, BackHandler } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import "react-native-reanimated";
@@ -32,7 +32,7 @@ const RootLayout = () => {
 
   if (isMobile) {
     Alert.alert("알림", "모바일 환경은 지원하지 않습니다.\n태블릿을 이용해 주세요.", [
-      { text: "확인" },
+      { text: "확인", onPress: () => BackHandler.exitApp() },
     ]);
     return null;
   }
