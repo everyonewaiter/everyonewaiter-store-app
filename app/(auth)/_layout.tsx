@@ -1,7 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 
-import { useAuthentication } from "@/contexts/AuthenticationContext";
-import SseProvider from "@/contexts/SseContext";
+import { useAuthentication } from "@/providers/AuthenticationProvider";
+import SseProvider from "@/providers/SseProvider";
 
 const AuthenticationLayout = () => {
   const { isAuthenticated } = useAuthentication();

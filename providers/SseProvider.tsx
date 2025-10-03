@@ -3,7 +3,7 @@ import { createContext, PropsWithChildren, useEffect } from "react";
 import "react-native-url-polyfill/auto";
 
 import { SseService } from "@/api/sse";
-import { useAuthentication } from "@/contexts/AuthenticationContext";
+import { useAuthentication } from "@/providers/AuthenticationProvider";
 
 const sseService = new SseService();
 

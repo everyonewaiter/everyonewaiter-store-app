@@ -1,20 +1,18 @@
-import Modal from "@/components/Modal/Modal";
+import Modal, { BaseModalProps } from "@/components/Modal/Modal";
 
-interface SuccessModalProps {
-  isVisible: boolean;
+export interface SuccessModalProps extends BaseModalProps {
   title: string;
   image?: string;
   message: string;
-  close: () => void;
 }
 
-const SuccessModal = ({ isVisible, title, image, message, close }: SuccessModalProps) => {
+const SuccessModal = ({ title, image, message, onClose }: SuccessModalProps) => {
   return (
-    <Modal visible={isVisible}>
+    <Modal>
       <Modal.Title color="black">{title}</Modal.Title>
       <Modal.Content image={image}>{message}</Modal.Content>
       <Modal.ButtonContainer>
-        <Modal.Button label="확인" onPress={close} />
+        <Modal.Button label="확인" onPress={onClose} />
       </Modal.ButtonContainer>
     </Modal>
   );

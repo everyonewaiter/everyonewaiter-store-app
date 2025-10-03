@@ -4,8 +4,8 @@ import { Redirect, Stack, useFocusEffect } from "expo-router";
 import { OrientationLock } from "expo-screen-orientation";
 
 import { colors } from "@/constants/colors";
-import { useAuthentication } from "@/contexts/AuthenticationContext";
 import { useOrientation } from "@/hooks/useOrientation";
+import { useAuthentication } from "@/providers/AuthenticationProvider";
 import { getNavigatePath } from "@/utils/navigate";
 
 const CustomerTableLayout = () => {

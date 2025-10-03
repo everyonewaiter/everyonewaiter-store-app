@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
-import Modal from "@/components/Modal/Modal";
+import Modal, { SubmitModalProps } from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 
-interface StaffCallModalProps {
-  isVisible: boolean;
+export interface StaffCallModalProps extends SubmitModalProps {
   options: string[];
   selectedOption: string;
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
-  submit: () => void;
-  close: () => void;
 }
 
 const numColumns = 4;
 const gap = 12;
 
 const StaffCallModal = ({
-  isVisible,
   options,
   selectedOption,
   setSelectedOption,
-  submit,
-  close,
+  onSubmit,
+  onClose,
 }: StaffCallModalProps) => {
   const { width: screenWidth } = useWindowDimensions();
   const [contentWidth, setContentWidth] = useState(0);
@@ -37,7 +33,7 @@ const StaffCallModal = ({
   }, [screenWidth]);
 
   return (
-    <Modal visible={isVisible}>
+    <Modal>
       <Modal.Title color="black" size="medium" position="left">
         직원 호출
       </Modal.Title>
@@ -63,8 +59,13 @@ const StaffCallModal = ({
         )}
       />
       <Modal.ButtonContainer>
-        <Modal.Button label="닫기" color="gray" onPress={close} />
-        <Modal.Button label="호출하기" color="black" disabled={!selectedOption} onPress={submit} />
+        <Modal.Button label="닫기" color="gray" onPress={onClose} />
+        <Modal.Button
+          label="호출하기"
+          color="black"
+          disabled={!selectedOption}
+          onPress={onSubmit}
+        />
       </Modal.ButtonContainer>
     </Modal>
   );

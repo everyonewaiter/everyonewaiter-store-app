@@ -15,10 +15,11 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 import { queryClient } from "@/api/queryClient";
 import { fontAssets } from "@/constants/fonts";
-import AppUpdateProvider, { useAppUpdate } from "@/contexts/AppUpdateContext";
-import AuthenticationProvider, { useAuthentication } from "@/contexts/AuthenticationContext";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import { useStickyImmersive } from "@/hooks/useStickyImmersive";
+import AppUpdateProvider, { useAppUpdate } from "@/providers/AppUpdateProvider";
+import AuthenticationProvider, { useAuthentication } from "@/providers/AuthenticationProvider";
+import ModalProvider from "@/providers/ModalProvider";
 import "@/sentry.config";
 
 SplashScreen.setOptions({ duration: 1000, fade: true });
@@ -44,6 +45,7 @@ const RootLayout = () => {
           <AppUpdateProvider>
             <AuthenticationProvider>
               <EveryoneWaiterApplication />
+              <ModalProvider />
             </AuthenticationProvider>
           </AppUpdateProvider>
         </GestureHandlerRootView>

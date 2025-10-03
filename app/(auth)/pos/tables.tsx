@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { useAuthentication } from "@/contexts/AuthenticationContext";
+import { useAuthentication } from "@/providers/AuthenticationProvider";
 
 const PosTableScreen = () => {
   const { device } = useAuthentication();

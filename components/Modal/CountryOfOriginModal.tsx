@@ -1,23 +1,18 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
-import Modal from "@/components/Modal/Modal";
+import Modal, { BaseModalProps } from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { CountryOfOrigin } from "@/types/store";
 
-interface CountryOfOriginModalProps {
-  isVisible: boolean;
+export interface CountryOfOriginModalProps extends BaseModalProps {
   countryOfOrigins: CountryOfOrigin[];
-  close: () => void;
+  onClose: () => void;
 }
 
-const CountryOfOriginModal = ({
-  isVisible,
-  countryOfOrigins,
-  close,
-}: CountryOfOriginModalProps) => {
+const CountryOfOriginModal = ({ countryOfOrigins, onClose }: CountryOfOriginModalProps) => {
   return (
-    <Modal visible={isVisible}>
+    <Modal>
       <Modal.Title color="black" size="medium" position="left">
         원산지
       </Modal.Title>
@@ -47,7 +42,7 @@ const CountryOfOriginModal = ({
         />
       </View>
       <Modal.ButtonContainer>
-        <Modal.Button label="확인" onPress={close} />
+        <Modal.Button label="확인" onPress={onClose} />
       </Modal.ButtonContainer>
     </Modal>
   );

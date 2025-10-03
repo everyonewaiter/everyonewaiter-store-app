@@ -9,7 +9,7 @@ export const DeviceStep1FormName = {
   AUTH_CODE: "code",
 } as const;
 
-type FormKey = ValueOf<typeof DeviceStep1FormName>;
+type FormNameValue = ValueOf<typeof DeviceStep1FormName>;
 
 const initialForm = {
   [DeviceStep1FormName.PHONE_NUMBER]: "",
@@ -25,15 +25,15 @@ const useDeviceStep1Form = () => {
   const [form, setForm] = useState(initialForm);
   const [errorMessage, setErrorMessage] = useState(initialErrorMessage);
 
-  const updateForm = (name: FormKey, value: string) => {
+  const updateForm = (name: FormNameValue, value: string) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const updateErrorMessage = (name: FormKey, message: string) => {
+  const updateErrorMessage = (name: FormNameValue, message: string) => {
     setErrorMessage((prev) => ({ ...prev, [name]: message }));
   };
 
-  const isValidForm = (name: FormKey) => {
+  const isValidForm = (name: FormNameValue) => {
     return form[name].length > 0 && errorMessage[name].length === 0;
   };
 
@@ -64,6 +64,11 @@ const useDeviceStep1Form = () => {
     [DeviceStep1FormName.AUTH_CODE]: isValidForm(DeviceStep1FormName.AUTH_CODE),
   };
 
+  const resetAllState = () => {
+    setForm(initialForm);
+    setErrorMessage(initialErrorMessage);
+  };
+
   return {
     form,
     errorMessage,
@@ -77,6 +82,7 @@ const useDeviceStep1Form = () => {
     },
     isValid,
     isValidForm: Object.values(isValid).every(Boolean),
+    resetAllState,
   };
 };
 

@@ -7,7 +7,7 @@ import { AntDesign } from "@expo/vector-icons";
 
 import Button from "@/components/Button";
 import MenuOptionSelectBox from "@/components/MenuOptionSelectBox";
-import Modal from "@/components/Modal/Modal";
+import Modal, { BaseModalProps } from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { MenuLabel } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
@@ -15,15 +15,13 @@ import { images } from "@/constants/images";
 import { Menu } from "@/types/menu";
 import { OrderCreate, OrderCreateOptionGroup } from "@/types/order";
 
-interface MenuModalProps {
-  visible: boolean;
+export interface MenuModalProps extends BaseModalProps {
   selectedMenu: Menu | null;
   cart: OrderCreate[];
   setCart: React.Dispatch<React.SetStateAction<OrderCreate[]>>;
-  close: () => void;
 }
 
-const MenuModal = ({ visible, selectedMenu, cart, setCart, close }: MenuModalProps) => {
+const MenuModal = ({ selectedMenu, cart, setCart, onClose }: MenuModalProps) => {
   const image = useImage(
     selectedMenu?.image
       ? process.env.EXPO_PUBLIC_CDN_URL + `/${selectedMenu.image}`
@@ -68,7 +66,7 @@ const MenuModal = ({ visible, selectedMenu, cart, setCart, close }: MenuModalPro
   const handleClose = () => {
     setQuantity(1);
     setSelectedOptions([]);
-    close();
+    onClose();
   };
 
   const minusQuantity = () => {
@@ -151,7 +149,7 @@ const MenuModal = ({ visible, selectedMenu, cart, setCart, close }: MenuModalPro
   };
 
   return (
-    <Modal visible={visible} size="large">
+    <Modal size="large">
       <View style={styles.imageContainer}>
         {image && (
           <ImageBackground

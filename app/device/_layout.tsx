@@ -2,7 +2,7 @@ import { Redirect, Stack } from "expo-router";
 
 import LogoHeaderTitle from "@/components/LogoHeaderTitle";
 import { colors } from "@/constants/colors";
-import { useAuthentication } from "@/contexts/AuthenticationContext";
+import { useAuthentication } from "@/providers/AuthenticationProvider";
 
 const UnAuthenticationLayout = () => {
   const { isAuthenticated } = useAuthentication();
