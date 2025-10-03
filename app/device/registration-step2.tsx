@@ -1,26 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { Alert, Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import React, { useEffect } from "react";
+import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { router, useLocalSearchParams } from "expo-router";
 
-import dayjs from "dayjs";
+import { useQueryClient } from "@tanstack/react-query";
 
-import { queryClient } from "@/api/queryClient";
 import Button from "@/components/Button";
 import DevicePurposeSelectBox from "@/components/DevicePurposeSelectBox";
 import Input from "@/components/Input";
 import InputLabel from "@/components/InputLabel";
+import ErrorModal from "@/components/Modal/ErrorModal";
 import PaymentTypeSelectBox from "@/components/PaymentTypeSelectBox";
-import { DevicePurpose, PaymentType } from "@/constants/domain";
+import { PaymentType, SupportPurpose } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
 import { queryKeys, storageKeys } from "@/constants/keys";
 import { useCreateDevice } from "@/hooks/useDeviceApi";
+import useDeviceStep2Form, {
+  DeviceStep2FormName,
+  DeviceStep2SelectorName,
+} from "@/hooks/useDeviceStep2Form";
+import useModals from "@/hooks/useModal";
+import { ModalName } from "@/stores/modal";
 import { Entries } from "@/types/utility";
 import { setItem } from "@/utils/storage";
 import { parseErrorMessage } from "@/utils/support";
-import { validateCreateDevice } from "@/utils/validation";
 
 type RegistrationPageParams = {
   accountId: string;
@@ -28,46 +33,15 @@ type RegistrationPageParams = {
   phoneNumber: string;
 };
 
-type SelectPurpose = Pick<typeof DevicePurpose, "TABLE" | "WAITING">;
-
-interface RegistrationForm {
-  name: RegistrationFormProps;
-  tableNo: RegistrationFormProps;
-}
-
-interface RegistrationFormProps {
-  value: string;
-  error: string;
-}
-
-const generateDeviceName = (selectedPurpose: keyof SelectPurpose) => {
-  const timestamp = dayjs().format("YYMMDDHHmm");
-  let name = timestamp;
-
-  switch (selectedPurpose) {
-    case "TABLE":
-      name = "1번 테이블";
-      break;
-    case "WAITING":
-      name = `웨이팅-${timestamp}`;
-      break;
-  }
-
-  return name;
-};
-
 const RegistrationStep2Screen = () => {
-  const [selectedPurpose, setSelectedPurpose] = useState<keyof SelectPurpose>("TABLE");
-  const [selectedPaymentType, setSelectedPaymentType] =
-    useState<keyof typeof PaymentType>("POSTPAID");
-  const [registrationForm, setRegistrationForm] = useState<RegistrationForm>({
-    name: { value: "", error: "" },
-    tableNo: { value: "1", error: "" },
-  });
-  const [isLoading, setIsLoading] = useState(false);
-
+  const queryClient = useQueryClient();
   const { accountId, storeId, phoneNumber } = useLocalSearchParams<RegistrationPageParams>();
-  const createDevice = useCreateDevice();
+
+  const { selector, form, errorMessage, handleOnChange, isValidForm } = useDeviceStep2Form();
+
+  const { mutate, isPending } = useCreateDevice();
+
+  const { openModal, closeModal } = useModals();
 
   useEffect(() => {
     if (!accountId || !storeId || !phoneNumber) {
@@ -75,63 +49,15 @@ const RegistrationStep2Screen = () => {
     }
   }, [accountId, storeId, phoneNumber]);
 
-  useEffect(() => {
-    setRegistrationForm((prev) => ({
-      ...prev,
-      name: {
-        value: generateDeviceName(selectedPurpose),
-        error: prev.name.error,
-      },
-    }));
-  }, [selectedPurpose]);
-
-  const handleOnChangeTableNo = (value: string) => {
-    const parsedTableNo = parseInt(value, 10);
-    const tableNo = isNaN(parsedTableNo) ? value : parsedTableNo;
-    setRegistrationForm({
-      name: { value: `${tableNo}번 테이블`, error: "" },
-      tableNo: { value: tableNo.toString(), error: "" },
-    });
-  };
-
-  const handleOnChangeName = (value: string) => {
-    setRegistrationForm((prev) => ({
-      ...prev,
-      name: { value, error: "" },
-    }));
-  };
-
-  const handleOnError = (key: keyof RegistrationForm, error: string) => {
-    if (error) {
-      setRegistrationForm((prev) => ({
-        ...prev,
-        [key]: { value: prev[key].value, error },
-      }));
-    }
-  };
-
-  const handleSubmit = () => {
-    const { hasError, error } = validateCreateDevice(
-      selectedPurpose,
-      registrationForm.name.value,
-      registrationForm.tableNo.value
-    );
-
-    if (hasError) {
-      handleOnError("name", error.name);
-      handleOnError("tableNo", error.tableNo);
-      return;
-    }
-
-    setIsLoading(true);
-    createDevice.mutate(
+  const handleOnSubmit = () => {
+    mutate(
       {
         storeId: storeId,
         phoneNumber,
-        name: registrationForm.name.value,
-        purpose: selectedPurpose,
-        tableNo: parseInt(registrationForm.tableNo.value, 10),
-        paymentType: selectedPaymentType,
+        purpose: selector[DeviceStep2SelectorName.PURPOSE],
+        paymentType: selector[DeviceStep2SelectorName.PAYMENT_TYPE],
+        name: form[DeviceStep2FormName.NAME],
+        tableNo: parseInt(form[DeviceStep2FormName.TABLE_NO], 10),
       },
       {
         onSuccess: ({ deviceId, secretKey }) => {
@@ -146,9 +72,12 @@ const RegistrationStep2Screen = () => {
           });
         },
         onError: (error) => {
-          Alert.alert("에러", parseErrorMessage(error), [{ text: "확인" }]);
+          openModal(ModalName.DEVICE_CREATE_ERROR, ErrorModal, {
+            title: "기기 등록 실패",
+            message: parseErrorMessage(error),
+            onClose: closeModal,
+          });
         },
-        onSettled: () => setIsLoading(false),
       }
     );
   };
@@ -164,42 +93,39 @@ const RegistrationStep2Screen = () => {
             </View>
             <View style={styles.selectBoxContainer}>
               <View style={styles.devicePurposeSelectBoxContainer}>
-                {(
-                  Object.entries({
-                    TABLE: "손님 테이블",
-                    WAITING: "웨이팅 등록",
-                  }) as Entries<SelectPurpose>
-                ).map(([key, value], index) => (
-                  <DevicePurposeSelectBox
-                    key={`${key}-${index}`}
-                    label={value}
-                    selected={selectedPurpose === key}
-                    onPress={() => setSelectedPurpose(key)}
-                  />
-                ))}
+                {(Object.entries(SupportPurpose) as Entries<typeof SupportPurpose>).map(
+                  ([key, value], index) => (
+                    <DevicePurposeSelectBox
+                      key={`${key}-${index}`}
+                      label={value}
+                      selected={selector[DeviceStep2SelectorName.PURPOSE] === key}
+                      onPress={() => handleOnChange[DeviceStep2SelectorName.PURPOSE](key)}
+                    />
+                  )
+                )}
               </View>
             </View>
             <View style={styles.inputContainer}>
-              {selectedPurpose === "TABLE" && (
+              {selector[DeviceStep2SelectorName.PURPOSE] === "TABLE" && (
                 <Input
                   label="테이블 번호"
                   inputMode="numeric"
                   placeholder="테이블 번호를 입력해주세요."
-                  value={registrationForm.tableNo.value}
-                  error={registrationForm.tableNo.error}
-                  onChangeText={handleOnChangeTableNo}
+                  value={form[DeviceStep2FormName.TABLE_NO]}
+                  error={errorMessage[DeviceStep2FormName.TABLE_NO]}
+                  onChangeText={handleOnChange[DeviceStep2FormName.TABLE_NO]}
                   returnKeyType="done"
                 />
               )}
               <Input
                 label="기기 이름"
                 placeholder="기기 이름을 입력해주세요."
-                value={registrationForm.name.value}
-                error={registrationForm.name.error}
-                onChangeText={handleOnChangeName}
+                value={form[DeviceStep2FormName.NAME]}
+                error={errorMessage[DeviceStep2FormName.NAME]}
+                onChangeText={handleOnChange[DeviceStep2FormName.NAME]}
                 returnKeyType="done"
               />
-              {selectedPurpose === "TABLE" && (
+              {selector[DeviceStep2SelectorName.PURPOSE] === "TABLE" && (
                 <View>
                   <InputLabel label="결제 수단" />
                   <View style={styles.paymentTypeSelectBoxContainer}>
@@ -208,8 +134,8 @@ const RegistrationStep2Screen = () => {
                         <PaymentTypeSelectBox
                           key={`${key}-${index}`}
                           label={value}
-                          selected={selectedPaymentType === key}
-                          onPress={() => setSelectedPaymentType(key)}
+                          selected={selector[DeviceStep2SelectorName.PAYMENT_TYPE] === key}
+                          onPress={() => handleOnChange[DeviceStep2SelectorName.PAYMENT_TYPE](key)}
                         />
                       )
                     )}
@@ -217,7 +143,11 @@ const RegistrationStep2Screen = () => {
                 </View>
               )}
             </View>
-            <Button label="기기 등록" onPress={handleSubmit} disabled={isLoading} />
+            <Button
+              label="기기 등록"
+              onPress={handleOnSubmit}
+              disabled={!isValidForm || isPending}
+            />
           </KeyboardAwareScrollView>
         </View>
       </SafeAreaView>

@@ -11,6 +11,7 @@ import { ValueOf } from "@/types/utility";
 
 export const ModalName = {
   STORE_IS_EMPTY: "storeIsEmpty",
+  DEVICE_CREATE_ERROR: "deviceCreateError",
 } as const;
 
 type ModalNameValue = ValueOf<typeof ModalName>;
