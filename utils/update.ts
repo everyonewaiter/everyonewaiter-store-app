@@ -1,4 +1,4 @@
-import { Alert } from "react-native";
+import { Alert, BackHandler } from "react-native";
 
 import { File, Paths } from "expo-file-system";
 import { startActivityAsync } from "expo-intent-launcher";
@@ -24,7 +24,7 @@ export const updateApp = async (downloadUrl: string) => {
   } catch (error: unknown) {
     Sentry.captureException(error);
     Alert.alert("알림", "앱 업데이트에 실패했습니다.\n앱을 종료 후 다시 시도해 주세요.", [
-      { text: "확인" },
+      { text: "확인", onPress: () => BackHandler.exitApp() },
     ]);
   }
 };
