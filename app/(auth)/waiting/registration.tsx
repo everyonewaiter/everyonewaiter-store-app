@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +17,7 @@ import { milliTimes } from "@/constants/times";
 import useIdle from "@/hooks/useIdle";
 import useModals from "@/hooks/useModal";
 import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaitingApi";
+import useWaitingForm, { WaitingFormName } from "@/hooks/useWaitingForm";
 import { ModalName } from "@/stores/modal";
 import { formatPhoneNumberWithoutPrefix } from "@/utils/format";
 import { parseErrorMessage } from "@/utils/support";
@@ -26,67 +27,39 @@ const PHONE_NUMBER_PREFIX = "010";
 const WaitingRegistrationScreen = () => {
   const { idleTime, resetIdleTime, gesture } = useIdle(milliTimes.ONE_MINUTE);
 
-  const [personCount, setPersonCount] = useState({
-    adult: 0,
-    infant: 0,
-  });
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [isValidForm, setIsValidForm] = useState(false);
+  const { form, handleOnChange, isEmptyForm, isValidForm, resetAllState } = useWaitingForm();
+  const formattedPhone = formatPhoneNumberWithoutPrefix(form[WaitingFormName.PHONE_NUMBER]);
 
   const { waitingCount } = useGetWaitingCount();
   const { mutate, isPending } = useCreateWaiting();
 
-  const { openModal, closeModal } = useModals();
+  const { openModal, closeModal, closeAllModals } = useModals();
 
   const resetAll = useCallback(() => {
+    closeAllModals();
+    resetAllState();
     resetIdleTime();
-    setPersonCount({ adult: 0, infant: 0 });
-    setPhoneNumber("");
-    setIsValidForm(false);
-  }, [resetIdleTime]);
+  }, [closeAllModals, resetAllState, resetIdleTime]);
 
   useEffect(() => {
-    if (personCount.adult > 0 && phoneNumber.length === 8) {
-      setIsValidForm(true);
-    } else {
-      setIsValidForm(false);
-    }
-  }, [personCount.adult, phoneNumber]);
-
-  useEffect(() => {
-    if (
-      idleTime <= milliTimes.ZERO &&
-      (personCount.adult > 0 || personCount.infant > 0 || phoneNumber.length > 0)
-    ) {
+    if (idleTime <= milliTimes.ZERO && !isEmptyForm) {
       resetAll();
     }
-  }, [idleTime, personCount, phoneNumber, resetAll]);
+  }, [idleTime, isEmptyForm, resetAll]);
 
-  const minusPersonCount = (key: "adult" | "infant") => {
-    if (personCount[key] > 0) {
-      setPersonCount((prev) => ({ ...prev, [key]: prev[key] - 1 }));
-    }
+  const addNumToPhone = (num: number) => {
+    const added = form[WaitingFormName.PHONE_NUMBER] + num;
+    handleOnChange[WaitingFormName.PHONE_NUMBER](added);
   };
 
-  const plusPersonCount = (key: "adult" | "infant") => {
-    if (personCount[key] <= 30) {
-      setPersonCount((prev) => ({ ...prev, [key]: prev[key] + 1 }));
-    }
-  };
-
-  const addPhoneNumber = (num: number) => {
-    if (phoneNumber.length < 8) {
-      setPhoneNumber((prev) => prev + num);
-    }
-  };
-
-  const removeLastPhoneNumber = () => {
-    setPhoneNumber((prev) => prev.slice(0, -1));
+  const removeLastNumToPhone = () => {
+    const removed = form[WaitingFormName.PHONE_NUMBER].slice(0, -1);
+    handleOnChange[WaitingFormName.PHONE_NUMBER](removed);
   };
 
   const openSubmitModal = () => {
     openModal(ModalName.WAITING_REGISTRATION_SUBMIT, SubmitModal, {
-      title: `${PHONE_NUMBER_PREFIX} - ${formatPhoneNumberWithoutPrefix(phoneNumber)}`,
+      title: `${PHONE_NUMBER_PREFIX} - ${formattedPhone}`,
       message: "위 번호로 웨이팅 등록을 하시겠습니까?",
       submitButtonLabel: "등록하기",
       onSubmit: () => {
@@ -101,29 +74,23 @@ const WaitingRegistrationScreen = () => {
   const submitCreateWaiting = () => {
     mutate(
       {
-        phoneNumber: `${PHONE_NUMBER_PREFIX}${phoneNumber}`,
-        adult: personCount.adult,
-        infant: personCount.infant,
+        phoneNumber: `${PHONE_NUMBER_PREFIX}${form[WaitingFormName.PHONE_NUMBER]}`,
+        adult: form[WaitingFormName.ADULT],
+        infant: form[WaitingFormName.INFANT],
       },
       {
         onSuccess: () => {
           openModal(ModalName.WAITING_REGISTRATION_SUCCESS, SuccessModal, {
             title: "웨이팅 등록 완료",
             message: "휴대폰 번호로 전송된 알림톡 또는 문자 메시지를 확인해 주세요.",
-            onClose: () => {
-              // TODO: RESET ALL STATE
-              closeModal();
-            },
+            onClose: resetAll,
           });
         },
         onError: (error) => {
           openModal(ModalName.WAITING_REGISTRATION_ERROR, ErrorModal, {
             title: "웨이팅 등록 실패",
             message: parseErrorMessage(error),
-            onClose: () => {
-              // TODO: RESET ALL STATE
-              closeModal();
-            },
+            onClose: resetAll,
           });
         },
       }
@@ -163,16 +130,16 @@ const WaitingRegistrationScreen = () => {
                 <PersonCountBox
                   icon={<AdultIcon />}
                   label="성인"
-                  count={personCount.adult}
-                  minusHandler={() => minusPersonCount("adult")}
-                  plusHandler={() => plusPersonCount("adult")}
+                  count={form[WaitingFormName.ADULT]}
+                  minusHandler={() => handleOnChange[WaitingFormName.ADULT]("decrease")}
+                  plusHandler={() => handleOnChange[WaitingFormName.ADULT]("increase")}
                 />
                 <PersonCountBox
                   icon={<BabyIcon />}
                   label="유아"
-                  count={personCount.infant}
-                  minusHandler={() => minusPersonCount("infant")}
-                  plusHandler={() => plusPersonCount("infant")}
+                  count={form[WaitingFormName.INFANT]}
+                  minusHandler={() => handleOnChange[WaitingFormName.INFANT]("decrease")}
+                  plusHandler={() => handleOnChange[WaitingFormName.INFANT]("increase")}
                 />
               </View>
             </View>
@@ -182,7 +149,7 @@ const WaitingRegistrationScreen = () => {
           <View style={styles.numPadContent}>
             <View style={styles.phoneNumberContainer}>
               <Text style={styles.phoneNumberText}>
-                {`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumberWithoutPrefix(phoneNumber)}`}
+                {`${PHONE_NUMBER_PREFIX} - ${formattedPhone}`}
               </Text>
               <Text style={styles.phoneNumberSubText}>
                 실시간 웨이팅 안내를 받을 수 있는 번호를 입력해 주세요.
@@ -194,19 +161,19 @@ const WaitingRegistrationScreen = () => {
                   label={1}
                   positionX="left"
                   positionY="top"
-                  onPress={() => addPhoneNumber(1)}
+                  onPress={() => addNumToPhone(1)}
                 />
                 <NumPad
                   label={2}
                   positionX="center"
                   positionY="top"
-                  onPress={() => addPhoneNumber(2)}
+                  onPress={() => addNumToPhone(2)}
                 />
                 <NumPad
                   label={3}
                   positionX="right"
                   positionY="top"
-                  onPress={() => addPhoneNumber(3)}
+                  onPress={() => addNumToPhone(3)}
                 />
               </View>
               <View style={styles.numPad}>
@@ -214,19 +181,19 @@ const WaitingRegistrationScreen = () => {
                   label={4}
                   positionX="left"
                   positionY="center"
-                  onPress={() => addPhoneNumber(4)}
+                  onPress={() => addNumToPhone(4)}
                 />
                 <NumPad
                   label={5}
                   positionX="center"
                   positionY="center"
-                  onPress={() => addPhoneNumber(5)}
+                  onPress={() => addNumToPhone(5)}
                 />
                 <NumPad
                   label={6}
                   positionX="right"
                   positionY="center"
-                  onPress={() => addPhoneNumber(6)}
+                  onPress={() => addNumToPhone(6)}
                 />
               </View>
               <View style={styles.numPad}>
@@ -234,19 +201,19 @@ const WaitingRegistrationScreen = () => {
                   label={7}
                   positionX="left"
                   positionY="center"
-                  onPress={() => addPhoneNumber(7)}
+                  onPress={() => addNumToPhone(7)}
                 />
                 <NumPad
                   label={8}
                   positionX="center"
                   positionY="center"
-                  onPress={() => addPhoneNumber(8)}
+                  onPress={() => addNumToPhone(8)}
                 />
                 <NumPad
                   label={9}
                   positionX="right"
                   positionY="center"
-                  onPress={() => addPhoneNumber(9)}
+                  onPress={() => addNumToPhone(9)}
                 />
               </View>
               <View style={styles.numPad}>
@@ -255,13 +222,13 @@ const WaitingRegistrationScreen = () => {
                   label={0}
                   positionX="center"
                   positionY="bottom"
-                  onPress={() => addPhoneNumber(0)}
+                  onPress={() => addNumToPhone(0)}
                 />
                 <NumPad
                   label="back"
                   positionX="right"
                   positionY="bottom"
-                  onPress={removeLastPhoneNumber}
+                  onPress={removeLastNumToPhone}
                 />
               </View>
             </View>
