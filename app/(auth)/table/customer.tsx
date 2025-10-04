@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureDetector } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { scheduleOnRN } from "react-native-worklets";
 
 import { BellIcon } from "@/assets/icons/BellIcon";
 import { ReceiptIcon } from "@/assets/icons/ReceiptIcon";
@@ -20,6 +19,7 @@ import { defaultCategory } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
 import { images } from "@/constants/images";
 import { milliTimes } from "@/constants/times";
+import useIdle from "@/hooks/useIdle";
 import { useGetMenus } from "@/hooks/useMenuApi";
 import { useModal } from "@/hooks/useModal";
 import { useCreateTableOrder, useGetTableOrderHistories, useStaffCall } from "@/hooks/useOrderApi";
@@ -33,20 +33,19 @@ import { calculateService, calculateVat } from "@/utils/calculate";
 import { parseErrorMessage } from "@/utils/support";
 
 const CustomerTableScreen = () => {
-  // Common
   const { width: screenWidth } = useWindowDimensions();
-  const { device } = useAuthentication();
-  const [idleTime, setIdleTime] = useState(milliTimes.FIVE_MINUTE);
-  const [error, setError] = useState({ title: "", message: "" });
+  const { idleTime, resetIdleTime, gesture } = useIdle(milliTimes.THREE_MINUTE);
 
-  // Store
-  const { data: store } = useGetStore(device?.storeId);
-
-  // Menu
-  const { categories } = useGetMenus(device?.storeId);
   const menusRef = useRef<FlatList | null>(null);
   const categoriesRef = useRef<FlatList | null>(null);
-  const [categoryContentWidth, setCategoryContentWidth] = useState(0);
+
+  const { device } = useAuthentication();
+  const { data: store } = useGetStore(device?.storeId);
+  const { categories } = useGetMenus(device?.storeId);
+
+  const [error, setError] = useState({ title: "", message: "" });
+
+  // Menu
   const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
 
@@ -73,7 +72,7 @@ const CustomerTableScreen = () => {
     const existsCategory = categories && categories.length > 0;
     const existsMenu = selectedCategory && selectedCategory.menus.length > 0;
 
-    setIdleTime(milliTimes.FIVE_MINUTE);
+    resetIdleTime();
     setError({ title: "", message: "" });
     setSelectedCategory(existsCategory ? categories[0] : defaultCategory);
     setSelectedStaffCallOption("");
@@ -97,6 +96,7 @@ const CustomerTableScreen = () => {
   }, [
     categories,
     selectedCategory,
+    resetIdleTime,
     countryOfOriginModal,
     menuModal,
     staffCallModal,
@@ -108,33 +108,21 @@ const CustomerTableScreen = () => {
   ]);
 
   useEffect(() => {
-    setCategoryContentWidth(screenWidth - 210);
-  }, [screenWidth]);
-
-  useEffect(() => {
     if (categories && categories.length > 0) {
       setSelectedCategory(categories[0]);
     }
   }, [categories]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIdleTime((prev) => prev - milliTimes.ONE_SECOND);
-    }, milliTimes.ONE_SECOND);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
+    // TODO: 모달이 열려있거나, 장바구니가 비어 있지 않거나, 카테고리 또는 메뉴의 스크롤 index가 0이 아닌 경우 초기화
     if (idleTime <= milliTimes.ZERO) {
       resetAll();
     }
   }, [idleTime, resetAll]);
 
-  const resetIdleTime = Gesture.Tap().onStart(() => {
-    if (idleTime < milliTimes.FIVE_MINUTE) {
-      scheduleOnRN(setIdleTime, milliTimes.FIVE_MINUTE);
-    }
-  });
+  if (!device || !store) {
+    return null;
+  }
 
   const handleOpenMenuModalOrAddToCart = (menu: Menu) => {
     if (store?.setting.showMenuPopup || menu.menuOptionGroups.length > 0) {
@@ -307,7 +295,7 @@ const CustomerTableScreen = () => {
   };
 
   return (
-    <GestureDetector gesture={resetIdleTime}>
+    <GestureDetector gesture={gesture}>
       <SafeAreaView style={styles.container}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
@@ -319,7 +307,7 @@ const CustomerTableScreen = () => {
             </View>
           </View>
           <View style={styles.categoryContainer}>
-            <View style={{ width: categoryContentWidth }}>
+            <View style={{ width: screenWidth - 210 }}>
               {categories && categories.length > 0 && (
                 <FlatList
                   ref={categoriesRef}
