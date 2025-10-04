@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
-import Modal, { SubmitModalProps } from "@/components/Modal/Modal";
+import Modal, { BaseSubmitModalProps } from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 
-export interface StaffCallModalProps extends SubmitModalProps {
+export interface StaffCallModalProps extends BaseSubmitModalProps {
   options: string[];
   selectedOption: string;
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
@@ -20,6 +20,7 @@ const StaffCallModal = ({
   setSelectedOption,
   onSubmit,
   onClose,
+  ...props
 }: StaffCallModalProps) => {
   const { width: screenWidth } = useWindowDimensions();
   const [contentWidth, setContentWidth] = useState(0);
@@ -65,6 +66,7 @@ const StaffCallModal = ({
           color="black"
           disabled={!selectedOption}
           onPress={onSubmit}
+          {...props}
         />
       </Modal.ButtonContainer>
     </Modal>

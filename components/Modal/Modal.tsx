@@ -10,7 +10,8 @@ export interface BaseModalProps {
   onClose: () => void;
 }
 
-export interface SubmitModalProps extends BaseModalProps {
+export interface BaseSubmitModalProps extends BaseModalProps, PressableProps {
+  submitButtonLabel?: string;
   onSubmit: () => void;
 }
 
@@ -80,7 +81,6 @@ function ButtonContainer({ children }: PropsWithChildren) {
 interface ModalButtonProps extends PressableProps {
   label: string;
   color?: "red" | "gray" | "black";
-  disabled?: boolean;
 }
 
 function ModalButton({ label, color = "red", disabled = false, ...props }: ModalButtonProps) {
