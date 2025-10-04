@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureDetector } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { scheduleOnRN } from "react-native-worklets";
 
 import { AdultIcon, BabyIcon } from "@/assets/icons";
 import Button from "@/components/Button";
@@ -15,6 +14,7 @@ import PersonCountBox from "@/components/PersonCountBox";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
+import useIdle from "@/hooks/useIdle";
 import useModals from "@/hooks/useModal";
 import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaitingApi";
 import { ModalName } from "@/stores/modal";
@@ -24,7 +24,8 @@ import { parseErrorMessage } from "@/utils/support";
 const PHONE_NUMBER_PREFIX = "010";
 
 const WaitingRegistrationScreen = () => {
-  const [idleTime, setIdleTime] = useState(milliTimes.ONE_MINUTE);
+  const { idleTime, resetIdleTime, gesture } = useIdle(milliTimes.ONE_MINUTE);
+
   const [personCount, setPersonCount] = useState({
     adult: 0,
     infant: 0,
@@ -38,11 +39,11 @@ const WaitingRegistrationScreen = () => {
   const { openModal, closeModal } = useModals();
 
   const resetAll = useCallback(() => {
-    setIdleTime(milliTimes.ONE_MINUTE);
+    resetIdleTime();
     setPersonCount({ adult: 0, infant: 0 });
     setPhoneNumber("");
     setIsValidForm(false);
-  }, []);
+  }, [resetIdleTime]);
 
   useEffect(() => {
     if (personCount.adult > 0 && phoneNumber.length === 8) {
@@ -53,25 +54,13 @@ const WaitingRegistrationScreen = () => {
   }, [personCount.adult, phoneNumber]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (personCount.adult !== 0 || personCount.infant !== 0 || phoneNumber !== "") {
-        setIdleTime((prev) => prev - milliTimes.ONE_SECOND);
-      }
-    }, milliTimes.ONE_SECOND);
-    return () => clearInterval(interval);
-  }, [personCount, phoneNumber]);
-
-  useEffect(() => {
-    if (idleTime <= milliTimes.ZERO) {
+    if (
+      idleTime <= milliTimes.ZERO &&
+      (personCount.adult > 0 || personCount.infant > 0 || phoneNumber.length > 0)
+    ) {
       resetAll();
     }
-  }, [idleTime, resetAll]);
-
-  const resetIdleTime = Gesture.Tap().onStart(() => {
-    if (idleTime < milliTimes.ONE_MINUTE) {
-      scheduleOnRN(setIdleTime, milliTimes.ONE_MINUTE);
-    }
-  });
+  }, [idleTime, personCount, phoneNumber, resetAll]);
 
   const minusPersonCount = (key: "adult" | "infant") => {
     if (personCount[key] > 0) {
@@ -142,7 +131,7 @@ const WaitingRegistrationScreen = () => {
   };
 
   return (
-    <GestureDetector gesture={resetIdleTime}>
+    <GestureDetector gesture={gesture}>
       <SafeAreaView style={styles.container}>
         <View style={styles.viewContainer}>
           <View style={styles.infoContainer}>
