@@ -5,14 +5,14 @@ import { AntDesign } from "@expo/vector-icons";
 
 import Button from "@/components/Button";
 import CartMenu from "@/components/CartMenu";
-import Modal, { SubmitModalProps } from "@/components/Modal/Modal";
+import Modal, { BaseSubmitModalProps } from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { PaymentType } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
 import { Menu } from "@/types/menu";
 import { OrderCreate } from "@/types/order";
 
-export interface CartModalProps extends SubmitModalProps {
+export interface CartModalProps extends BaseSubmitModalProps {
   menus: Menu[];
   cart: OrderCreate[];
   setCart: React.Dispatch<React.SetStateAction<OrderCreate[]>>;
@@ -28,6 +28,7 @@ const CartModal = ({
   paymentType,
   onSubmit,
   onClose,
+  ...props
 }: CartModalProps) => {
   const { height: screenHeight } = useWindowDimensions();
   const [contentHeight, setContentHeight] = useState(0);
@@ -116,6 +117,7 @@ const CartModal = ({
           <Button
             label={paymentType === "PREPAID" ? "결제하고 주문하기" : "주문하기"}
             onPress={onSubmit}
+            {...props}
           />
         </View>
       </View>

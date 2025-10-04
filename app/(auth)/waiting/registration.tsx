@@ -8,15 +8,16 @@ import { AdultIcon, BabyIcon } from "@/assets/icons";
 import Button from "@/components/Button";
 import LogoHeaderTitle from "@/components/LogoHeaderTitle";
 import ErrorModal from "@/components/Modal/ErrorModal";
-import Modal from "@/components/Modal/Modal";
+import SubmitModal from "@/components/Modal/SubmitModal";
 import SuccessModal from "@/components/Modal/SuccessModal";
 import NumPad from "@/components/NumPad";
 import PersonCountBox from "@/components/PersonCountBox";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
-import { useModal } from "@/hooks/useModal";
+import useModals from "@/hooks/useModal";
 import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaitingApi";
+import { ModalName } from "@/stores/modal";
 import { formatPhoneNumberWithoutPrefix } from "@/utils/format";
 import { parseErrorMessage } from "@/utils/support";
 
@@ -30,25 +31,18 @@ const WaitingRegistrationScreen = () => {
   });
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isValidForm, setIsValidForm] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
   const { waitingCount } = useGetWaitingCount();
-  const createWaiting = useCreateWaiting();
+  const { mutate, isPending } = useCreateWaiting();
 
-  const submitModal = useModal();
-  const successModal = useModal();
-  const errorModal = useModal();
+  const { openModal, closeModal } = useModals();
 
   const resetAll = useCallback(() => {
     setIdleTime(milliTimes.ONE_MINUTE);
     setPersonCount({ adult: 0, infant: 0 });
     setPhoneNumber("");
     setIsValidForm(false);
-    submitModal.close();
-    successModal.close();
-    errorModal.close();
-    setErrorMessage("");
-  }, [errorModal, submitModal, successModal]);
+  }, []);
 
   useEffect(() => {
     if (personCount.adult > 0 && phoneNumber.length === 8) {
@@ -101,9 +95,22 @@ const WaitingRegistrationScreen = () => {
     setPhoneNumber((prev) => prev.slice(0, -1));
   };
 
+  const openSubmitModal = () => {
+    openModal(ModalName.WAITING_REGISTRATION_SUBMIT, SubmitModal, {
+      title: `${PHONE_NUMBER_PREFIX} - ${formatPhoneNumberWithoutPrefix(phoneNumber)}`,
+      message: "위 번호로 웨이팅 등록을 하시겠습니까?",
+      submitButtonLabel: "등록하기",
+      onSubmit: () => {
+        closeModal();
+        submitCreateWaiting();
+      },
+      onClose: closeModal,
+      disabled: !isValidForm || isPending,
+    });
+  };
+
   const submitCreateWaiting = () => {
-    submitModal.close();
-    createWaiting.mutate(
+    mutate(
       {
         phoneNumber: `${PHONE_NUMBER_PREFIX}${phoneNumber}`,
         adult: personCount.adult,
@@ -111,11 +118,24 @@ const WaitingRegistrationScreen = () => {
       },
       {
         onSuccess: () => {
-          successModal.open();
+          openModal(ModalName.WAITING_REGISTRATION_SUCCESS, SuccessModal, {
+            title: "웨이팅 등록 완료",
+            message: "휴대폰 번호로 전송된 알림톡 또는 문자 메시지를 확인해 주세요.",
+            onClose: () => {
+              // TODO: RESET ALL STATE
+              closeModal();
+            },
+          });
         },
         onError: (error) => {
-          setErrorMessage(parseErrorMessage(error));
-          errorModal.open();
+          openModal(ModalName.WAITING_REGISTRATION_ERROR, ErrorModal, {
+            title: "웨이팅 등록 실패",
+            message: parseErrorMessage(error),
+            onClose: () => {
+              // TODO: RESET ALL STATE
+              closeModal();
+            },
+          });
         },
       }
     );
@@ -260,32 +280,12 @@ const WaitingRegistrationScreen = () => {
               <Button
                 label="등록하기"
                 color="black"
-                onPress={submitModal.open}
+                onPress={openSubmitModal}
                 disabled={!isValidForm}
               />
             </View>
           </View>
         </View>
-        <Modal visible={submitModal.isOpen}>
-          <Modal.Title color="red">{`${PHONE_NUMBER_PREFIX} - ${formatPhoneNumberWithoutPrefix(phoneNumber)}`}</Modal.Title>
-          <Modal.Content>위 번호로 웨이팅 등록을 하시겠습니까?</Modal.Content>
-          <Modal.ButtonContainer>
-            <Modal.Button label="닫기" color="gray" onPress={resetAll} />
-            <Modal.Button label="등록하기" color="black" onPress={submitCreateWaiting} />
-          </Modal.ButtonContainer>
-        </Modal>
-        <SuccessModal
-          isVisible={successModal.isOpen}
-          title="웨이팅 등록 완료"
-          message="휴대폰 번호로 전송된 알림톡 또는 문자 메시지를 확인해 주세요."
-          close={resetAll}
-        />
-        <ErrorModal
-          isVisible={errorModal.isOpen}
-          title="웨이팅 등록 실패"
-          message={errorMessage}
-          close={resetAll}
-        />
       </SafeAreaView>
     </GestureDetector>
   );

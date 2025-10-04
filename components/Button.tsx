@@ -8,7 +8,6 @@ interface ButtonProps extends PressableProps {
   variant?: "fill" | "outline";
   color?: "red" | "gray" | "black";
   size?: "small" | "medium" | "large";
-  disabled?: boolean;
 }
 
 const Button = ({

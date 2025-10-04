@@ -6,12 +6,16 @@ import { ErrorModalProps } from "@/components/Modal/ErrorModal";
 import { MenuModalProps } from "@/components/Modal/MenuModal";
 import { OrderHistoryModalProps } from "@/components/Modal/OrderHistoryModal";
 import { StaffCallModalProps } from "@/components/Modal/StaffCallModal";
+import { SubmitModalProps } from "@/components/Modal/SubmitModal";
 import { SuccessModalProps } from "@/components/Modal/SuccessModal";
 import { ValueOf } from "@/types/utility";
 
 export const ModalName = {
   STORE_IS_EMPTY: "storeIsEmpty",
   DEVICE_CREATE_ERROR: "deviceCreateError",
+  WAITING_REGISTRATION_SUBMIT: "waitingRegistrationSubmit",
+  WAITING_REGISTRATION_SUCCESS: "waitingRegistrationSuccess",
+  WAITING_REGISTRATION_ERROR: "waitingRegistrationError",
 } as const;
 
 type ModalNameValue = ValueOf<typeof ModalName>;
@@ -23,6 +27,7 @@ type ModalProps =
   | MenuModalProps
   | OrderHistoryModalProps
   | StaffCallModalProps
+  | SubmitModalProps
   | SuccessModalProps;
 
 interface Modal<P = ModalProps> {
