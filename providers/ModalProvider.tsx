@@ -1,7 +1,7 @@
-import useModals from "@/hooks/useModal";
+import useModal from "@/hooks/useModal";
 
 const ModalProvider = () => {
-  const { modals } = useModals();
+  const { modals } = useModal();
 
   return (
     <>

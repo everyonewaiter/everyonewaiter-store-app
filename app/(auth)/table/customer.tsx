@@ -21,12 +21,13 @@ import { images } from "@/constants/images";
 import { milliTimes } from "@/constants/times";
 import useIdle from "@/hooks/useIdle";
 import { useGetMenus } from "@/hooks/useMenuApi";
-import { useModal } from "@/hooks/useModal";
+import useModal from "@/hooks/useModal";
 import { useCreateTableOrder, useGetTableOrderHistories, useStaffCall } from "@/hooks/useOrderApi";
 import { useCreateCardPayment } from "@/hooks/usePaymentApi";
 import { useGetStore } from "@/hooks/useStoreApi";
 import KscatModule, { KscatResponse } from "@/modules/kscat";
 import { useAuthentication } from "@/providers/AuthenticationProvider";
+import { ModalName } from "@/stores/modal";
 import { Category, Menu } from "@/types/menu";
 import { OrderCreate } from "@/types/order";
 import { calculateService, calculateVat } from "@/utils/calculate";
@@ -42,15 +43,14 @@ const CustomerTableScreen = () => {
   const { device } = useAuthentication();
   const { data: store } = useGetStore(device?.storeId);
   const { categories } = useGetMenus(device?.storeId);
-
-  const [error, setError] = useState({ title: "", message: "" });
+  const { histories } = useGetTableOrderHistories(device?.tableNo);
 
   // Menu
   const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
-  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
+  const existsCategory = categories && categories.length > 0;
+  const existsMenu = selectedCategory && selectedCategory.menus.length > 0;
 
   // Order
-  const { histories } = useGetTableOrderHistories(device?.tableNo);
   const [cart, setCart] = useState<OrderCreate[]>([]);
   const [selectedStaffCallOption, setSelectedStaffCallOption] = useState("");
   const staffCall = useStaffCall();
@@ -58,76 +58,77 @@ const CustomerTableScreen = () => {
   const createCardPayment = useCreateCardPayment();
 
   // Modal
-  const countryOfOriginModal = useModal();
-  const menuModal = useModal();
-  const staffCallModal = useModal();
-  const staffCallSuccessModal = useModal();
-  const cartModal = useModal();
-  const cartResetModal = useModal();
-  const orderHistoryModal = useModal();
-  const orderSuccessModal = useModal();
-  const errorModal = useModal();
+  const { isOpenModal, openModal, closeAllModals } = useModal();
+
+  const resetScroll = useCallback(() => {
+    if (existsCategory) categoriesRef.current?.scrollToIndex({ index: 0 });
+    if (existsMenu) menusRef.current?.scrollToIndex({ index: 0 });
+  }, [existsCategory, existsMenu]);
 
   const resetAll = useCallback(() => {
-    const existsCategory = categories && categories.length > 0;
-    const existsMenu = selectedCategory && selectedCategory.menus.length > 0;
-
-    resetIdleTime();
-    setError({ title: "", message: "" });
+    closeAllModals();
+    setCart([]);
     setSelectedCategory(existsCategory ? categories[0] : defaultCategory);
     setSelectedStaffCallOption("");
-    setCart([]);
-    countryOfOriginModal.close();
-    menuModal.close();
-    staffCallModal.close();
-    staffCallSuccessModal.close();
-    cartModal.close();
-    orderHistoryModal.close();
-    orderSuccessModal.close();
-    errorModal.close();
-
-    if (existsCategory) {
-      categoriesRef.current?.scrollToIndex({ index: 0 });
-    }
-
-    if (existsMenu) {
-      menusRef.current?.scrollToIndex({ index: 0 });
-    }
-  }, [
-    categories,
-    selectedCategory,
-    resetIdleTime,
-    countryOfOriginModal,
-    menuModal,
-    staffCallModal,
-    staffCallSuccessModal,
-    cartModal,
-    orderHistoryModal,
-    orderSuccessModal,
-    errorModal,
-  ]);
+    resetScroll();
+    resetIdleTime();
+  }, [closeAllModals, existsCategory, categories, resetScroll, resetIdleTime]);
 
   useEffect(() => {
-    if (categories && categories.length > 0) {
+    if (existsCategory) {
       setSelectedCategory(categories[0]);
     }
-  }, [categories]);
+  }, [categories, existsCategory]);
 
   useEffect(() => {
-    // TODO: 모달이 열려있거나, 장바구니가 비어 있지 않거나, 카테고리 또는 메뉴의 스크롤 index가 0이 아닌 경우 초기화
-    if (idleTime <= milliTimes.ZERO) {
+    // TODO: 장바구니가 비어 있지 않거나, 카테고리 또는 메뉴의 스크롤 index가 0이 아닌 경우 초기화
+    if (idleTime <= milliTimes.ZERO && isOpenModal) {
       resetAll();
     }
-  }, [idleTime, resetAll]);
+  }, [idleTime, isOpenModal, resetAll]);
 
   if (!device || !store) {
     return null;
   }
 
-  const handleOpenMenuModalOrAddToCart = (menu: Menu) => {
-    if (store?.setting.showMenuPopup || menu.menuOptionGroups.length > 0) {
-      setSelectedMenu(menu);
-      menuModal.open();
+  const openCountryOfOriginModal = () => {
+    openModal(ModalName.COUNTRY_OF_ORIGIN, CountryOfOriginModal, {
+      countryOfOrigins: store.setting.countryOfOrigins,
+      onClose: closeAllModals,
+    });
+  };
+
+  const openStaffCallModal = () => {
+    openModal(ModalName.STAFF_CALL, StaffCallModal, {
+      options: store.setting.staffCallOptions,
+      selectedOption: selectedStaffCallOption,
+      setSelectedOption: setSelectedStaffCallOption,
+      onSubmit: submitStaffCall,
+      onClose: () => {
+        setSelectedStaffCallOption("");
+        closeAllModals();
+      },
+    });
+  };
+
+  const openOrderHistoryModal = () => {
+    if (histories.length > 0) {
+      openModal(ModalName.ORDER_HISTORY, OrderHistoryModal, {
+        histories: histories,
+        setting: store.setting,
+        onClose: closeAllModals,
+      });
+    }
+  };
+
+  const openMenuModalOrAddToCart = (menu: Menu) => {
+    if (store.setting.showMenuPopup || menu.menuOptionGroups.length > 0) {
+      openModal(ModalName.MENU, MenuModal, {
+        menu: menu,
+        cart: cart,
+        setCart: setCart,
+        onClose: closeAllModals,
+      });
     } else {
       const copy = [...cart];
       const index = copy.findIndex((item) => item.menuId === menu.menuId);
@@ -140,12 +141,39 @@ const CustomerTableScreen = () => {
     }
   };
 
+  const openCartModal = () => {
+    if (existsCategory && cart.length > 0) {
+      openModal(ModalName.CART, CartModal, {
+        menus: categories[0].menus,
+        cart: cart,
+        setCart: setCart,
+        resetCart: forceResetCart,
+        paymentType: device.paymentType,
+        onSubmit: submitCreateOrder,
+        onClose: closeAllModals,
+      });
+    }
+  };
+
+  const openCartResetModal = () => {
+    openModal(ModalName.CART_RESET, ErrorModal, {
+      title: "알림",
+      message: "변경된 메뉴 항목이 있습니다.\n장바구니에 메뉴를 다시 담아주세요.",
+      onClose: closeAllModals,
+    });
+  };
+
+  const handleOnChangeCategory = (category: Category, index: number) => {
+    setSelectedCategory(category);
+    categoriesRef.current?.scrollToIndex({ index });
+  };
+
   const calculateCartTotalPrice = () => {
     let totalPrice = 0;
     for (const orderCreate of cart) {
       const menu = categories?.[0].menus.find((menu) => menu.menuId === orderCreate.menuId);
       if (!menu) {
-        resetCart();
+        forceResetCart();
         return;
       }
 
@@ -158,7 +186,7 @@ const CustomerTableScreen = () => {
             (menuOption) => menuOption.name === option.name && menuOption.price === option.price
           );
           if (!menuOption) {
-            resetCart();
+            forceResetCart();
             return;
           }
           optionPrice += menuOption.price;
@@ -168,27 +196,34 @@ const CustomerTableScreen = () => {
     return totalPrice;
   };
 
-  const resetCart = () => {
-    cartModal.close();
+  const forceResetCart = () => {
+    closeAllModals();
     setCart([]);
-    cartResetModal.open();
+    openCartResetModal();
   };
 
-  const callStaff = () => {
+  const submitStaffCall = () => {
     if (selectedStaffCallOption) {
-      staffCallModal.close();
       staffCall.mutate(
         { optionName: selectedStaffCallOption },
         {
           onSuccess: () => {
-            staffCallSuccessModal.open();
+            openModal(ModalName.STAFF_CALL_SUCCESS, SuccessModal, {
+              title: selectedStaffCallOption,
+              image: images.BELL_ANIMATION,
+              message: "직원을 호출했습니다. 잠시만 기다려주세요!",
+              onClose: () => {
+                setSelectedStaffCallOption("");
+                closeAllModals();
+              },
+            });
           },
           onError: (error) => {
-            setError({
+            openModal(ModalName.STAFF_CALL_ERROR, ErrorModal, {
               title: "직원 호출 실패",
               message: parseErrorMessage(error),
+              onClose: closeAllModals,
             });
-            errorModal.open();
           },
         }
       );
@@ -200,16 +235,16 @@ const CustomerTableScreen = () => {
       return;
     }
 
-    if (!store?.setting || store.setting.ksnetDeviceNo.length < 8) {
-      setError({
+    if (store.setting.ksnetDeviceNo.length < 8) {
+      openModal(ModalName.KSNET_DEVICE_NO_NOT_INITIALIZED, ErrorModal, {
         title: "단말기 번호가 등록되지 않았습니다.",
         message: "설정 페이지에서 Ksnet 단말기 번호를 등록해주세요.",
+        onClose: closeAllModals,
       });
-      errorModal.open();
       return;
     }
 
-    if (device?.paymentType === "POSTPAID") {
+    if (device.paymentType === "POSTPAID") {
       createOrder();
       return;
     }
@@ -229,11 +264,17 @@ const CustomerTableScreen = () => {
       createPayment(amount, installment, response);
     } catch (exception: any) {
       if (exception.code === "FAIL") {
-        setError({ title: "결제 실패", message: exception.message });
-        errorModal.open();
+        openModal(ModalName.KSNET_PAYMENT_ERROR, ErrorModal, {
+          title: "결제 실패",
+          message: exception.message,
+          onClose: closeAllModals,
+        });
       } else {
-        setError({ title: "결제 오류", message: exception.message });
-        errorModal.open();
+        openModal(ModalName.KSNET_PAYMENT_ERROR, ErrorModal, {
+          title: "결제 오류",
+          message: exception.message,
+          onClose: closeAllModals,
+        });
       }
     }
   };
@@ -261,34 +302,34 @@ const CustomerTableScreen = () => {
           createOrder();
         },
         onError: (error) => {
-          setError({
+          openModal(ModalName.ORDER_PAYMENT_ERROR, ErrorModal, {
             title: "오류: 직원을 호출하여 결제를 취소하세요.",
             message: parseErrorMessage(error),
+            onClose: closeAllModals,
           });
-          errorModal.open();
         },
       }
     );
   };
 
   const createOrder = () => {
-    if (!device) {
-      return;
-    }
-
     createTableOrder.mutate(
       { tableNo: device.tableNo, memo: "", orderMenus: cart },
       {
         onSuccess: () => {
-          cartModal.close();
-          orderSuccessModal.open();
+          openModal(ModalName.ORDER_SUCCESS, SuccessModal, {
+            title: "주문 완료",
+            image: images.COMPLETE_ANIMATION,
+            message: "주문이 완료되었습니다.",
+            onClose: resetAll,
+          });
         },
         onError: (error) => {
-          setError({
+          openModal(ModalName.ORDER_ERROR, ErrorModal, {
             title: "주문 실패",
             message: parseErrorMessage(error),
+            onClose: closeAllModals,
           });
-          errorModal.open();
         },
       }
     );
@@ -320,17 +361,14 @@ const CustomerTableScreen = () => {
                       category={renderItem.item}
                       index={renderItem.index}
                       selectedCategory={selectedCategory}
-                      handleSelectCategory={(category: Category, index) => {
-                        setSelectedCategory(category);
-                        categoriesRef.current?.scrollToIndex({ index });
-                      }}
+                      handleSelectCategory={handleOnChangeCategory}
                     />
                   )}
                 />
               )}
             </View>
             <View>
-              <Pressable style={styles.countryOfOrigin} onPress={countryOfOriginModal.open}>
+              <Pressable style={styles.countryOfOrigin} onPress={openCountryOfOriginModal}>
                 <Text style={styles.countryOfOriginText}>원산지 정보</Text>
               </Pressable>
             </View>
@@ -354,7 +392,7 @@ const CustomerTableScreen = () => {
                     rootNumColumns={4}
                     rootGap={16}
                     rootPaddingHorizontal={24}
-                    onPress={() => handleOpenMenuModalOrAddToCart(renderItem.item)}
+                    onPress={() => openMenuModalOrAddToCart(renderItem.item)}
                   />
                 )}
               />
@@ -363,110 +401,22 @@ const CustomerTableScreen = () => {
         </View>
         <View style={styles.footerContainer}>
           <View style={styles.footerLeft}>
-            <Pressable
-              style={styles.receipt}
-              onPress={() => {
-                if (histories.length > 0) {
-                  orderHistoryModal.open();
-                }
-              }}
-            >
+            <Pressable style={styles.receipt} onPress={openOrderHistoryModal}>
               <ReceiptIcon />
               <Text style={styles.receiptText}>주문 내역</Text>
             </Pressable>
           </View>
           <View style={styles.footerRight}>
-            <Pressable style={styles.staffCall} onPress={staffCallModal.open}>
+            <Pressable style={styles.staffCall} onPress={openStaffCallModal}>
               <BellIcon />
               <Text style={styles.staffCallText}>직원 호출</Text>
             </Pressable>
-            <Pressable
-              style={styles.cart}
-              onPress={() => {
-                if (cart.length > 0) {
-                  cartModal.open();
-                }
-              }}
-            >
+            <Pressable style={styles.cart} onPress={openCartModal}>
               <Text style={styles.cartText}>장바구니</Text>
               <Text style={styles.cartCountText}>{cart.length}</Text>
             </Pressable>
           </View>
         </View>
-        <CountryOfOriginModal
-          isVisible={countryOfOriginModal.isOpen}
-          countryOfOrigins={store?.setting.countryOfOrigins ?? []}
-          close={countryOfOriginModal.close}
-        />
-        <MenuModal
-          visible={menuModal.isOpen}
-          selectedMenu={selectedMenu}
-          cart={cart}
-          setCart={setCart}
-          close={() => {
-            setSelectedMenu(null);
-            menuModal.close();
-          }}
-        />
-        <StaffCallModal
-          isVisible={staffCallModal.isOpen}
-          options={store?.setting.staffCallOptions ?? []}
-          selectedOption={selectedStaffCallOption}
-          setSelectedOption={setSelectedStaffCallOption}
-          submit={callStaff}
-          close={() => {
-            setSelectedStaffCallOption("");
-            staffCallModal.close();
-          }}
-        />
-        <SuccessModal
-          isVisible={staffCallSuccessModal.isOpen}
-          title={selectedStaffCallOption}
-          image={images.BELL_ANIMATION}
-          message="직원을 호출했습니다. 잠시만 기다려주세요!"
-          close={() => {
-            setSelectedStaffCallOption("");
-            staffCallSuccessModal.close();
-          }}
-        />
-        <CartModal
-          visible={cartModal.isOpen}
-          menus={categories?.[0]?.menus ?? []}
-          cart={cart}
-          setCart={setCart}
-          resetCart={resetCart}
-          paymentType={device?.paymentType ?? "POSTPAID"}
-          submit={submitCreateOrder}
-          close={cartModal.close}
-        />
-        <ErrorModal
-          isVisible={cartResetModal.isOpen}
-          title={"알림"}
-          message={"변경된 메뉴 항목이 있습니다.\n장바구니에 메뉴를 다시 담아주세요."}
-          close={cartResetModal.close}
-        />
-        <OrderHistoryModal
-          isVisible={orderHistoryModal.isOpen}
-          histories={histories}
-          setting={store?.setting}
-          close={orderHistoryModal.close}
-        />
-        <SuccessModal
-          isVisible={orderSuccessModal.isOpen}
-          title="주문 완료"
-          image={images.COMPLETE_ANIMATION}
-          message="주문이 완료되었습니다."
-          close={resetAll}
-        />
-        <ErrorModal
-          isVisible={errorModal.isOpen}
-          title={error.title}
-          message={error.message}
-          close={() => {
-            setError({ title: "", message: "" });
-            errorModal.close();
-          }}
-        />
       </SafeAreaView>
     </GestureDetector>
   );

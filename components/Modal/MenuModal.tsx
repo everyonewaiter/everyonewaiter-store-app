@@ -11,51 +11,40 @@ import Modal, { BaseModalProps } from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { MenuLabel } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
-import { images } from "@/constants/images";
 import { Menu } from "@/types/menu";
 import { OrderCreate, OrderCreateOptionGroup } from "@/types/order";
 
 export interface MenuModalProps extends BaseModalProps {
-  selectedMenu: Menu | null;
+  menu: Menu;
   cart: OrderCreate[];
   setCart: React.Dispatch<React.SetStateAction<OrderCreate[]>>;
 }
 
-const MenuModal = ({ selectedMenu, cart, setCart, onClose }: MenuModalProps) => {
-  const image = useImage(
-    selectedMenu?.image
-      ? process.env.EXPO_PUBLIC_CDN_URL + `/${selectedMenu.image}`
-      : images.PREPARATION
-  );
+const MenuModal = ({ menu, cart, setCart, onClose }: MenuModalProps) => {
+  const image = useImage(process.env.EXPO_PUBLIC_CDN_URL + `/${menu.image}`);
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<OrderCreateOptionGroup[]>([]);
 
   useEffect(() => {
-    if (selectedMenu) {
-      setSelectedOptions(
-        selectedMenu.menuOptionGroups
-          .filter((optionGroup) => optionGroup.type === "MANDATORY")
-          .map((optionGroup) => ({
-            menuOptionGroupId: optionGroup.menuOptionGroupId,
-            orderOptions: [
-              {
-                name: optionGroup.menuOptions[0].name,
-                price: optionGroup.menuOptions[0].price,
-              },
-            ],
-          }))
-      );
-    }
-  }, [selectedMenu]);
+    setSelectedOptions(
+      menu.menuOptionGroups
+        .filter((optionGroup) => optionGroup.type === "MANDATORY")
+        .map((optionGroup) => ({
+          menuOptionGroupId: optionGroup.menuOptionGroupId,
+          orderOptions: [
+            {
+              name: optionGroup.menuOptions[0].name,
+              price: optionGroup.menuOptions[0].price,
+            },
+          ],
+        }))
+    );
+  }, [menu]);
 
-  if (!selectedMenu) {
-    return null;
-  }
-
-  const mandatoryOptionGroups = selectedMenu.menuOptionGroups.filter(
+  const mandatoryOptionGroups = menu.menuOptionGroups.filter(
     (optionGroup) => optionGroup.type === "MANDATORY"
   );
-  const choiceOptionGroups = selectedMenu.menuOptionGroups.filter(
+  const choiceOptionGroups = menu.menuOptionGroups.filter(
     (optionGroup) => optionGroup.type === "OPTIONAL"
   );
   const optionGroups = [
@@ -82,23 +71,23 @@ const MenuModal = ({ selectedMenu, cart, setCart, onClose }: MenuModalProps) => 
   const calculateTotalPrice = () => {
     const options = selectedOptions.flatMap((optionGroup) => optionGroup.orderOptions);
     const optionPrice = options.reduce((acc, option) => {
-      const selectedOption = selectedMenu.menuOptionGroups
+      const selectedOption = menu.menuOptionGroups
         .flatMap((optionGroup) => optionGroup.menuOptions)
         .find((menuOption) => menuOption.name === option.name && menuOption.price === option.price);
       return acc + (selectedOption?.price ?? 0);
     }, 0);
-    const totalPrice = (selectedMenu.price + optionPrice) * quantity;
+    const totalPrice = (menu.price + optionPrice) * quantity;
     return totalPrice.toPrice();
   };
 
   const addCart = () => {
     const copy = [...cart];
     const index = copy
-      .filter((c) => c.menuId === selectedMenu.menuId)
+      .filter((c) => c.menuId === menu.menuId)
       .findIndex((item) => compareOptionGroups(item.menuOptionGroups, selectedOptions));
     if (index === -1) {
       copy.push({
-        menuId: selectedMenu.menuId,
+        menuId: menu.menuId,
         quantity: quantity,
         menuOptionGroups: selectedOptions,
       });
@@ -156,7 +145,7 @@ const MenuModal = ({ selectedMenu, cart, setCart, onClose }: MenuModalProps) => 
             style={styles.image}
             imageStyle={styles.imageBorder}
             source={image}
-            alt={selectedMenu.name}
+            alt={menu.name}
             contentFit="cover"
           />
         )}
@@ -165,20 +154,18 @@ const MenuModal = ({ selectedMenu, cart, setCart, onClose }: MenuModalProps) => 
         <View style={{ flex: 1 }}>
           <View style={styles.info}>
             <View style={{ flexDirection: "row" }}>
-              <Text style={styles.infoLabel}>{MenuLabel[selectedMenu.label]}</Text>
+              <Text style={styles.infoLabel}>{MenuLabel[menu.label]}</Text>
               <Pressable style={styles.closeButton} onPress={handleClose}>
                 <AntDesign name="close" size={28} color="black" />
               </Pressable>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={styles.infoTitleText}>{selectedMenu.name}</Text>
-              {selectedMenu.spicy > 0 && (
-                <Text style={styles.infoDescriptionText}> {"🌶".repeat(selectedMenu.spicy)}</Text>
+              <Text style={styles.infoTitleText}>{menu.name}</Text>
+              {menu.spicy > 0 && (
+                <Text style={styles.infoDescriptionText}> {"🌶".repeat(menu.spicy)}</Text>
               )}
             </View>
-            {selectedMenu.description && (
-              <Text style={styles.infoDescriptionText}>{selectedMenu.description}</Text>
-            )}
+            {menu.description && <Text style={styles.infoDescriptionText}>{menu.description}</Text>}
             <View style={{ flexDirection: "row", marginTop: 8 }}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Pressable style={styles.quantityButton} onPress={minusQuantity}>
@@ -190,12 +177,12 @@ const MenuModal = ({ selectedMenu, cart, setCart, onClose }: MenuModalProps) => 
                 </Pressable>
               </View>
               <View style={styles.menuPrice}>
-                <Text style={styles.menuPriceText}>{selectedMenu.price.toPrice()}원</Text>
+                <Text style={styles.menuPriceText}>{menu.price.toPrice()}원</Text>
               </View>
             </View>
             <View style={styles.divider} />
             <SectionList
-              style={{ height: selectedMenu.description ? 320 : 360 }}
+              style={{ height: menu.description ? 320 : 360 }}
               sections={optionGroups}
               keyExtractor={(item) => item.menuOptionGroupId}
               renderItem={({ item }) => (

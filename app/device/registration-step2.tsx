@@ -21,7 +21,7 @@ import useDeviceStep2Form, {
   DeviceStep2FormName,
   DeviceStep2SelectorName,
 } from "@/hooks/useDeviceStep2Form";
-import useModals from "@/hooks/useModal";
+import useModal from "@/hooks/useModal";
 import { ModalName } from "@/stores/modal";
 import { Entries } from "@/types/utility";
 import { setItem } from "@/utils/storage";
@@ -41,7 +41,7 @@ const RegistrationStep2Screen = () => {
 
   const { mutate, isPending } = useCreateDevice();
 
-  const { openModal, closeModal } = useModals();
+  const { openModal, closeModal } = useModal();
 
   useEffect(() => {
     if (!accountId || !storeId || !phoneNumber) {

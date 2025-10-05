@@ -11,8 +11,21 @@ import { SuccessModalProps } from "@/components/Modal/SuccessModal";
 import { ValueOf } from "@/types/utility";
 
 export const ModalName = {
-  STORE_IS_EMPTY: "storeIsEmpty",
+  CART: "cart",
+  CART_RESET: "cartReset",
+  COUNTRY_OF_ORIGIN: "countryOfOrigin",
   DEVICE_CREATE_ERROR: "deviceCreateError",
+  KSNET_DEVICE_NO_NOT_INITIALIZED: "ksnetDeviceNoNotInitialized",
+  KSNET_PAYMENT_ERROR: "paymentError",
+  MENU: "menu",
+  ORDER_SUCCESS: "orderSuccess",
+  ORDER_ERROR: "orderError",
+  ORDER_HISTORY: "orderHistory",
+  ORDER_PAYMENT_ERROR: "orderPaymentError",
+  STAFF_CALL: "staffCall",
+  STAFF_CALL_SUCCESS: "staffCallSuccess",
+  STAFF_CALL_ERROR: "staffCallError",
+  STORE_IS_EMPTY: "storeIsEmpty",
   WAITING_REGISTRATION_SUBMIT: "waitingRegistrationSubmit",
   WAITING_REGISTRATION_SUCCESS: "waitingRegistrationSuccess",
   WAITING_REGISTRATION_ERROR: "waitingRegistrationError",
@@ -38,6 +51,7 @@ interface Modal<P = ModalProps> {
 
 interface ModalStore {
   modals: Modal[];
+  isOpenModal: boolean;
   openModal: <P extends ModalProps>(
     name: ModalNameValue,
     ModalComponent: React.FC<P>,
@@ -47,8 +61,9 @@ interface ModalStore {
   closeAllModals: () => void;
 }
 
-const useModalStore = create<ModalStore>((set) => ({
+const useModalStore = create<ModalStore>((set, get) => ({
   modals: [],
+  isOpenModal: get().modals.length > 0,
   openModal: <P extends ModalProps>(name: ModalNameValue, ModalComponent: React.FC<P>, props: P) =>
     set((state) => ({
       modals: [
