@@ -15,7 +15,7 @@ import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
 import useIdle from "@/hooks/useIdle";
-import useModals from "@/hooks/useModal";
+import useModal from "@/hooks/useModal";
 import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaitingApi";
 import useWaitingForm, { WaitingFormName } from "@/hooks/useWaitingForm";
 import { ModalName } from "@/stores/modal";
@@ -33,7 +33,7 @@ const WaitingRegistrationScreen = () => {
   const { waitingCount } = useGetWaitingCount();
   const { mutate, isPending } = useCreateWaiting();
 
-  const { openModal, closeModal, closeAllModals } = useModals();
+  const { openModal, closeModal, closeAllModals } = useModal();
 
   const resetAll = useCallback(() => {
     closeAllModals();

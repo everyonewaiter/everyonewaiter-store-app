@@ -22,7 +22,7 @@ import { milliTimes } from "@/constants/times";
 import { useGetProfile } from "@/hooks/useAccountApi";
 import useAuthCode from "@/hooks/useAuthCode";
 import useDeviceStep1Form, { DeviceStep1FormName } from "@/hooks/useDeviceStep1Form";
-import useModals from "@/hooks/useModal";
+import useModal from "@/hooks/useModal";
 import { useGetStores } from "@/hooks/useStoreApi";
 import { ModalName } from "@/stores/modal";
 import { formatPhoneNumberOnlyNumber, formatTime } from "@/utils/format";
@@ -61,7 +61,7 @@ const RegistrationStep1Screen = () => {
   const { accountId } = profile || {};
   const { data: stores } = useGetStores(accountId, isVerifyAuthCode);
 
-  const { openModal, closeModal } = useModals();
+  const { openModal, closeModal } = useModal();
 
   useEffect(() => {
     if (stores && stores.length > 0) {
