@@ -51,7 +51,7 @@ interface Modal<P = ModalProps> {
 
 interface ModalStore {
   modals: Modal[];
-  isOpenModal: boolean;
+  isOpenedModal: () => boolean;
   openModal: <P extends ModalProps>(
     name: ModalNameValue,
     ModalComponent: React.FC<P>,
@@ -63,7 +63,7 @@ interface ModalStore {
 
 const useModalStore = create<ModalStore>((set, get) => ({
   modals: [],
-  isOpenModal: get().modals.length > 0,
+  isOpenedModal: () => get().modals.length > 0,
   openModal: <P extends ModalProps>(name: ModalNameValue, ModalComponent: React.FC<P>, props: P) =>
     set((state) => ({
       modals: [
