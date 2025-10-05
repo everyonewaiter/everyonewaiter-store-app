@@ -1,13 +1,19 @@
+import { useShallow } from "zustand/react/shallow";
+
 import useModalStore from "@/stores/modal";
 
 const useModal = () => {
-  const modals = useModalStore((state) => state.modals);
-  const isOpenModal = useModalStore((state) => state.isOpenModal);
-  const openModal = useModalStore((state) => state.openModal);
-  const closeModal = useModalStore((state) => state.closeModal);
-  const closeAllModals = useModalStore((state) => state.closeAllModals);
+  const [modals, isOpenedModal, openModal, closeModal, closeAllModals] = useModalStore(
+    useShallow((state) => [
+      state.modals,
+      state.isOpenedModal,
+      state.openModal,
+      state.closeModal,
+      state.closeAllModals,
+    ])
+  );
 
-  return { modals, isOpenModal, openModal, closeModal, closeAllModals };
+  return { modals, isOpenedModal: isOpenedModal(), openModal, closeModal, closeAllModals };
 };
 
 export default useModal;

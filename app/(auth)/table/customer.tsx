@@ -58,7 +58,7 @@ const CustomerTableScreen = () => {
   const createCardPayment = useCreateCardPayment();
 
   // Modal
-  const { isOpenModal, openModal, closeAllModals } = useModal();
+  const { isOpenedModal, openModal, closeAllModals } = useModal();
 
   const resetScroll = useCallback(() => {
     if (existsCategory) categoriesRef.current?.scrollToIndex({ index: 0 });
@@ -82,10 +82,10 @@ const CustomerTableScreen = () => {
 
   useEffect(() => {
     // TODO: 장바구니가 비어 있지 않거나, 카테고리 또는 메뉴의 스크롤 index가 0이 아닌 경우 초기화
-    if (idleTime <= milliTimes.ZERO && isOpenModal) {
+    if (idleTime <= milliTimes.ZERO && isOpenedModal) {
       resetAll();
     }
-  }, [idleTime, isOpenModal, resetAll]);
+  }, [idleTime, isOpenedModal, resetAll]);
 
   if (!device || !store) {
     return null;
