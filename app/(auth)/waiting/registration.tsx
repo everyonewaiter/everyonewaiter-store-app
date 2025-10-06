@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,6 +15,7 @@ import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { milliTimes } from "@/constants/times";
 import useIdle from "@/hooks/useIdle";
+import useInterval from "@/hooks/useInterval";
 import useModal from "@/hooks/useModal";
 import { useCreateWaiting, useGetWaitingCount } from "@/hooks/useWaitingApi";
 import useWaitingForm, { WaitingFormName } from "@/hooks/useWaitingForm";
@@ -41,11 +42,11 @@ const WaitingRegistrationScreen = () => {
     resetIdleTime();
   }, [closeAllModals, resetAllState, resetIdleTime]);
 
-  useEffect(() => {
-    if (idleTime <= milliTimes.ZERO && !isEmptyForm) {
+  useInterval(() => {
+    if (idleTime.current <= milliTimes.ZERO && !isEmptyForm) {
       resetAll();
     }
-  }, [idleTime, isEmptyForm, resetAll]);
+  }, milliTimes.ONE_SECOND);
 
   const addNumToPhone = (num: number) => {
     const added = form[WaitingFormName.PHONE_NUMBER] + num;

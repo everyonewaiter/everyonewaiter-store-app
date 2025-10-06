@@ -10,91 +10,94 @@ import { OrderCreateOptionGroup } from "@/types/order";
 import { formatPriceText } from "@/utils/format";
 
 interface MenuOptionSelectBoxProps {
-  groupId: string;
+  menuOptionGroupId: string;
   type: keyof typeof MenuOptionGroupType;
-  options: MenuOption[];
-  selectedOptions: OrderCreateOptionGroup[];
-  setSelectedOptions: React.Dispatch<React.SetStateAction<OrderCreateOptionGroup[]>>;
+  menuOptions: MenuOption[];
+  selectedMenuOptionGroups: OrderCreateOptionGroup[];
+  setSelectedMenuOptionGroups: React.Dispatch<React.SetStateAction<OrderCreateOptionGroup[]>>;
 }
 
 const MenuOptionSelectBox = ({
-  groupId,
+  menuOptionGroupId,
   type,
-  options,
-  selectedOptions,
-  setSelectedOptions,
+  menuOptions,
+  selectedMenuOptionGroups,
+  setSelectedMenuOptionGroups,
 }: MenuOptionSelectBoxProps) => {
-  const isSelectedOption = (option: MenuOption) => {
-    const selectedOption = selectedOptions.find((option) => option.menuOptionGroupId === groupId);
-    if (!selectedOption) {
-      return false;
-    }
-    return selectedOption.orderOptions.some(
-      (selectedOption) =>
-        selectedOption.name === option.name && selectedOption.price === option.price
-    );
+  const isSelectedOption = (menuOption: MenuOption) => {
+    return selectedMenuOptionGroups
+      .filter(
+        (selectedMenuOptionGroup) => selectedMenuOptionGroup.menuOptionGroupId === menuOptionGroupId
+      )
+      .flatMap((selectedMenuOptionGroup) => selectedMenuOptionGroup.orderOptions)
+      .some(
+        (selectedOrderOption) =>
+          selectedOrderOption.name === menuOption.name &&
+          selectedOrderOption.price === menuOption.price
+      );
   };
 
-  const handleSelectOption = (option: MenuOption) => {
-    const copy = [...selectedOptions];
-    const index = copy.findIndex((option) => option.menuOptionGroupId === groupId);
-    if (index === -1) {
+  const handleOnSelectOption = (menuOption: MenuOption) => {
+    const copy = [...selectedMenuOptionGroups];
+    const selectedMenuOptionGroupIndex = copy.findIndex(
+      (selectedMenuOptionGroup) => selectedMenuOptionGroup.menuOptionGroupId === menuOptionGroupId
+    );
+
+    if (selectedMenuOptionGroupIndex === -1) {
       copy.push({
-        menuOptionGroupId: groupId,
-        orderOptions: [{ name: option.name, price: option.price }],
+        menuOptionGroupId: menuOptionGroupId,
+        orderOptions: [{ name: menuOption.name, price: menuOption.price }],
       });
     } else {
+      const selectedMenuOptionGroup = copy[selectedMenuOptionGroupIndex];
+
       if (type === "MANDATORY") {
-        copy[index].orderOptions = [{ name: option.name, price: option.price }];
+        selectedMenuOptionGroup.orderOptions = [{ name: menuOption.name, price: menuOption.price }];
       } else {
-        const optionIndex = copy[index].orderOptions.findIndex(
-          (selectedOption) =>
-            selectedOption.name === option.name && selectedOption.price === option.price
+        const selectedOrderOptions = selectedMenuOptionGroup.orderOptions;
+        const selectedOrderOptionIndex = selectedOrderOptions.findIndex(
+          (selectedOrderOption) =>
+            selectedOrderOption.name === menuOption.name &&
+            selectedOrderOption.price === menuOption.price
         );
-        if (optionIndex === -1) {
-          copy[index].orderOptions.push({
-            name: option.name,
-            price: option.price,
-          });
+
+        if (selectedOrderOptionIndex === -1) {
+          selectedOrderOptions.push({ name: menuOption.name, price: menuOption.price });
         } else {
-          copy[index].orderOptions.splice(optionIndex, 1);
+          selectedOrderOptions.splice(selectedOrderOptionIndex, 1);
         }
-        if (copy[index].orderOptions.length === 0) {
-          copy.splice(index, 1);
+
+        if (selectedOrderOptions.length === 0) {
+          copy.splice(selectedMenuOptionGroupIndex, 1);
         }
       }
     }
 
-    copy.sort((a, b) =>
-      a.menuOptionGroupId < b.menuOptionGroupId
-        ? -1
-        : a.menuOptionGroupId > b.menuOptionGroupId
-          ? 1
-          : 0
+    copy.sort((a, b) => a.menuOptionGroupId.localeCompare(b.menuOptionGroupId));
+    copy.forEach((orderOptionGroup) =>
+      orderOptionGroup.orderOptions.sort((a, b) => a.name.localeCompare(b.name))
     );
-    copy.forEach((group) =>
-      group.orderOptions.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-    );
-    setSelectedOptions(copy);
+
+    setSelectedMenuOptionGroups(copy);
   };
 
   return (
     <View style={styles.container}>
-      {options.map((option, index) => (
+      {menuOptions.map((menuOption, index) => (
         <Pressable
-          key={`${option.name}-${option.price}-${index}`}
+          key={`${menuOption.name}-${menuOption.price}-${index}`}
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
             gap: 8,
           }}
-          onPress={() => handleSelectOption(option)}
+          onPress={() => handleOnSelectOption(menuOption)}
         >
-          {isSelectedOption(option) ? <RadioOnIcon /> : <RadioOffIcon />}
-          <Text style={styles.text}>{option.name}</Text>
+          {isSelectedOption(menuOption) ? <RadioOnIcon /> : <RadioOffIcon />}
+          <Text style={styles.text}>{menuOption.name}</Text>
           <View style={{ flex: 1, alignItems: "flex-end" }}>
-            <Text style={styles.text}>{formatPriceText(option.price)}</Text>
+            <Text style={styles.text}>{formatPriceText(menuOption.price)}</Text>
           </View>
         </Pressable>
       ))}

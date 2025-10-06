@@ -1,28 +1,28 @@
-import { useState } from "react";
+import { useRef } from "react";
 import { Gesture } from "react-native-gesture-handler";
 
 import { milliTimes } from "@/constants/times";
 import useInterval from "@/hooks/useInterval";
 
 const useIdle = (milliseconds: number) => {
-  const [idleTime, setIdleTime] = useState(milliseconds);
+  const idleTimeRef = useRef(milliseconds);
 
   useInterval(() => {
-    if (idleTime > milliTimes.ZERO) {
-      setIdleTime((prev) => prev - milliTimes.ONE_SECOND);
+    if (idleTimeRef.current > milliTimes.ZERO) {
+      idleTimeRef.current -= milliTimes.ONE_SECOND;
     }
   }, milliTimes.ONE_SECOND);
 
   const resetIdleTime = () => {
-    if (idleTime < milliseconds) {
-      setIdleTime(milliseconds);
+    if (idleTimeRef.current < milliseconds) {
+      idleTimeRef.current = milliseconds;
     }
   };
 
   const gesture = Gesture.Tap().runOnJS(true).onEnd(resetIdleTime);
 
   return {
-    idleTime,
+    idleTime: idleTimeRef,
     resetIdleTime,
     gesture,
   };

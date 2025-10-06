@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, SectionList, StyleSheet, Text, View } from "react-native";
 
 import { ImageBackground, useImage } from "expo-image";
@@ -7,55 +7,65 @@ import { AntDesign } from "@expo/vector-icons";
 
 import Button from "@/components/Button";
 import MenuOptionSelectBox from "@/components/MenuOptionSelectBox";
-import Modal, { BaseModalProps } from "@/components/Modal/Modal";
+import Modal from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { MenuLabel } from "@/constants/domain";
 import { fonts } from "@/constants/fonts";
+import useCart, { AddCartAction } from "@/hooks/useCart";
+import useModal from "@/hooks/useModal";
 import { Menu } from "@/types/menu";
-import { OrderCreate, OrderCreateOptionGroup } from "@/types/order";
+import { OrderCreateOptionGroup } from "@/types/order";
 
-export interface MenuModalProps extends BaseModalProps {
+export interface MenuModalProps {
   menu: Menu;
-  cart: OrderCreate[];
-  setCart: React.Dispatch<React.SetStateAction<OrderCreate[]>>;
 }
 
-const MenuModal = ({ menu, cart, setCart, onClose }: MenuModalProps) => {
+const MenuModal = ({ menu }: MenuModalProps) => {
   const image = useImage(process.env.EXPO_PUBLIC_CDN_URL + `/${menu.image}`);
+
+  const { addCart } = useCart();
+
   const [quantity, setQuantity] = useState(1);
-  const [selectedOptions, setSelectedOptions] = useState<OrderCreateOptionGroup[]>([]);
+  const [selectedMenuOptionGroups, setSelectedMenuOptionGroups] = useState<
+    OrderCreateOptionGroup[]
+  >([]);
+
+  const { closeAllModals } = useModal();
+
+  const menuOptionGroups = useMemo(
+    () => [
+      {
+        title: "필수 옵션",
+        data: menu.menuOptionGroups.filter(
+          (menuOptionGroup) => menuOptionGroup.type === "MANDATORY"
+        ),
+      },
+      {
+        title: "선택 옵션",
+        data: menu.menuOptionGroups.filter(
+          (menuOptionGroup) => menuOptionGroup.type === "OPTIONAL"
+        ),
+      },
+    ],
+    [menu]
+  );
 
   useEffect(() => {
-    setSelectedOptions(
-      menu.menuOptionGroups
-        .filter((optionGroup) => optionGroup.type === "MANDATORY")
-        .map((optionGroup) => ({
-          menuOptionGroupId: optionGroup.menuOptionGroupId,
-          orderOptions: [
-            {
-              name: optionGroup.menuOptions[0].name,
-              price: optionGroup.menuOptions[0].price,
-            },
-          ],
-        }))
-    );
-  }, [menu]);
+    const initMandatoryMenuOptionGroups = menuOptionGroups[0].data.map((menuOptionGroup) => ({
+      menuOptionGroupId: menuOptionGroup.menuOptionGroupId,
+      orderOptions: [
+        {
+          name: menuOptionGroup.menuOptions[0].name,
+          price: menuOptionGroup.menuOptions[0].price,
+        },
+      ],
+    }));
 
-  const mandatoryOptionGroups = menu.menuOptionGroups.filter(
-    (optionGroup) => optionGroup.type === "MANDATORY"
-  );
-  const choiceOptionGroups = menu.menuOptionGroups.filter(
-    (optionGroup) => optionGroup.type === "OPTIONAL"
-  );
-  const optionGroups = [
-    { title: "필수 옵션", data: mandatoryOptionGroups },
-    { title: "선택 옵션", data: choiceOptionGroups },
-  ];
+    setSelectedMenuOptionGroups(initMandatoryMenuOptionGroups);
+  }, [menu, menuOptionGroups]);
 
-  const handleClose = () => {
-    setQuantity(1);
-    setSelectedOptions([]);
-    onClose();
+  const addQuantity = () => {
+    setQuantity((prev) => prev + 1);
   };
 
   const minusQuantity = () => {
@@ -64,77 +74,22 @@ const MenuModal = ({ menu, cart, setCart, onClose }: MenuModalProps) => {
     }
   };
 
-  const addQuantity = () => {
-    setQuantity((prev) => prev + 1);
-  };
-
   const calculateTotalPrice = () => {
-    const options = selectedOptions.flatMap((optionGroup) => optionGroup.orderOptions);
-    const optionPrice = options.reduce((acc, option) => {
-      const selectedOption = menu.menuOptionGroups
-        .flatMap((optionGroup) => optionGroup.menuOptions)
-        .find((menuOption) => menuOption.name === option.name && menuOption.price === option.price);
-      return acc + (selectedOption?.price ?? 0);
-    }, 0);
-    const totalPrice = (menu.price + optionPrice) * quantity;
+    const selectedMenuOptionsPrice = selectedMenuOptionGroups
+      .flatMap((selectedMenuOptionGroup) => selectedMenuOptionGroup.orderOptions)
+      .reduce((acc, orderOption) => acc + orderOption.price, 0);
+
+    const totalPrice = (menu.price + selectedMenuOptionsPrice) * quantity;
+
     return totalPrice.toPrice();
   };
 
-  const addCart = () => {
-    const copy = [...cart];
-    const index = copy
-      .filter((c) => c.menuId === menu.menuId)
-      .findIndex((item) => compareOptionGroups(item.menuOptionGroups, selectedOptions));
-    if (index === -1) {
-      copy.push({
-        menuId: menu.menuId,
-        quantity: quantity,
-        menuOptionGroups: selectedOptions,
-      });
-    } else {
-      copy[index].quantity += quantity;
-    }
-    setCart(copy);
-    handleClose();
+  const handleOnSubmit = () => {
+    addCart[AddCartAction.WITH_OPTION](menu, quantity, selectedMenuOptionGroups);
   };
 
-  const compareOptionGroups = (
-    groups1: OrderCreateOptionGroup[],
-    groups2: OrderCreateOptionGroup[]
-  ) => {
-    if (groups1.length !== groups2.length) {
-      return false;
-    }
-
-    for (let i = 0; i < groups1.length; i++) {
-      const group1 = groups1[i];
-      const group2 = groups2[i];
-      if (!compareOptionGroup(group1, group2)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  const compareOptionGroup = (group1: OrderCreateOptionGroup, group2: OrderCreateOptionGroup) => {
-    if (group1.menuOptionGroupId !== group2.menuOptionGroupId) {
-      return false;
-    }
-
-    if (group1.orderOptions.length !== group2.orderOptions.length) {
-      return false;
-    }
-
-    for (let i = 0; i < group1.orderOptions.length; i++) {
-      const option1 = group1.orderOptions[i];
-      const option2 = group2.orderOptions[i];
-      if (option1.name !== option2.name || option1.price !== option2.price) {
-        return false;
-      }
-    }
-
-    return true;
+  const handleOnClose = () => {
+    closeAllModals();
   };
 
   return (
@@ -155,7 +110,7 @@ const MenuModal = ({ menu, cart, setCart, onClose }: MenuModalProps) => {
           <View style={styles.info}>
             <View style={{ flexDirection: "row" }}>
               <Text style={styles.infoLabel}>{MenuLabel[menu.label]}</Text>
-              <Pressable style={styles.closeButton} onPress={handleClose}>
+              <Pressable style={styles.closeButton} onPress={handleOnClose}>
                 <AntDesign name="close" size={28} color="black" />
               </Pressable>
             </View>
@@ -183,18 +138,18 @@ const MenuModal = ({ menu, cart, setCart, onClose }: MenuModalProps) => {
             <View style={styles.divider} />
             <SectionList
               style={{ height: menu.description ? 320 : 360 }}
-              sections={optionGroups}
+              sections={menuOptionGroups}
               keyExtractor={(item) => item.menuOptionGroupId}
               renderItem={({ item }) => (
                 <View style={styles.optionGroupContainer}>
                   <View style={styles.optionGroup}>
                     <Text style={styles.optionGroupTitle}>{item.name}</Text>
                     <MenuOptionSelectBox
-                      groupId={item.menuOptionGroupId}
+                      menuOptionGroupId={item.menuOptionGroupId}
                       type={item.type}
-                      options={item.menuOptions}
-                      selectedOptions={selectedOptions}
-                      setSelectedOptions={setSelectedOptions}
+                      menuOptions={item.menuOptions}
+                      selectedMenuOptionGroups={selectedMenuOptionGroups}
+                      setSelectedMenuOptionGroups={setSelectedMenuOptionGroups}
                     />
                   </View>
                 </View>
@@ -217,7 +172,7 @@ const MenuModal = ({ menu, cart, setCart, onClose }: MenuModalProps) => {
             />
           </View>
         </View>
-        <Button label={`총 ${calculateTotalPrice()}원 | 메뉴 담기`} onPress={addCart} />
+        <Button label={`총 ${calculateTotalPrice()}원 | 메뉴 담기`} onPress={handleOnSubmit} />
       </View>
     </Modal>
   );

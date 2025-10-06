@@ -5,24 +5,24 @@ import { fonts } from "@/constants/fonts";
 import { Category } from "@/types/menu";
 
 interface CategoryButtonProps {
-  index: number;
   category: Category;
-  selectedCategory: Category | null;
-  handleSelectCategory: (category: Category, index: number) => void;
+  itemIndex: number;
+  selectedCategoryIndex: number;
+  handleOnChangeCategoryIndex: (itemIndex: number) => void;
 }
 
 const CategoryButton = ({
-  index,
   category,
-  selectedCategory,
-  handleSelectCategory,
+  itemIndex,
+  selectedCategoryIndex,
+  handleOnChangeCategoryIndex,
 }: CategoryButtonProps) => {
-  const isSelected = category.categoryId === selectedCategory?.categoryId;
+  const isSelected = itemIndex === selectedCategoryIndex;
 
   return (
     <Pressable
       style={[styles.category, isSelected ? styles.selectedCategory : styles.notSelectedCategory]}
-      onPress={() => handleSelectCategory(category, index)}
+      onPress={() => handleOnChangeCategoryIndex(itemIndex)}
     >
       <Text
         style={[
