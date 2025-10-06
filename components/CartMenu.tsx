@@ -1,75 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { AntDesign } from "@expo/vector-icons";
 
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
-import { Menu, MenuOption } from "@/types/menu";
+import useCart from "@/hooks/useCart";
+import { Menu } from "@/types/menu";
 import { OrderCreate } from "@/types/order";
 
 interface CartMenuProps {
-  index: number;
   menus: Menu[];
-  item: OrderCreate;
-  resetCart: () => void;
-  addQuantity: (index: number) => void;
-  minusQuantity: (index: number) => void;
-  removeItem: (index: number) => void;
+  cartItem: OrderCreate;
+  cartItemIndex: number;
 }
 
-const CartMenu = ({
-  index,
-  menus,
-  item,
-  resetCart,
-  addQuantity,
-  minusQuantity,
-  removeItem,
-}: CartMenuProps) => {
-  const [menu, setMenu] = useState<Menu | null>(null);
-  const [options, setOptions] = useState<MenuOption[]>([]);
+const CartMenu = ({ menus, cartItem, cartItemIndex }: CartMenuProps) => {
+  const { addQuantity, minusQuantity, removeCartItem, clearCart } = useCart();
 
-  useEffect(() => {
-    const foundMenu = menus
-      .filter((menu) => menu.state === "DEFAULT")
-      .find((menu) => menu.menuId === item.menuId);
-
-    if (foundMenu) {
-      setMenu(foundMenu);
-    } else {
-      resetCart();
-    }
-  }, [menus, item.menuId, resetCart]);
-
-  useEffect(() => {
-    if (menu) {
-      const menuOptions = menu.menuOptionGroups.flatMap((group) => group.menuOptions);
-
-      const selectedOptions = item.menuOptionGroups.flatMap((group) => group.orderOptions);
-
-      for (const selectedOption of selectedOptions) {
-        if (
-          !menuOptions.some(
-            (menuOption) =>
-              menuOption.name === selectedOption.name && menuOption.price === selectedOption.price
-          )
-        ) {
-          resetCart();
-          return;
-        }
-      }
-
-      setOptions(selectedOptions);
-    }
-  }, [menu, item.menuOptionGroups, resetCart]);
+  const menu = menus
+    .filter((menu) => menu.state === "DEFAULT")
+    .find((menu) => menu.menuId === cartItem.menuId);
 
   if (!menu) {
+    clearCart("force");
     return;
   }
 
-  const totalPrice =
-    (menu.price + options.reduce((acc, option) => acc + option.price, 0)) * item.quantity;
+  const selectedMenuOptions = cartItem.menuOptionGroups.flatMap(
+    (menuOptionGroup) => menuOptionGroup.orderOptions
+  );
+
+  const selectedMenuOptionPrice = selectedMenuOptions.reduce(
+    (acc, selectedMenuOption) => acc + selectedMenuOption.price,
+    0
+  );
+
+  const totalPrice = (menu.price + selectedMenuOptionPrice) * cartItem.quantity;
 
   return (
     <View style={styles.container}>
@@ -77,17 +44,17 @@ const CartMenu = ({
         <Text style={styles.menuName}>{menu.name}</Text>
         <Text style={styles.menuPrice}>{menu.price.toPrice()}원</Text>
       </View>
-      {options.length > 0 && (
+      {selectedMenuOptions.length > 0 && (
         <View style={{ gap: 4 }}>
-          {options.map((option, index) => (
+          {selectedMenuOptions.map((selectedMenuOption, index) => (
             <View
-              key={`${option.name}-${option.price}-${index}`}
+              key={`${selectedMenuOption.name}-${selectedMenuOption.price}-${index}`}
               style={styles.menuOptionContainer}
             >
               <View style={{ flexDirection: "row" }}>
-                <Text style={styles.menuOption}>+ {option.name}</Text>
+                <Text style={styles.menuOption}>+ {selectedMenuOption.name}</Text>
               </View>
-              <Text style={styles.menuOption}>{option.price.toPrice()}원</Text>
+              <Text style={styles.menuOption}>{selectedMenuOption.price.toPrice()}원</Text>
             </View>
           ))}
         </View>
@@ -95,11 +62,11 @@ const CartMenu = ({
       <View style={styles.divider} />
       <View style={{ flexDirection: "row", marginTop: 8, marginBottom: 16 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Pressable style={styles.quantityButton} onPress={() => minusQuantity(index)}>
+          <Pressable style={styles.quantityButton} onPress={() => minusQuantity(cartItemIndex)}>
             <AntDesign name="minus" size={24} color="black" />
           </Pressable>
-          <Text style={styles.quantityText}>{item.quantity}</Text>
-          <Pressable style={styles.quantityButton} onPress={() => addQuantity(index)}>
+          <Text style={styles.quantityText}>{cartItem.quantity}</Text>
+          <Pressable style={styles.quantityButton} onPress={() => addQuantity(cartItemIndex)}>
             <AntDesign name="plus" size={24} color="black" />
           </Pressable>
         </View>
@@ -113,7 +80,7 @@ const CartMenu = ({
           <Text style={styles.totalPrice}>{totalPrice.toPrice()}원</Text>
         </View>
       </View>
-      <Pressable style={{ alignItems: "flex-end" }} onPress={() => removeItem(index)}>
+      <Pressable style={{ alignItems: "flex-end" }} onPress={() => removeCartItem(cartItemIndex)}>
         <Text style={styles.removeText}>삭제</Text>
       </Pressable>
     </View>

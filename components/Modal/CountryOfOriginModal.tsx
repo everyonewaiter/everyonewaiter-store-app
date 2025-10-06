@@ -1,16 +1,22 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
-import Modal, { BaseModalProps } from "@/components/Modal/Modal";
+import Modal from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
-import { CountryOfOrigin } from "@/types/store";
+import useModal from "@/hooks/useModal";
+import { useGetStore } from "@/hooks/useStoreApi";
 
-export interface CountryOfOriginModalProps extends BaseModalProps {
-  countryOfOrigins: CountryOfOrigin[];
-  onClose: () => void;
+export interface CountryOfOriginModalProps {
+  storeId: string;
 }
 
-const CountryOfOriginModal = ({ countryOfOrigins, onClose }: CountryOfOriginModalProps) => {
+const CountryOfOriginModal = ({ storeId }: CountryOfOriginModalProps) => {
+  const { data: store } = useGetStore(storeId);
+
+  const { closeAllModals } = useModal();
+
+  if (!store) return null;
+
   return (
     <Modal>
       <Modal.Title color="black" size="medium" position="left">
@@ -27,7 +33,7 @@ const CountryOfOriginModal = ({ countryOfOrigins, onClose }: CountryOfOriginModa
         </View>
         <FlatList
           style={{ height: 300 }}
-          data={countryOfOrigins}
+          data={store.setting.countryOfOrigins}
           keyExtractor={(item, index) => `${item.item}-${item.origin}-${index}`}
           renderItem={(renderItem) => (
             <View style={styles.contentContainer}>
@@ -42,7 +48,7 @@ const CountryOfOriginModal = ({ countryOfOrigins, onClose }: CountryOfOriginModa
         />
       </View>
       <Modal.ButtonContainer>
-        <Modal.Button label="확인" onPress={onClose} />
+        <Modal.Button label="확인" onPress={closeAllModals} />
       </Modal.ButtonContainer>
     </Modal>
   );

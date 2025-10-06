@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -6,27 +6,18 @@ import { getMenus } from "@/api/menu";
 import { queryKeys } from "@/constants/keys";
 
 export const useGetMenus = (storeId: string | undefined, enabled = true) => {
-  const { data, isPending, isSuccess } = useQuery({
+  const { data } = useQuery({
     queryKey: [queryKeys.MENU, queryKeys.GET_MENUS],
     queryFn: () => getMenus(storeId!),
     enabled: Boolean(storeId) && enabled,
   });
 
-  useEffect(() => {
-    if (!isPending && isSuccess && data) {
-      data.forEach((category) => {
-        category.menus = category.menus.filter((menu) => menu.state !== "HIDE");
-      });
+  const categories = useMemo(() => data ?? [], [data]);
+  const menus = useMemo(() => categories.flatMap((category) => category.menus), [categories]);
+  const allCategories = useMemo(
+    () => [{ categoryId: "0", name: "전체", menus: menus }, ...categories],
+    [categories, menus]
+  );
 
-      if (!data.some((category) => category.categoryId === "0")) {
-        data.unshift({
-          categoryId: "0",
-          name: "전체",
-          menus: data?.flatMap((category) => category.menus),
-        });
-      }
-    }
-  }, [isPending, isSuccess, data]);
-
-  return { categories: data };
+  return { allCategories, categories, menus };
 };

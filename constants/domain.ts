@@ -1,5 +1,3 @@
-import { Category } from "@/types/menu";
-
 export const CashReceiptType = {
   NONE: "미발행",
   DEDUCTION: "소득공제",
@@ -22,12 +20,6 @@ export const DeviceState = {
   ACTIVE: "활성",
   INACTIVE: "비활성",
 } as const;
-
-export const defaultCategory: Category = {
-  categoryId: "0",
-  name: "전체",
-  menus: [],
-};
 
 export const KitchenPrinterLocation = {
   POS: "POS",

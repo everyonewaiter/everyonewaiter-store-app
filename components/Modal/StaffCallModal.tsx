@@ -1,29 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
-import Modal, { BaseSubmitModalProps } from "@/components/Modal/Modal";
+import ErrorModal from "@/components/Modal/ErrorModal";
+import Modal from "@/components/Modal/Modal";
+import SuccessModal from "@/components/Modal/SuccessModal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
+import { images } from "@/constants/images";
+import useModal from "@/hooks/useModal";
+import { useStaffCall } from "@/hooks/useOrderApi";
+import { useGetStore } from "@/hooks/useStoreApi";
+import { ModalName } from "@/stores/modal";
+import { parseErrorMessage } from "@/utils/support";
 
-export interface StaffCallModalProps extends BaseSubmitModalProps {
-  options: string[];
-  selectedOption: string;
-  setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
+export interface StaffCallModalProps {
+  storeId: string;
 }
 
 const numColumns = 4;
 const gap = 12;
 
-const StaffCallModal = ({
-  options,
-  selectedOption,
-  setSelectedOption,
-  onSubmit,
-  onClose,
-  ...props
-}: StaffCallModalProps) => {
+const StaffCallModal = ({ storeId }: StaffCallModalProps) => {
   const { width: screenWidth } = useWindowDimensions();
   const [contentWidth, setContentWidth] = useState(0);
+
+  const { data: store } = useGetStore(storeId);
+  const [selectedStaffCallOption, setSelectedStaffCallOption] = useState("");
+
+  const { openModal, closeAllModals } = useModal();
+  const { mutate, isPending } = useStaffCall();
 
   useEffect(() => {
     const modalWidth = screenWidth * 0.5;
@@ -33,13 +38,48 @@ const StaffCallModal = ({
     setContentWidth(availableSpace / numColumns);
   }, [screenWidth]);
 
+  if (!store) return null;
+
+  const handleOnClose = () => {
+    setSelectedStaffCallOption("");
+    closeAllModals();
+  };
+
+  const handleOnSubmit = () => {
+    if (selectedStaffCallOption) {
+      mutate(
+        { optionName: selectedStaffCallOption },
+        {
+          onSuccess: () => {
+            openModal(ModalName.STAFF_CALL_SUCCESS, SuccessModal, {
+              title: selectedStaffCallOption,
+              image: images.BELL_ANIMATION,
+              message: "직원을 호출했습니다. 잠시만 기다려주세요!",
+              onClose: () => {
+                setSelectedStaffCallOption("");
+                closeAllModals();
+              },
+            });
+          },
+          onError: (error) => {
+            openModal(ModalName.STAFF_CALL_ERROR, ErrorModal, {
+              title: "직원 호출 실패",
+              message: parseErrorMessage(error),
+              onClose: closeAllModals,
+            });
+          },
+        }
+      );
+    }
+  };
+
   return (
     <Modal>
       <Modal.Title color="black" size="medium" position="left">
         직원 호출
       </Modal.Title>
       <FlatList
-        data={options}
+        data={store.setting.staffCallOptions}
         numColumns={numColumns}
         keyExtractor={(item, index) => `${item}-${index}`}
         columnWrapperStyle={{ gap }}
@@ -49,9 +89,9 @@ const StaffCallModal = ({
             style={[
               styles.staffCallOption,
               { width: contentWidth },
-              selectedOption === renderItem.item && styles.selectedOption,
+              selectedStaffCallOption === renderItem.item && styles.selectedOption,
             ]}
-            onPress={() => setSelectedOption(renderItem.item)}
+            onPress={() => setSelectedStaffCallOption(renderItem.item)}
           >
             <View style={styles.center}>
               <Text style={styles.staffCallOptionText}>{renderItem.item}</Text>
@@ -60,13 +100,12 @@ const StaffCallModal = ({
         )}
       />
       <Modal.ButtonContainer>
-        <Modal.Button label="닫기" color="gray" onPress={onClose} />
+        <Modal.Button label="닫기" color="gray" onPress={handleOnClose} />
         <Modal.Button
           label="호출하기"
           color="black"
-          disabled={!selectedOption}
-          onPress={onSubmit}
-          {...props}
+          disabled={!selectedStaffCallOption || isPending}
+          onPress={handleOnSubmit}
         />
       </Modal.ButtonContainer>
     </Modal>

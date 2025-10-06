@@ -1,18 +1,54 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
-import Modal, { BaseModalProps } from "@/components/Modal/Modal";
+import Modal from "@/components/Modal/Modal";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
-import { Order } from "@/types/order";
-import { Setting } from "@/types/store";
-import { calculateOrdersTotalPrice } from "@/utils/calculate";
+import useModal from "@/hooks/useModal";
+import { useGetTableOrderHistories } from "@/hooks/useOrderApi";
+import { useGetStore } from "@/hooks/useStoreApi";
+import { Order, OrderOption, OrderOptionGroup } from "@/types/order";
 
-export interface OrderHistoryModalProps extends BaseModalProps {
-  histories: Order[];
-  setting?: Setting;
+export interface OrderHistoryModalProps {
+  storeId: string;
+  tableNo: number;
 }
 
-const OrderHistoryModal = ({ histories, setting, onClose }: OrderHistoryModalProps) => {
+const OrderHistoryModal = ({ storeId, tableNo }: OrderHistoryModalProps) => {
+  const { data: store } = useGetStore(storeId);
+  const { histories } = useGetTableOrderHistories(tableNo);
+
+  const { closeAllModals } = useModal();
+
+  if (!store) return null;
+
+  const getOrderOptionsWithGroupId = (
+    orderOptionGroups: OrderOptionGroup[]
+  ): (OrderOption & { orderOptionGroupId: string })[] => {
+    return orderOptionGroups.flatMap((orderOptionGroup) =>
+      orderOptionGroup.orderOptions.map((orderOption) => ({
+        ...orderOption,
+        orderOptionGroupId: orderOptionGroup.orderOptionGroupId,
+      }))
+    );
+  };
+
+  const calculateOrdersTotalPrice = (orders: Order[]) => {
+    let totalPrice = 0;
+    for (const order of orders) {
+      totalPrice += calculateOrderTotalPrice(order);
+    }
+    return totalPrice;
+  };
+
+  const calculateOrderTotalPrice = (order: Order) => {
+    return order.orderMenus.reduce((acc, menu) => {
+      const optionPrice = menu.orderOptionGroups
+        .flatMap((group) => group.orderOptions)
+        .reduce((acc, option) => acc + option.price, 0);
+      return acc + (menu.price + optionPrice) * menu.quantity;
+    }, 0);
+  };
+
   return (
     <Modal>
       <Modal.Title color="black" size="medium" position="left">
@@ -24,7 +60,7 @@ const OrderHistoryModal = ({ histories, setting, onClose }: OrderHistoryModalPro
           data={histories}
           keyExtractor={(item) => item.orderId}
           contentContainerStyle={{ gap: 14 }}
-          renderItem={({ item, index }) => (
+          renderItem={({ item: order, index }) => (
             <View
               style={{
                 flexDirection: "row",
@@ -34,22 +70,20 @@ const OrderHistoryModal = ({ histories, setting, onClose }: OrderHistoryModalPro
             >
               <Text style={styles.indexNumber}>{index + 1}</Text>
               <View style={styles.orderContainer}>
-                {item.orderMenus.map((menu, index) => (
-                  <View key={`${item.orderId}-${menu.orderMenuId}-${index}`} style={{ flex: 1 }}>
+                {order.orderMenus.map((orderMenu) => (
+                  <View key={`${order.orderId}-${orderMenu.orderMenuId}`} style={{ flex: 1 }}>
                     <View style={[styles.spaceBetween]}>
-                      <Text style={styles.menuName}>{menu.name}</Text>
-                      <Text style={styles.menuName}>{menu.quantity}개</Text>
+                      <Text style={styles.menuName}>{orderMenu.name}</Text>
+                      <Text style={styles.menuName}>{orderMenu.quantity}개</Text>
                     </View>
-                    {menu.orderOptionGroups
-                      .flatMap((group) => group.orderOptions)
-                      .map((option, index) => (
-                        <Text
-                          key={`${option.name}-${option.price}-${index}`}
-                          style={styles.menuOption}
-                        >
-                          + {option.name}
-                        </Text>
-                      ))}
+                    {getOrderOptionsWithGroupId(orderMenu.orderOptionGroups).map((orderOption) => (
+                      <Text
+                        key={`${orderOption.orderOptionGroupId}-${orderOption.name}`}
+                        style={styles.menuOption}
+                      >
+                        + {orderOption.name}
+                      </Text>
+                    ))}
                   </View>
                 ))}
               </View>
@@ -57,14 +91,14 @@ const OrderHistoryModal = ({ histories, setting, onClose }: OrderHistoryModalPro
           )}
         />
       </View>
-      {setting?.showOrderTotalPrice && (
+      {store.setting.showOrderTotalPrice && (
         <View style={[styles.spaceBetween, { alignItems: "center" }]}>
           <Text style={styles.totalPriceText}>총 주문 금액</Text>
           <Text style={styles.totalPrice}>{calculateOrdersTotalPrice(histories).toPrice()}원</Text>
         </View>
       )}
       <Modal.ButtonContainer>
-        <Modal.Button label="확인" onPress={onClose} />
+        <Modal.Button label="확인" onPress={closeAllModals} />
       </Modal.ButtonContainer>
     </Modal>
   );
