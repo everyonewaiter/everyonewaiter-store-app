@@ -1,8 +1,9 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 import { Redirect, Stack, useFocusEffect } from "expo-router";
 import { OrientationLock } from "expo-screen-orientation";
 
+import { cleanUpQueryForWaiting } from "@/api/query";
 import { colors } from "@/constants/colors";
 import { useOrientation } from "@/hooks/useOrientation";
 import { useAuthentication } from "@/providers/AuthenticationProvider";
@@ -18,6 +19,10 @@ const WaitingLayout = () => {
       return () => unlockOrientation();
     }, [lockOrientation, unlockOrientation])
   );
+
+  useEffect(() => {
+    cleanUpQueryForWaiting();
+  }, []);
 
   if (!device) {
     return null;
