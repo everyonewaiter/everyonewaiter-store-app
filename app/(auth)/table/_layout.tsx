@@ -1,8 +1,9 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 import { Redirect, Stack, useFocusEffect } from "expo-router";
 import { OrientationLock } from "expo-screen-orientation";
 
+import { cleanUpQueryForTable } from "@/api/query";
 import { colors } from "@/constants/colors";
 import { useOrientation } from "@/hooks/useOrientation";
 import { useAuthentication } from "@/providers/AuthenticationProvider";
@@ -18,6 +19,10 @@ const CustomerTableLayout = () => {
       return () => unlockOrientation();
     }, [lockOrientation, unlockOrientation])
   );
+
+  useEffect(() => {
+    cleanUpQueryForTable();
+  }, []);
 
   if (!device) {
     return null;

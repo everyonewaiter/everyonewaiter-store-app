@@ -1,18 +1,22 @@
-import { createContext, PropsWithChildren, useContext } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useRef } from "react";
 
+import { storageKeys } from "@/constants/keys";
 import { useGetDevice } from "@/hooks/useDeviceApi";
 import { Device } from "@/types/device";
+import { getItem } from "@/utils/storage";
 
 interface AuthenticationContextProps {
   device: Device | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  secretKeyRef: React.RefObject<string>;
 }
 
 const AuthenticationContext = createContext<AuthenticationContextProps>({
   device: null,
   isAuthenticated: false,
   isLoading: false,
+  secretKeyRef: { current: "" },
 });
 
 export const useAuthentication = () => {
@@ -26,7 +30,19 @@ export const useAuthentication = () => {
 };
 
 const AuthenticationProvider = ({ children }: PropsWithChildren) => {
+  const secretKeyRef = useRef("");
   const { device, isSuccess, isPending } = useGetDevice();
+
+  useEffect(() => {
+    if (isSuccess) {
+      const setSecretKey = async () => {
+        secretKeyRef.current = (await getItem<string>(storageKeys.SECRET_KEY)) ?? "";
+      };
+      setSecretKey();
+    } else {
+      secretKeyRef.current = "";
+    }
+  }, [isSuccess]);
 
   return (
     <AuthenticationContext.Provider
@@ -34,6 +50,7 @@ const AuthenticationProvider = ({ children }: PropsWithChildren) => {
         device: device ?? null,
         isAuthenticated: isSuccess,
         isLoading: isPending,
+        secretKeyRef,
       }}
     >
       {children}

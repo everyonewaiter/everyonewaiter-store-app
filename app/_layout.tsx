@@ -13,7 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import * as Sentry from "@sentry/react-native";
 import { QueryClientProvider } from "@tanstack/react-query";
 
-import { queryClient } from "@/api/queryClient";
+import { queryClient } from "@/api/query";
 import { fontAssets } from "@/constants/fonts";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import { useStickyImmersive } from "@/hooks/useStickyImmersive";
