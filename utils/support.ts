@@ -49,7 +49,6 @@ export const makeSignature = (
   secretKey: string,
   timestamp: string
 ) => {
-  console.log({ requestMethod, requestURI, deviceId, secretKey, timestamp });
   const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey);
   hmac.update(`${requestMethod} ${requestURI}`);
   hmac.update("\n");
