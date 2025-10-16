@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import { useQuery } from "@tanstack/react-query";
 
 import { getMenus } from "@/api/menu";
@@ -12,12 +10,9 @@ export const useGetMenus = (storeId: string | undefined, enabled = true) => {
     enabled: Boolean(storeId) && enabled,
   });
 
-  const categories = useMemo(() => data ?? [], [data]);
-  const menus = useMemo(() => categories.flatMap((category) => category.menus), [categories]);
-  const allCategories = useMemo(
-    () => [{ categoryId: "0", name: "전체", menus: menus }, ...categories],
-    [categories, menus]
-  );
+  const categories = data ?? [];
+  const menus = categories.flatMap((category) => category.menus);
+  const allCategories = [{ categoryId: "0", name: "전체", menus: menus }, ...categories];
 
   return { allCategories, categories, menus };
 };
