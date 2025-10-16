@@ -20,6 +20,7 @@ import useIdle from "@/hooks/useIdle";
 import useInterval from "@/hooks/useInterval";
 import { useGetMenus } from "@/hooks/useMenuApi";
 import useModal from "@/hooks/useModal";
+import { useGetTableOrderHistories } from "@/hooks/useOrderApi";
 import { useGetStore } from "@/hooks/useStoreApi";
 import { useAuthentication } from "@/providers/AuthenticationProvider";
 import { ModalName } from "@/stores/modal";
@@ -35,6 +36,7 @@ const CustomerTableScreen = () => {
   const { device } = useAuthentication();
   const { data: store } = useGetStore(device?.storeId);
   const { allCategories } = useGetMenus(device?.storeId);
+  const { histories } = useGetTableOrderHistories(device?.tableNo);
   const { cart, addCart, clearCart } = useCart();
 
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
@@ -79,10 +81,12 @@ const CustomerTableScreen = () => {
   };
 
   const openOrderHistoryModal = () => {
-    openModal(ModalName.ORDER_HISTORY, OrderHistoryModal, {
-      storeId: store.storeId,
-      tableNo: device.tableNo,
-    });
+    if (histories.length > 0) {
+      openModal(ModalName.ORDER_HISTORY, OrderHistoryModal, {
+        storeId: store.storeId,
+        tableNo: device.tableNo,
+      });
+    }
   };
 
   const openMenuModalOrAddToCart = (menu: Menu) => {
