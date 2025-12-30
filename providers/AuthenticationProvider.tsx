@@ -1,22 +1,22 @@
-import { createContext, PropsWithChildren, useContext, useEffect, useRef } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 
 import { storageKeys } from "@/constants/keys";
 import { useGetDevice } from "@/hooks/useDeviceApi";
 import { Device } from "@/types/device";
-import { getItem } from "@/utils/storage";
+import { getItemOrElseThrow } from "@/utils/storage";
 
 interface AuthenticationContextProps {
   device: Device | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  secretKeyRef: React.RefObject<string>;
+  secretKey: string;
 }
 
 const AuthenticationContext = createContext<AuthenticationContextProps>({
   device: null,
   isAuthenticated: false,
   isLoading: false,
-  secretKeyRef: { current: "" },
+  secretKey: "",
 });
 
 export const useAuthentication = () => {
@@ -30,17 +30,16 @@ export const useAuthentication = () => {
 };
 
 const AuthenticationProvider = ({ children }: PropsWithChildren) => {
-  const secretKeyRef = useRef("");
+  const [secretKey, setSecretKey] = useState("");
   const { device, isSuccess, isPending } = useGetDevice();
 
   useEffect(() => {
     if (isSuccess) {
-      const setSecretKey = async () => {
-        secretKeyRef.current = (await getItem<string>(storageKeys.SECRET_KEY)) ?? "";
+      const getSecretKey = async () => {
+        const findSecretKey = await getItemOrElseThrow<string>(storageKeys.SECRET_KEY);
+        setSecretKey(findSecretKey);
       };
-      setSecretKey();
-    } else {
-      secretKeyRef.current = "";
+      getSecretKey();
     }
   }, [isSuccess]);
 
@@ -50,7 +49,7 @@ const AuthenticationProvider = ({ children }: PropsWithChildren) => {
         device: device ?? null,
         isAuthenticated: isSuccess,
         isLoading: isPending,
-        secretKeyRef,
+        secretKey,
       }}
     >
       {children}

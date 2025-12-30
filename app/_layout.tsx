@@ -12,6 +12,7 @@ import { StatusBar } from "expo-status-bar";
 
 import * as Sentry from "@sentry/react-native";
 import { QueryClientProvider } from "@tanstack/react-query";
+import "react-native-url-polyfill/auto";
 
 import { queryClient } from "@/api/query";
 import { fontAssets } from "@/constants/fonts";
@@ -20,6 +21,7 @@ import { useStickyImmersive } from "@/hooks/useStickyImmersive";
 import AppUpdateProvider, { useAppUpdate } from "@/providers/AppUpdateProvider";
 import AuthenticationProvider, { useAuthentication } from "@/providers/AuthenticationProvider";
 import ModalProvider from "@/providers/ModalProvider";
+import SseProvider from "@/providers/SseProvider";
 import "@/sentry.config";
 
 SplashScreen.setOptions({ duration: 1000, fade: true });
@@ -44,8 +46,10 @@ const RootLayout = () => {
         <GestureHandlerRootView>
           <AppUpdateProvider>
             <AuthenticationProvider>
-              <EveryoneWaiterApplication />
-              <ModalProvider />
+              <SseProvider>
+                <EveryoneWaiterApplication />
+                <ModalProvider />
+              </SseProvider>
             </AuthenticationProvider>
           </AppUpdateProvider>
         </GestureHandlerRootView>

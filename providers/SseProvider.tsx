@@ -2,7 +2,6 @@ import { createContext, PropsWithChildren, useEffect, useRef } from "react";
 import EventSource, { EventSourceListener } from "react-native-sse";
 
 import { useQueryClient } from "@tanstack/react-query";
-import "react-native-url-polyfill/auto";
 
 import { queryKeys } from "@/constants/keys";
 import { milliTimes } from "@/constants/times";
@@ -43,7 +42,7 @@ const SseContext = createContext(null);
 
 const SseProvider = ({ children }: PropsWithChildren) => {
   const queryClient = useQueryClient();
-  const { device, secretKeyRef } = useAuthentication();
+  const { device, secretKey } = useAuthentication();
 
   const isConnectedRef = useRef(false);
   const timestampRef = useRef(Date.now().toString());
@@ -53,7 +52,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
   }, milliTimes.THIRTY_SECONDS);
 
   useEffect(() => {
-    if (!device || isConnectedRef.current || !secretKeyRef.current) {
+    if (!device || isConnectedRef.current || !secretKey) {
       return;
     }
 
@@ -72,7 +71,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
               requestMethod,
               requestURI,
               device.deviceId,
-              secretKeyRef.current,
+              secretKey,
               timestampRef.current
             ),
         },
@@ -136,7 +135,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
       eventSource.removeAllEventListeners();
       eventSource.close();
     };
-  }, [device, secretKeyRef, queryClient]);
+  }, [device, secretKey, queryClient]);
 
   return <SseContext.Provider value={null}>{children}</SseContext.Provider>;
 };
