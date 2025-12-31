@@ -30,14 +30,15 @@ export interface CartModalProps {
 const CartModal = ({ successCallback }: CartModalProps) => {
   const { height: screenHeight } = useWindowDimensions();
   const [contentHeight, setContentHeight] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { device } = useAuthentication();
   const { data: store } = useGetStore(device?.storeId);
   const { menus } = useGetMenus(device?.storeId);
   const { cart, clearCart, calculateCartTotalPrice, validateCartItems } = useCart();
 
-  const { mutate: mutateCreateOrder, isPending: isCreateOrderPending } = useCreateTableOrder();
-  const { mutate: mutateCreatePayment, isPending: isCreatePaymentPending } = useCreateCardPayment();
+  const { mutate: mutateCreateOrder } = useCreateTableOrder();
+  const { mutate: mutateCreatePayment } = useCreateCardPayment();
 
   const { openModal, closeAllModals } = useModal();
 
@@ -48,6 +49,7 @@ const CartModal = ({ successCallback }: CartModalProps) => {
   if (!device || !store) return null;
 
   const handleOnSubmit = async () => {
+    setIsLoading(true);
     if (!validateCartItems()) {
       return;
     }
@@ -106,6 +108,9 @@ const CartModal = ({ successCallback }: CartModalProps) => {
             message: parseErrorMessage(error),
             onClose: closeAllModals,
           });
+        },
+        onSettled: () => {
+          setIsLoading(false);
         },
       }
     );
@@ -185,7 +190,7 @@ const CartModal = ({ successCallback }: CartModalProps) => {
           <Button
             label={device.paymentType === "PREPAID" ? "결제하고 주문하기" : "주문하기"}
             onPress={handleOnSubmit}
-            disabled={isCreateOrderPending || isCreatePaymentPending}
+            disabled={isLoading}
           />
         </View>
       </View>
