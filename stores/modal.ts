@@ -18,6 +18,7 @@ export const ModalName = {
   KSNET_DEVICE_NO_NOT_INITIALIZED: "ksnetDeviceNoNotInitialized",
   KSNET_PAYMENT_ERROR: "paymentError",
   MENU: "menu",
+  ORDER_CONFIRM: "orderConfirm",
   ORDER_SUCCESS: "orderSuccess",
   ORDER_ERROR: "orderError",
   ORDER_HISTORY: "orderHistory",

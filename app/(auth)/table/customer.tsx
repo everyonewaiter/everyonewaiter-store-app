@@ -99,7 +99,7 @@ const CustomerTableScreen = () => {
 
   const openCartModal = () => {
     if (cart.length > 0) {
-      openModal(ModalName.CART, CartModal, { successCallback: resetAll });
+      openModal(ModalName.CART, CartModal, { orderSuccessCallback: resetAll });
     }
   };
 
