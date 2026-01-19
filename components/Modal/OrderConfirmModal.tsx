@@ -53,26 +53,25 @@ const OrderConfirmModal = ({ device, store, orderSuccessCallback }: OrderConfirm
   };
 
   const createOrder = async () => {
-    if (!(orderStep.current === "INIT" || orderStep.current === "SAVE_PAYMENT")) {
-      return;
-    }
-    setOrderStep((prev) => ({ ...prev, current: "PENDING" }));
+    if (orderStep.current === "INIT" || orderStep.current === "SAVE_PAYMENT") {
+      setOrderStep((prev) => ({ ...prev, current: "PENDING" }));
 
-    try {
-      await mutateCreateOrder({ tableNo: device.tableNo, memo: "", orderMenus: cart });
-      openModal(ModalName.ORDER_SUCCESS, SuccessModal, {
-        title: "주문 완료",
-        image: images.COMPLETE_ANIMATION,
-        message: "주문이 완료되었습니다.",
-        onClose: orderSuccessCallback,
-      });
-    } catch (error: any) {
-      setOrderStep((prev) => ({ ...prev, current: "ERROR" }));
-      openModal(ModalName.ORDER_ERROR, ErrorModal, {
-        title: "주문 실패",
-        message: parseErrorMessage(error),
-        onClose: closeAllModals,
-      });
+      try {
+        await mutateCreateOrder({ tableNo: device.tableNo, memo: "", orderMenus: cart });
+        openModal(ModalName.ORDER_SUCCESS, SuccessModal, {
+          title: "주문 완료",
+          image: images.COMPLETE_ANIMATION,
+          message: "주문이 완료되었습니다.",
+          onClose: orderSuccessCallback,
+        });
+      } catch (error: any) {
+        setOrderStep((prev) => ({ ...prev, current: "ERROR" }));
+        openModal(ModalName.ORDER_ERROR, ErrorModal, {
+          title: "주문 실패",
+          message: parseErrorMessage(error),
+          onClose: closeAllModals,
+        });
+      }
     }
   };
 
@@ -82,70 +81,63 @@ const OrderConfirmModal = ({ device, store, orderSuccessCallback }: OrderConfirm
       setOrderStep((prev) => ({ ...prev, current: "ERROR" }));
       openModal(ModalName.KSNET_DEVICE_NO_NOT_INITIALIZED, ErrorModal, {
         title: "단말기 번호가 등록되지 않았습니다.",
-        message: "설정 페이지에서 Ksnet 단말기 번호를 등록해주세요.",
+        message: "설정 페이지에서 KSNET 단말기 번호를 등록해주세요.",
         onClose: closeAllModals,
       });
     }
   };
 
   const approveKscat = async (amount: number) => {
-    if (orderStep.current !== "INIT") {
-      return;
-    }
-
-    try {
-      const deviceNo = store.setting.ksnetDeviceNo;
-      const response = await KscatModule.approveIC(deviceNo, "00", amount);
-      setOrderStep(() => ({ current: "PAYMENT", res: response }));
-    } catch (exception: any) {
-      setOrderStep((prev) => ({ ...prev, current: "ERROR" }));
-      if (exception.code === "FAIL") {
-        openModal(ModalName.KSNET_PAYMENT_ERROR, ErrorModal, {
-          title: "결제 실패",
-          message: exception.message,
-          onClose: closeAllModals,
-        });
-      } else {
-        openModal(ModalName.KSNET_PAYMENT_ERROR, ErrorModal, {
-          title: "결제 오류",
-          message: exception.message,
-          onClose: closeAllModals,
-        });
+    if (orderStep.current === "INIT") {
+      try {
+        const deviceNo = store.setting.ksnetDeviceNo;
+        const response = await KscatModule.approveIC(deviceNo, "00", amount);
+        setOrderStep(() => ({ current: "PAYMENT", res: response }));
+      } catch (exception: any) {
+        setOrderStep((prev) => ({ ...prev, current: "ERROR" }));
+        if (exception.code === "FAIL") {
+          openModal(ModalName.KSNET_PAYMENT_ERROR, ErrorModal, {
+            title: "결제 실패",
+            message: exception.message,
+            onClose: closeAllModals,
+          });
+        } else {
+          openModal(ModalName.KSNET_PAYMENT_ERROR, ErrorModal, {
+            title: "결제 오류",
+            message: exception.message,
+            onClose: closeAllModals,
+          });
+        }
       }
     }
   };
 
   const createPayment = async (amount: number, service: number, vat: number) => {
-    if (orderStep.current !== "PAYMENT") {
-      return;
-    }
-    if (orderStep.res === null) {
-      return;
-    }
-
-    try {
-      await mutateCreatePayment({
-        tableNo: device.tableNo,
-        amount: amount,
-        approvalNo: orderStep.res.approvalNo,
-        installment: "00",
-        cardNo: orderStep.res.filler,
-        issuerName: orderStep.res.message1,
-        purchaseName: orderStep.res.purchaseCompanyName,
-        merchantNo: orderStep.res.merchantNo,
-        tradeTime: orderStep.res.transferDate,
-        tradeUniqueNo: orderStep.res.transactionUniqueNo,
-        vat: vat,
-        supplyAmount: amount - service - vat,
-      });
-      setOrderStep((prev) => ({ ...prev, current: "SAVE_PAYMENT" }));
-    } catch (error: any) {
-      setOrderStep((prev) => ({ ...prev, current: "ERROR" }));
-      openModal(ModalName.ORDER_PAYMENT_ERROR, ErrorModal, {
-        title: "오류: 직원을 호출하여 결제를 취소하세요.",
-        message: parseErrorMessage(error),
-        onClose: closeAllModals,
-      });
+    if (orderStep.current === "PAYMENT" && orderStep.res !== null) {
+      try {
+        await mutateCreatePayment({
+          tableNo: device.tableNo,
+          amount: amount,
+          approvalNo: orderStep.res.approvalNo,
+          installment: "00",
+          cardNo: orderStep.res.filler,
+          issuerName: orderStep.res.message1,
+          purchaseName: orderStep.res.purchaseCompanyName,
+          merchantNo: orderStep.res.merchantNo,
+          tradeTime: orderStep.res.transferDate,
+          tradeUniqueNo: orderStep.res.transactionUniqueNo,
+          vat: vat,
+          supplyAmount: amount - service - vat,
+        });
+        setOrderStep((prev) => ({ ...prev, current: "SAVE_PAYMENT" }));
+      } catch (error: any) {
+        setOrderStep((prev) => ({ ...prev, current: "ERROR" }));
+        openModal(ModalName.ORDER_PAYMENT_ERROR, ErrorModal, {
+          title: "오류: 직원을 호출하여 결제를 취소하세요.",
+          message: parseErrorMessage(error),
+          onClose: closeAllModals,
+        });
+      }
     }
   };
 
@@ -156,7 +148,7 @@ const OrderConfirmModal = ({ device, store, orderSuccessCallback }: OrderConfirm
       <Modal.ButtonContainer>
         <Modal.Button label="닫기" color="gray" onPress={closeModal} />
         <Modal.Button
-          label="주문하기"
+          label={device.paymentType === "POSTPAID" ? "주문하기" : "결제하고 주문하기"}
           color="red"
           onPress={handleOnSubmit}
           disabled={orderStep.current !== "INIT"}
