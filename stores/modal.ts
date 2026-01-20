@@ -1,3 +1,5 @@
+import React from "react";
+
 import { create } from "zustand";
 
 import { CartModalProps } from "@/components/Modal/CartModal";
@@ -15,14 +17,11 @@ export const ModalName = {
   CART_RESET: "cartReset",
   COUNTRY_OF_ORIGIN: "countryOfOrigin",
   DEVICE_CREATE_ERROR: "deviceCreateError",
-  KSNET_DEVICE_NO_NOT_INITIALIZED: "ksnetDeviceNoNotInitialized",
-  KSNET_PAYMENT_ERROR: "paymentError",
   MENU: "menu",
   ORDER_CONFIRM: "orderConfirm",
   ORDER_SUCCESS: "orderSuccess",
-  ORDER_ERROR: "orderError",
+  ORDER_FLOW_ERROR: "orderFlowError",
   ORDER_HISTORY: "orderHistory",
-  ORDER_PAYMENT_ERROR: "orderPaymentError",
   STAFF_CALL: "staffCall",
   STAFF_CALL_SUCCESS: "staffCallSuccess",
   STAFF_CALL_ERROR: "staffCallError",
