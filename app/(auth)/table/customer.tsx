@@ -28,7 +28,7 @@ import { Menu } from "@/types/menu";
 
 const CustomerTableScreen = () => {
   const { width: screenWidth } = useWindowDimensions();
-  const { idleTime, resetIdleTime, gesture } = useIdle(milliTimes.THREE_MINUTE);
+  const { idleTime, resetIdleTime, gesture } = useIdle(milliTimes.TWO_MINUTE);
 
   const menusRef = useRef<FlatList | null>(null);
   const categoriesRef = useRef<FlatList | null>(null);
