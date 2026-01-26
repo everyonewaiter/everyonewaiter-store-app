@@ -67,7 +67,7 @@ const RegistrationStep1Screen = () => {
     if (stores && stores.length > 0) {
       setSelectedStoreId(stores[0].storeId);
     }
-    if (stores && stores.length === 0) {
+    if (stores?.length === 0) {
       openModal(ModalName.STORE_IS_EMPTY, ErrorModal, {
         title: "알림",
         message: "매장을 먼저 등록해주세요.",
@@ -203,10 +203,7 @@ const RegistrationStep1Screen = () => {
                 })
               }
               disabled={
-                !isValidForm ||
-                !isVerifyAuthCode ||
-                !Boolean(profile?.accountId) ||
-                !Boolean(selectedStoreId)
+                !isValidForm || !isVerifyAuthCode || !profile?.accountId || !selectedStoreId
               }
             />
           </KeyboardAwareScrollView>

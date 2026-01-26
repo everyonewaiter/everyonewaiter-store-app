@@ -10,7 +10,7 @@ export const updateApp = async (downloadUrl: string) => {
   const updateFile = new File(Paths.document, "release.apk");
 
   if (updateFile.exists) {
-    await updateFile.delete();
+    updateFile.delete();
   }
 
   try {

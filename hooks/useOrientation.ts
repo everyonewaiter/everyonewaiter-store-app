@@ -10,8 +10,8 @@ import {
   unlockAsync,
 } from "expo-screen-orientation";
 
-const PORTRAIT_ORIENTATIONS = [Orientation.PORTRAIT_UP, Orientation.PORTRAIT_DOWN];
-const LANDSCAPE_ORIENTATIONS = [Orientation.LANDSCAPE_LEFT, Orientation.LANDSCAPE_RIGHT];
+const PORTRAIT_ORIENTATIONS = new Set([Orientation.PORTRAIT_UP, Orientation.PORTRAIT_DOWN]);
+const LANDSCAPE_ORIENTATIONS = new Set([Orientation.LANDSCAPE_LEFT, Orientation.LANDSCAPE_RIGHT]);
 
 const lockOrientation = async (orientationLock: OrientationLock) => {
   await lockAsync(orientationLock);
@@ -38,7 +38,7 @@ export const useOrientation = () => {
     orientation,
     lockOrientation,
     unlockOrientation,
-    isPortrait: PORTRAIT_ORIENTATIONS.includes(orientation),
-    isLandscape: LANDSCAPE_ORIENTATIONS.includes(orientation),
+    isPortrait: PORTRAIT_ORIENTATIONS.has(orientation),
+    isLandscape: LANDSCAPE_ORIENTATIONS.has(orientation),
   };
 };

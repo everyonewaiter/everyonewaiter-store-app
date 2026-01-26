@@ -28,11 +28,9 @@ function ModalContainer({
   const isRightPosition = position === "right";
 
   const alignItems = isRightPosition ? "flex-end" : "center";
-  const containerStyle = isRightPosition
-    ? styles.rightModalContainer
-    : size === "large"
-      ? styles.largeModalContainer
-      : styles.defaultModalContainer;
+  const containerSize =
+    size === "large" ? styles.largeModalContainer : styles.defaultModalContainer;
+  const containerStyle = isRightPosition ? styles.rightModalContainer : containerSize;
 
   return (
     <View style={[styles.container, { alignItems }]}>
@@ -74,7 +72,7 @@ function ModalContent({ image, children }: PropsWithChildren<ModalContentProps>)
   );
 }
 
-function ButtonContainer({ children }: PropsWithChildren) {
+function ButtonContainer({ children }: Readonly<PropsWithChildren>) {
   return <View style={styles.buttonContainer}>{children}</View>;
 }
 
@@ -83,7 +81,12 @@ interface ModalButtonProps extends PressableProps {
   color?: "red" | "gray" | "black";
 }
 
-function ModalButton({ label, color = "red", disabled = false, ...props }: ModalButtonProps) {
+function ModalButton({
+  label,
+  color = "red",
+  disabled = false,
+  ...props
+}: Readonly<ModalButtonProps>) {
   return (
     <Pressable
       disabled={disabled}

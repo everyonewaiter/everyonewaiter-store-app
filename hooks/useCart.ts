@@ -151,7 +151,7 @@ const useCart = () => {
   const validateCartItems = () => {
     for (const cartItem of cart) {
       const menu = menus.find((menu) => menu.menuId === cartItem.menuId);
-      if (!menu || menu.state !== "DEFAULT") {
+      if (menu?.state !== "DEFAULT") {
         clearCart("force");
         return false;
       }

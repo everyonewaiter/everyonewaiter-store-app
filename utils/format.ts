@@ -3,7 +3,7 @@ import { milliTimes } from "@/constants/times";
 const onlyNumberRegex = /\D/g;
 
 export const formatPhoneNumberOnlyNumber = (value: string) => {
-  return value.replace(onlyNumberRegex, "");
+  return value.replaceAll(onlyNumberRegex, "");
 };
 
 export const formatPhoneNumberWithPrefix = (value: string) => {
@@ -51,7 +51,7 @@ export const formatPhoneNumberWithoutPrefix = (value: string) => {
 
 // eslint-disable-next-line no-extend-native
 Number.prototype.toPrice = function () {
-  return `${this.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  return `${this.toString().replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 };
 
 export const formatPriceText = (price: number) => {

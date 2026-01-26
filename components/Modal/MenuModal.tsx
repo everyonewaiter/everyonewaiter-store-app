@@ -120,7 +120,9 @@ const MenuModal = ({ menu }: MenuModalProps) => {
                 <Text style={styles.infoDescriptionText}> {"🌶".repeat(menu.spicy)}</Text>
               )}
             </View>
-            {menu.description && <Text style={styles.infoDescriptionText}>{menu.description}</Text>}
+            {!!menu.description && (
+              <Text style={styles.infoDescriptionText}>{menu.description}</Text>
+            )}
             <View style={{ flexDirection: "row", marginTop: 8 }}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Pressable style={styles.quantityButton} onPress={minusQuantity}>
@@ -154,18 +156,19 @@ const MenuModal = ({ menu }: MenuModalProps) => {
                   </View>
                 </View>
               )}
-              renderSectionHeader={({ section: { title, data } }) =>
-                data.length > 0 ? (
-                  title === "필수 옵션" ? (
-                    <View style={styles.rowCenter}>
-                      <Text style={styles.optionTypeText}>필수 옵션</Text>
-                      <Text style={[styles.optionTypeText, styles.redText]}> *</Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.optionTypeText}>선택 옵션</Text>
-                  )
-                ) : null
-              }
+              renderSectionHeader={({ section: { title, data } }) => {
+                if (data.length <= 0) {
+                  return null;
+                }
+                return title === "필수 옵션" ? (
+                  <View style={styles.rowCenter}>
+                    <Text style={styles.optionTypeText}>필수 옵션</Text>
+                    <Text style={[styles.optionTypeText, styles.redText]}> *</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.optionTypeText}>선택 옵션</Text>
+                );
+              }}
               renderSectionFooter={({ section: { data } }) =>
                 data.length > 0 ? <View style={styles.thinDivider} /> : null
               }

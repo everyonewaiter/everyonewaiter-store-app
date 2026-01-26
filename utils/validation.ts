@@ -16,9 +16,9 @@ export const validateAuthCode = (authCode: string) => {
 };
 
 export const validateTableNo = (tableNo: string) => {
-  const parsedTableNo = parseInt(tableNo, 10);
+  const parsedTableNo = Number.parseInt(tableNo, 10);
 
-  if (isNaN(parsedTableNo)) {
+  if (Number.isNaN(parsedTableNo)) {
     return "테이블 번호는 숫자만 입력 가능합니다.";
   }
   if (parsedTableNo.toString() !== tableNo) {

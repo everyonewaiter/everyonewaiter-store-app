@@ -57,7 +57,7 @@ const RegistrationStep2Screen = () => {
         purpose: selector[DeviceStep2SelectorName.PURPOSE],
         paymentType: selector[DeviceStep2SelectorName.PAYMENT_TYPE],
         name: form[DeviceStep2FormName.NAME],
-        tableNo: parseInt(form[DeviceStep2FormName.TABLE_NO], 10),
+        tableNo: Number.parseInt(form[DeviceStep2FormName.TABLE_NO], 10),
       },
       {
         onSuccess: ({ deviceId, secretKey }) => {
