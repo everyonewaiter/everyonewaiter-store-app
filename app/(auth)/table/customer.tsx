@@ -41,7 +41,7 @@ const CustomerTableScreen = () => {
 
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
 
-  const { isOpenedModal, openModal, closeAllModals } = useModal();
+  const { openModal, closeAllModals } = useModal();
 
   const resetAll = useCallback(() => {
     closeAllModals();
@@ -56,10 +56,7 @@ const CustomerTableScreen = () => {
   }, [closeAllModals, clearCart, resetIdleTime, allCategories]);
 
   useInterval(() => {
-    if (
-      idleTime.current <= milliTimes.ZERO &&
-      (isOpenedModal || cart.length > 0 || selectedCategoryIndex !== 0)
-    ) {
+    if (idleTime.current <= milliTimes.ZERO) {
       resetAll();
     }
   }, milliTimes.ONE_SECOND);
