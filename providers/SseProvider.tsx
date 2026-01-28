@@ -122,7 +122,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
           case "POS":
             break;
           default:
-            throw new Error(`Unhandled store action event: ${sseEvent}`);
+            throw new Error(`Unhandled store action event: ${JSON.stringify(sseEvent)}`);
         }
       }
     };

@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
 
 import * as Application from "expo-application";
 
@@ -46,7 +46,9 @@ const AppUpdateProvider = ({ children }: PropsWithChildren) => {
     }
   }, [apkVersion, isPending, isSuccess]);
 
-  return <AppUpdateContext.Provider value={{ isUpdated }}>{children}</AppUpdateContext.Provider>;
+  const memo = useMemo(() => ({ isUpdated }), [isUpdated]);
+
+  return <AppUpdateContext.Provider value={memo}>{children}</AppUpdateContext.Provider>;
 };
 
 export default AppUpdateProvider;

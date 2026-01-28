@@ -73,12 +73,16 @@ const MenuOptionSelectBox = ({
       }
     }
 
-    copy.sort((a, b) => a.menuOptionGroupId.localeCompare(b.menuOptionGroupId));
-    copy.forEach((orderOptionGroup) =>
-      orderOptionGroup.orderOptions.sort((a, b) => a.name.localeCompare(b.name))
-    );
+    const sorted = copy
+      .toSorted((a, b) => a.menuOptionGroupId.localeCompare(b.menuOptionGroupId))
+      .map((orderOptionGroup) => {
+        orderOptionGroup.orderOptions = [...orderOptionGroup.orderOptions].toSorted((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        return orderOptionGroup;
+      });
 
-    setSelectedMenuOptionGroups(copy);
+    setSelectedMenuOptionGroups(sorted);
   };
 
   return (

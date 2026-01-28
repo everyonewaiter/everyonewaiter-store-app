@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
 
 import { storageKeys } from "@/constants/keys";
 import { useGetDevice } from "@/hooks/useDeviceApi";
@@ -43,18 +43,17 @@ const AuthenticationProvider = ({ children }: PropsWithChildren) => {
     }
   }, [isSuccess]);
 
-  return (
-    <AuthenticationContext.Provider
-      value={{
-        device: device ?? null,
-        isAuthenticated: isSuccess,
-        isLoading: isPending,
-        secretKey,
-      }}
-    >
-      {children}
-    </AuthenticationContext.Provider>
+  const memo = useMemo(
+    () => ({
+      device: device ?? null,
+      isAuthenticated: isSuccess,
+      isLoading: isPending,
+      secretKey,
+    }),
+    [device, isPending, isSuccess, secretKey]
   );
+
+  return <AuthenticationContext.Provider value={memo}>{children}</AuthenticationContext.Provider>;
 };
 
 export default AuthenticationProvider;
