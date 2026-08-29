@@ -114,7 +114,7 @@ const OrderConfirmModal = ({ device, store, orderSuccessCallback }: OrderConfirm
         issuerName: res.message1,
         purchaseName: res.purchaseCompanyName,
         merchantNo: res.merchantNo,
-        tradeTime: res.transferDate,
+        tradeTime: res.transferDate.substring(0, 6),
         tradeUniqueNo: res.transactionUniqueNo,
         vat: vat,
         supplyAmount: amount - service - vat,
