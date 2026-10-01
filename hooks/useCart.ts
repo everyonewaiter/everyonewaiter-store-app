@@ -46,11 +46,11 @@ const useCart = () => {
     selectedMenuOptionGroups: OrderCreateOptionGroup[]
   ) => {
     const copy = [...cart];
-    const cartItemIndex = copy
-      .filter((cartItem) => cartItem.menuId === menu.menuId)
-      .findIndex((cartItem) =>
+    const cartItemIndex = copy.findIndex(
+      (cartItem) =>
+        cartItem.menuId === menu.menuId &&
         compareOrderOptionGroups(cartItem.menuOptionGroups, selectedMenuOptionGroups)
-      );
+    );
 
     if (cartItemIndex === -1) {
       copy.push({
@@ -140,7 +140,9 @@ const useCart = () => {
 
   const calculateCartTotalPrice = () => {
     return cart.reduce((acc, cartItem) => {
-      const menu = menus.find((menu) => menu.menuId === cartItem.menuId) as Menu;
+      const menu = menus.find((menu) => menu.menuId === cartItem.menuId);
+      if (!menu) return acc;
+
       const selectedMenuOptionPrice = cartItem.menuOptionGroups
         .flatMap((selectedMenuOptionGroup) => selectedMenuOptionGroup.orderOptions)
         .reduce((acc, selectedMenuOption) => acc + selectedMenuOption.price, 0);

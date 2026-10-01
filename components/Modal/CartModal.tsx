@@ -27,7 +27,7 @@ const CartModal = ({ orderSuccessCallback }: CartModalProps) => {
   const { device } = useAuthentication();
   const { data: store } = useGetStore(device?.storeId);
   const { menus } = useGetMenus(device?.storeId);
-  const { cart, clearCart, validateCartItems } = useCart();
+  const { cart, clearCart, validateCartItems, calculateCartTotalPrice } = useCart();
 
   const { openModal, closeAllModals } = useModal();
 
@@ -83,6 +83,12 @@ const CartModal = ({ orderSuccessCallback }: CartModalProps) => {
           )}
         />
       </View>
+      {store.setting.showCartTotalPrice && (
+        <View style={styles.totalPriceContainer}>
+          <Text style={styles.totalPriceText}>총 주문 금액</Text>
+          <Text style={styles.totalPrice}>{calculateCartTotalPrice().toPrice()}원</Text>
+        </View>
+      )}
       <View style={{ flexDirection: "row", gap: 8 }}>
         <View style={{ flex: 1 }}>
           <Button label="전체 삭제" variant="outline" onPress={() => clearCart()} />
@@ -115,6 +121,21 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "flex-end",
     justifyContent: "center",
+  },
+  totalPriceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  totalPriceText: {
+    fontFamily: fonts.PRETENDARD_MEDIUM,
+    fontSize: 16,
+    color: colors.PRIMARY_RED,
+  },
+  totalPrice: {
+    fontFamily: fonts.PRETENDARD_MEDIUM,
+    fontSize: 28,
+    color: colors.PRIMARY_RED,
   },
 });
 
