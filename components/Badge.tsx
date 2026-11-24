@@ -9,7 +9,7 @@ interface BadgeProps {
 }
 
 const Badge = ({ label }: BadgeProps) => {
-  const color = label === "BEST" ? colors.ORANGE : colors.PRIMARY_RED;
+  const color = colors.PRIMARY_RED;
 
   return (
     <View style={styles.container}>
