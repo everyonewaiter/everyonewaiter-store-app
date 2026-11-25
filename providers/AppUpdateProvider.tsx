@@ -36,8 +36,10 @@ const AppUpdateProvider = ({ children }: PropsWithChildren) => {
       if (
         apkVersion &&
         (majorVersion < apkVersion.majorVersion ||
-          minorVersion < apkVersion.minorVersion ||
-          patchVersion < apkVersion.patchVersion)
+          (majorVersion === apkVersion.majorVersion &&
+            (minorVersion < apkVersion.minorVersion ||
+              (minorVersion === apkVersion.minorVersion &&
+                patchVersion < apkVersion.patchVersion))))
       ) {
         updateApp(apkVersion.downloadUrl).finally(() => setIsUpdated(true));
       } else {
