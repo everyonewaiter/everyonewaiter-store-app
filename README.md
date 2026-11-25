@@ -70,3 +70,49 @@ npx expo prebuild --clean
 ```bash
 npm run android
 ```
+
+## 배포
+
+매장 기기에 변경을 배포하는 방법은 앱 업데이트와 OTA 업데이트 두 가지다.
+
+| 변경                                                              | 배포 방법                  |
+|-------------------------------------------------------------------|----------------------------|
+| 네이티브 변경 (의존성 업그레이드, 앱 설정 변경, Kscat 모듈 변경) | 앱 버전을 올려 앱 업데이트 |
+| JS 코드만 수정한 변경                                             | OTA 업데이트               |
+
+네이티브 변경이 있으면 반드시 앱 버전을 올려 앱 업데이트로 배포한다.  
+OTA 업데이트는 같은 앱 버전의 매장 기기에 적용되므로 앱 버전을 올리지 않고 네이티브 변경을 OTA 업데이트로 배포하면 매장 기기에서 앱이 크래시 날 수 있다.  
+이 규칙이 필요한 이유는 [ADR 0001](docs/adr/0001-runtime-version-app-version-policy.md)을 참고한다.
+
+### 앱 업데이트
+
+1. `app.json`의 `expo.version`, `package.json`과 `package-lock.json`의 `version`을 새 앱 버전으로 올린다.
+2. production 프로필로 EAS 빌드를 실행한다.
+
+   ```bash
+   npx eas-cli build --platform android --profile production
+   ```
+
+3. 빌드한 APK를 운영 서버의 테스트 매장 기기에 설치해 확인한다.
+4. 확인한 APK를 다시 빌드하지 않고 서버에 등록한다.
+5. 매장 기기는 앱을 시작할 때 서버에 등록된 앱 버전이 기기의 앱 버전보다 높으면 APK를 다운로드해 설치 화면을 연다.
+
+### OTA 업데이트
+
+JS 코드만 수정한 변경은 앱 버전을 올리지 않고 OTA 업데이트로 배포한다.
+
+```bash
+npm run ota:production -- --message "변경 내용"
+```
+
+- `ota:production`은 production channel에 OTA 업데이트를 배포한다.  
+  production 프로필로 빌드한 같은 앱 버전의 매장 기기에 적용된다.
+- OTA 업데이트를 배포하면 매장 기기는 앱을 처음 새로 실행할 때 적용한다 (1.2.0부터).  
+  앱을 시작할 때 새 OTA 업데이트를 최대 10초 기다리고 시간을 넘기면 기존 번들로 시작한 뒤 다음 실행 때 적용한다.  
+  매장 기기는 종일 켜져 있으므로 바로 적용하려면 앱을 종료한 뒤 다시 실행한다.
+
+#### `--environment production`이 필요한 이유
+
+`EXPO_PUBLIC_*` 환경 변수는 번들을 만들 때 JS 코드에 값이 들어간다.  
+`--environment production` 없이 `eas update`를 실행하면 로컬 `.env`(개발 서버)의 값으로 운영 번들을 만들어 매장 기기가 개발 서버로 요청한다.  
+`ota:production`은 이 옵션으로 EAS 서버에 등록된 production 환경 변수를 사용한다.
