@@ -61,12 +61,19 @@ const RegistrationStep1Screen = () => {
   const { accountId } = profile || {};
   const { data: stores } = useGetStores(accountId, isVerifyAuthCode);
 
-  const { openModal, closeModal } = useModal();
-
-  useEffect(() => {
+  // 매장 목록을 새로 조회하면 첫 번째 매장을 선택한다.
+  // 캐시에 남은 매장 목록으로 화면이 열려도 첫 렌더에서 선택하도록 초기값을 undefined로 둔다.
+  const [prevStores, setPrevStores] = useState<typeof stores>(undefined);
+  if (prevStores !== stores) {
+    setPrevStores(stores);
     if (stores && stores.length > 0) {
       setSelectedStoreId(stores[0].storeId);
     }
+  }
+
+  const { openModal, closeModal } = useModal();
+
+  useEffect(() => {
     if (stores && stores.length === 0) {
       openModal(ModalName.STORE_IS_EMPTY, ErrorModal, {
         title: "알림",

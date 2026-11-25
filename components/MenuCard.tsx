@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Pressable,
   PressableProps,
@@ -31,15 +31,12 @@ const MenuCard = ({
   ...props
 }: MenuCardProps) => {
   const { width: screenWidth } = useWindowDimensions();
-  const [contentWidth, setContentWidth] = useState(0);
   const image = useImage(process.env.EXPO_PUBLIC_CDN_URL + `/${menu.image}`);
 
-  useEffect(() => {
-    const paddingHorizontalSpace = rootPaddingHorizontal * 2;
-    const columnGapSpace = rootGap * (rootNumColumns - 1);
-    const availableSpace = screenWidth - paddingHorizontalSpace - columnGapSpace;
-    setContentWidth(availableSpace / rootNumColumns);
-  }, [screenWidth, rootGap, rootNumColumns, rootPaddingHorizontal]);
+  const paddingHorizontalSpace = rootPaddingHorizontal * 2;
+  const columnGapSpace = rootGap * (rootNumColumns - 1);
+  const availableSpace = screenWidth - paddingHorizontalSpace - columnGapSpace;
+  const contentWidth = availableSpace / rootNumColumns;
 
   const isSoldOut = menu.state === "SOLD_OUT";
 

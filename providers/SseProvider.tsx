@@ -45,7 +45,7 @@ const SseProvider = ({ children }: PropsWithChildren) => {
   const { device, secretKey } = useAuthentication();
 
   const isConnectedRef = useRef(false);
-  const timestampRef = useRef(Date.now().toString());
+  const timestampRef = useRef("");
 
   useInterval(() => {
     timestampRef.current = Date.now().toString();
@@ -55,6 +55,9 @@ const SseProvider = ({ children }: PropsWithChildren) => {
     if (!device || isConnectedRef.current || !secretKey) {
       return;
     }
+
+    // 렌더 중 Date.now()를 호출하면 React Compiler의 purity 규칙을 위반하므로 useRef 초기값 대신 연결 직전에 설정한다.
+    timestampRef.current = Date.now().toString();
 
     const requestMethod = "GET";
     const requestURI = "/v1/stores/subscribe";

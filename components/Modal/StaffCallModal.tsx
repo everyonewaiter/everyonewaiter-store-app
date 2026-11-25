@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import ErrorModal from "@/components/Modal/ErrorModal";
@@ -22,21 +22,17 @@ const gap = 12;
 
 const StaffCallModal = ({ storeId }: StaffCallModalProps) => {
   const { width: screenWidth } = useWindowDimensions();
-  const [contentWidth, setContentWidth] = useState(0);
+  const modalWidth = screenWidth * 0.5;
+  const paddingHorizontalSpace = 32 * 2;
+  const columnGapSpace = gap * (numColumns - 1);
+  const availableSpace = modalWidth - paddingHorizontalSpace - columnGapSpace;
+  const contentWidth = availableSpace / numColumns;
 
   const { data: store } = useGetStore(storeId);
   const [selectedStaffCallOption, setSelectedStaffCallOption] = useState("");
 
   const { openModal, closeAllModals } = useModal();
   const { mutate, isPending } = useStaffCall();
-
-  useEffect(() => {
-    const modalWidth = screenWidth * 0.5;
-    const paddingHorizontalSpace = 32 * 2;
-    const columnGapSpace = gap * (numColumns - 1);
-    const availableSpace = modalWidth - paddingHorizontalSpace - columnGapSpace;
-    setContentWidth(availableSpace / numColumns);
-  }, [screenWidth]);
 
   if (!store) return null;
 

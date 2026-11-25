@@ -24,29 +24,31 @@ export const useAppUpdate = () => {
 };
 
 const AppUpdateProvider = ({ children }: PropsWithChildren) => {
-  const [isUpdated, setIsUpdated] = useState(false);
+  const [isUpdateFinished, setIsUpdateFinished] = useState(false);
   const { apkVersion, isSuccess, isPending } = useGetApkVersion();
 
-  useEffect(() => {
-    if (!isPending && isSuccess) {
-      const appVersion = Application.nativeApplicationVersion ?? "1.0.0";
-      const appVersionParts = appVersion.split(".").map(Number);
-      const [majorVersion, minorVersion, patchVersion] = appVersionParts;
+  const isLoaded = !isPending && isSuccess;
+  const appVersion = Application.nativeApplicationVersion ?? "1.0.0";
+  const appVersionParts = appVersion.split(".").map(Number);
+  const [majorVersion, minorVersion, patchVersion] = appVersionParts;
 
-      if (
-        apkVersion &&
-        (majorVersion < apkVersion.majorVersion ||
-          (majorVersion === apkVersion.majorVersion &&
-            (minorVersion < apkVersion.minorVersion ||
-              (minorVersion === apkVersion.minorVersion &&
-                patchVersion < apkVersion.patchVersion))))
-      ) {
-        updateApp(apkVersion.downloadUrl).finally(() => setIsUpdated(true));
-      } else {
-        setIsUpdated(true);
-      }
+  const newerApkVersion =
+    isLoaded &&
+    apkVersion &&
+    (majorVersion < apkVersion.majorVersion ||
+      (majorVersion === apkVersion.majorVersion &&
+        (minorVersion < apkVersion.minorVersion ||
+          (minorVersion === apkVersion.minorVersion && patchVersion < apkVersion.patchVersion))))
+      ? apkVersion
+      : undefined;
+
+  useEffect(() => {
+    if (newerApkVersion) {
+      updateApp(newerApkVersion.downloadUrl).finally(() => setIsUpdateFinished(true));
     }
-  }, [apkVersion, isPending, isSuccess]);
+  }, [newerApkVersion]);
+
+  const isUpdated = (isLoaded && !newerApkVersion) || isUpdateFinished;
 
   return <AppUpdateContext.Provider value={{ isUpdated }}>{children}</AppUpdateContext.Provider>;
 };

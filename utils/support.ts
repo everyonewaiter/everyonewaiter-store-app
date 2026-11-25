@@ -1,5 +1,3 @@
-import { ForwardedRef } from "react";
-
 import { isAxiosError } from "axios";
 import CryptoJS from "crypto-js";
 
@@ -11,18 +9,6 @@ export const parseErrorMessage = (error: Error) => {
     return error.response?.data.message ?? error.message;
   }
   return error.message;
-};
-
-export const mergeRefs = <T>(...refs: ForwardedRef<T>[]) => {
-  return (node: T) => {
-    refs.forEach((ref) => {
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref) {
-        ref.current = node;
-      }
-    });
-  };
 };
 
 export const makeSignatureHeader = async (requestMethod: string, requestURI: string) => {

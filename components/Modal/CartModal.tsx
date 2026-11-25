@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { AntDesign } from "@expo/vector-icons";
@@ -22,7 +22,7 @@ export interface CartModalProps {
 
 const CartModal = ({ orderSuccessCallback }: CartModalProps) => {
   const { height: screenHeight } = useWindowDimensions();
-  const [contentHeight, setContentHeight] = useState(0);
+  const contentHeight = screenHeight - 100;
 
   const { device } = useAuthentication();
   const { data: store } = useGetStore(device?.storeId);
@@ -30,10 +30,6 @@ const CartModal = ({ orderSuccessCallback }: CartModalProps) => {
   const { cart, clearCart, validateCartItems, calculateCartTotalPrice } = useCart();
 
   const { openModal, closeAllModals } = useModal();
-
-  useEffect(() => {
-    setContentHeight(screenHeight - 100);
-  }, [screenHeight]);
 
   if (!device || !store) return null;
 

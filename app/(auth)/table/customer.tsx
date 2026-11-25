@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -41,6 +41,15 @@ const CustomerTableScreen = () => {
 
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
 
+  // 메뉴 데이터가 바뀌면 카테고리 구성이 달라질 수 있어 선택한 카테고리를 전체로 되돌린다.
+  // allCategories는 React Compiler가 memoize한 useGetMenus 결과라서 메뉴 데이터가 바뀔 때만 새 배열이 된다.
+  // useGetMenus가 렌더마다 새 배열을 반환하면 이 비교가 매번 setState를 호출해 무한 렌더가 발생한다.
+  const [prevAllCategories, setPrevAllCategories] = useState(allCategories);
+  if (prevAllCategories !== allCategories) {
+    setPrevAllCategories(allCategories);
+    setSelectedCategoryIndex(0);
+  }
+
   const { isOpenedModal, openModal, closeAllModals } = useModal();
 
   const resetAll = useCallback(() => {
@@ -63,10 +72,6 @@ const CustomerTableScreen = () => {
       resetAll();
     }
   }, milliTimes.ONE_SECOND);
-
-  useEffect(() => {
-    setSelectedCategoryIndex(0);
-  }, [allCategories]);
 
   if (!device || !store) {
     return null;

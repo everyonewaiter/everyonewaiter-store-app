@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef, useRef } from "react";
+import { ForwardedRef, forwardRef, useImperativeHandle, useRef } from "react";
 import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -6,7 +6,6 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import InputLabel from "@/components/InputLabel";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
-import { mergeRefs } from "@/utils/support";
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -20,6 +19,7 @@ const Input = (
   ref?: ForwardedRef<TextInput>
 ) => {
   const innerRef = useRef<TextInput | null>(null);
+  useImperativeHandle(ref, () => innerRef.current as TextInput, []);
   const hasError = Boolean(error);
 
   return (
@@ -34,7 +34,7 @@ const Input = (
           ]}
         >
           <TextInput
-            ref={ref ? mergeRefs(innerRef, ref) : innerRef}
+            ref={innerRef}
             style={[styles.input, hasError && styles.inputError, disabled && styles.inputDisabled]}
             placeholderTextColor={colors.GRAY3_99}
             editable={!disabled}

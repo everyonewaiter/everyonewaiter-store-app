@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Pressable, SectionList, StyleSheet, Text, View } from "react-native";
 
 import { ImageBackground, useImage } from "expo-image";
@@ -25,13 +25,6 @@ const MenuModal = ({ menu }: MenuModalProps) => {
 
   const { addCart } = useCart();
 
-  const [quantity, setQuantity] = useState(1);
-  const [selectedMenuOptionGroups, setSelectedMenuOptionGroups] = useState<
-    OrderCreateOptionGroup[]
-  >([]);
-
-  const { closeAllModals } = useModal();
-
   const menuOptionGroups = useMemo(
     () => [
       {
@@ -50,8 +43,11 @@ const MenuModal = ({ menu }: MenuModalProps) => {
     [menu]
   );
 
-  useEffect(() => {
-    const initMandatoryMenuOptionGroups = menuOptionGroups[0].data.map((menuOptionGroup) => ({
+  const [quantity, setQuantity] = useState(1);
+  const [selectedMenuOptionGroups, setSelectedMenuOptionGroups] = useState<
+    OrderCreateOptionGroup[]
+  >(() =>
+    menuOptionGroups[0].data.map((menuOptionGroup) => ({
       menuOptionGroupId: menuOptionGroup.menuOptionGroupId,
       orderOptions: [
         {
@@ -59,10 +55,10 @@ const MenuModal = ({ menu }: MenuModalProps) => {
           price: menuOptionGroup.menuOptions[0].price,
         },
       ],
-    }));
+    }))
+  );
 
-    setSelectedMenuOptionGroups(initMandatoryMenuOptionGroups);
-  }, [menu, menuOptionGroups]);
+  const { closeAllModals } = useModal();
 
   const addQuantity = () => {
     setQuantity((prev) => prev + 1);
