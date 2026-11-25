@@ -10,7 +10,6 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 
-import * as Sentry from "@sentry/react-native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import "react-native-url-polyfill/auto";
 
@@ -22,7 +21,6 @@ import AppUpdateProvider, { useAppUpdate } from "@/providers/AppUpdateProvider";
 import AuthenticationProvider, { useAuthentication } from "@/providers/AuthenticationProvider";
 import ModalProvider from "@/providers/ModalProvider";
 import SseProvider from "@/providers/SseProvider";
-import "@/sentry.config";
 
 SplashScreen.setOptions({ duration: 1000, fade: true });
 SplashScreen.preventAutoHideAsync();
@@ -85,4 +83,4 @@ const EveryoneWaiterApplication = () => {
   );
 };
 
-export default Sentry.wrap(RootLayout);
+export default RootLayout;

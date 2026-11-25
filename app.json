@@ -49,14 +49,6 @@
         }
       ],
       "expo-secure-store",
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "store-app",
-          "organization": "everyonewaiter"
-        }
-      ],
       "expo-font",
       "expo-web-browser"
     ],

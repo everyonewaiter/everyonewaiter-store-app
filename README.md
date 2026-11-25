@@ -51,11 +51,6 @@ npm install
 EXPO_PUBLIC_API_SERVER_URL=https://devapi.everyonewaiter.com
 EXPO_PUBLIC_SSE_SERVER_URL=https://devapi.everyonewaiter.com/v1/stores/subscribe
 EXPO_PUBLIC_CDN_URL=https://cdn.everyonewaiter.com/d
-
-# SENTRY
-EXPO_PUBLIC_SENTRY_DSN=
-SENTRY_AUTH_TOKEN=
-SENTRY_ENVIRONMENT=development
 ```
 
 ### 3. 안드로이드 스튜디오 에뮬레이터 설치 및 설정
